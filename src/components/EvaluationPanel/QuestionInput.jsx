@@ -14,7 +14,7 @@ function QuestionInput({ question, value, onChange }) {
     };
   
     return (
-      <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg shadow-sm">
+      <div className="flex items-center justify-between  bg-gray-50 p-3 rounded-lg shadow-sm">
         <span className="text-sm font-medium text-gray-700">{question.id}</span>
         <div className="flex items-center space-x-2">
           <input
@@ -23,7 +23,7 @@ function QuestionInput({ question, value, onChange }) {
             max={question.maxMarks}
             value={value}
             onChange={handleChange}
-            className="w-16 p-2 text-sm text-center border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-16 p-2 text-xs text-center border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="0"
           />
           <span className="text-sm text-gray-500">/ {question.maxMarks}</span>

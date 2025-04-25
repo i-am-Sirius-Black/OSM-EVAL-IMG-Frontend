@@ -187,12 +187,12 @@
 // export default ImageViewer;
 
 
-//?v2 comment position fix
+//?v2 comment position fix (current working)
 
 // import { memo, useState, useRef, useEffect, useCallback, useMemo } from 'react';
 // import SinglePage from './SinglePage';
 // import LoadingSpinner from '../Common/LoadingSpinner';
-
+// import axios from '../../axiosConfig.js';
 
 // // ImageViewer component to display 36 pages as images
 // const ImageViewer = memo(
@@ -201,7 +201,11 @@
 //     const [containerWidth, setContainerWidth] = useState(0);
 //     const [commentPosition, setCommentPosition] = useState(null);
 //     const [commentText, setCommentText] = useState('');
+
 //     const containerRef = useRef(null);
+
+    
+    
 
 //     // Generate pages 1 to 36
 //     const pages = useMemo(() => 
@@ -244,10 +248,11 @@
       
 //           const pageAnnotations = annotationsByPage[pageNumber] || [];
 //           const hasAnnotation = pageAnnotations.some(
-//             (a) => Math.abs(a.position.x - x) < 5 && Math.abs(a.position.y - y) < 5
-//           );
+//             (a) => Math.abs(a.position.x - x) < 5 && Math.abs(a.position.y - y) < 5  
+//           );    //preventing annotating near an existing annotation (within ~5px) 5×5 pixel square
       
 //           if (hasAnnotation) return;
+
       
 //           if (selectedTool === 'comment') {
 //             setCommentPosition({
@@ -281,6 +286,8 @@
 //   setCommentText('');
 // }, [commentText, commentPosition, handleAnnotate]);
 
+
+
 //     // Render pages with lazy loading
 //     const renderedPages = useMemo(
 //       () =>
@@ -290,11 +297,13 @@
 //             pageNumber={page_number}
 //             imageUrl={`http://localhost:3000/api/copies/image?copyId=${copyId}&page=${page_number}`}
 //             width={containerWidth * zoom}
+//             height={containerWidth * zoom * 1.414} // A4 aspect ratio
 //             onPageClick={(e) => handlePageClick(e, page_number)}
 //             annotations={annotationsByPage[page_number] || []}
 //             selectedTool={selectedTool}
 //             handleRemoveAnnotation={handleRemoveAnnotation}
 //             handleUpdateAnnotation={handleUpdateAnnotation}
+//             handleAnnotate={handleAnnotate} // test Pass handleAnnot
 //           />
 //         )),
 //       [
@@ -329,6 +338,8 @@
 //           window.removeEventListener("wheel", handleWheel);
 //         };
 //       }, []);
+
+
 
 //     return (
 //       <div ref={containerRef} className="w-full h-full bg-white rounded-lg shadow-sm overflow-y-auto">
@@ -375,8 +386,10 @@
 //             >
 //               Cancel
 //             </button>
+            
 //           </div>
 //         )}
+    
 //       </div>
 //     );
 //   }
@@ -384,23 +397,20 @@
 
 // export default ImageViewer;
 
-//?v3 with draw
-// Now, let's update the ImageViewer component to pass the handleAnnotate function correctly:
-
+//?v2.2 separating out the logic of the drawing annotations
 import { memo, useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import SinglePage from './SinglePage';
 import LoadingSpinner from '../Common/LoadingSpinner';
 
 // ImageViewer component to display 36 pages as images
 const ImageViewer = memo(
-  ({ copyId, annotations, selectedTool, handleAnnotate, handleRemoveAnnotation, handleUpdateAnnotation }) => {
+  ({ copyId, annotations, selectedTool, handleAnnotate, handleRemoveAnnotation, handleUpdateAnnotation, handleDrawAnnotation }) => {
     const [zoom, setZoom] = useState(1);
     const [containerWidth, setContainerWidth] = useState(0);
     const [commentPosition, setCommentPosition] = useState(null);
     const [commentText, setCommentText] = useState('');
+
     const containerRef = useRef(null);
-    const isDrawing = useRef(false);
-    const currentDrawingId = useRef(null);
 
     // Generate pages 1 to 36
     const pages = useMemo(() => 
@@ -435,35 +445,30 @@ const ImageViewer = memo(
     const handlePageClick = useCallback(
       (e, pageNumber) => {
         e.preventDefault();
-        
-        // Skip if we're in drawing mode - handled by the SinglePage component
-        if (selectedTool === 'draw') {
-          return;
-        }
-        
         const rect = e.currentTarget.getBoundingClientRect();
         const x = Math.round(((e.clientX - rect.left) / rect.width) * 100 * 10) / 10;
         const y = Math.round(((e.clientY - rect.top) / rect.height) * 100 * 10) / 10;
     
         const pageAnnotations = annotationsByPage[pageNumber] || [];
         const hasAnnotation = pageAnnotations.some(
-          (a) => Math.abs(a.position.x - x) < 5 && Math.abs(a.position.y - y) < 5
-        );
+          (a) => Math.abs(a.position.x - x) < 5 && Math.abs(a.position.y - y) < 5  
+        );    //preventing annotating near an existing annotation (within ~5px) 5×5 pixel square
     
         if (hasAnnotation) return;
-    
+
         if (selectedTool === 'comment') {
           setCommentPosition({
             x: e.clientX,
             y: e.clientY,
             pageNumber,
-            pageRect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height }, // Store page rect
+            pageRect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
           });
         } else if (selectedTool === 'check' || selectedTool === 'cancel') {
           handleAnnotate(selectedTool, pageNumber, { x, y });
         } else if (selectedTool === 'mouse') {
           handleAnnotate(e.type === 'contextmenu' ? 'cancel' : 'check', pageNumber, { x, y });
         }
+        // Note: draw handling is now done in SinglePage component
       },
       [selectedTool, annotationsByPage, handleAnnotate]
     );
@@ -488,12 +493,13 @@ const ImageViewer = memo(
             pageNumber={page_number}
             imageUrl={`http://localhost:3000/api/copies/image?copyId=${copyId}&page=${page_number}`}
             width={containerWidth * zoom}
+            height={containerWidth * zoom * 1.414} // A4 aspect ratio
             onPageClick={(e) => handlePageClick(e, page_number)}
             annotations={annotationsByPage[page_number] || []}
             selectedTool={selectedTool}
-            handleAnnotate={handleAnnotate}
             handleRemoveAnnotation={handleRemoveAnnotation}
             handleUpdateAnnotation={handleUpdateAnnotation}
+            handleDrawAnnotation={handleDrawAnnotation} // Pass the new draw handler
           />
         )),
       [
@@ -504,9 +510,9 @@ const ImageViewer = memo(
         handlePageClick,
         annotationsByPage,
         selectedTool,
-        handleAnnotate,
         handleRemoveAnnotation,
         handleUpdateAnnotation,
+        handleDrawAnnotation,
       ]
     );
 
@@ -532,7 +538,7 @@ const ImageViewer = memo(
     return (
       <div ref={containerRef} className="w-full h-full bg-white rounded-lg shadow-sm overflow-y-auto">
         {/* Zoom Controls */}
-        <div className="sticky top-0 z-20 bg-white p-2 border-b border-gray-200 flex justify-end gap-2">
+        <div className="sticky top-0 z-10 bg-white p-2 border-b border-gray-200 flex justify-end gap-2">
           <button
             onClick={() => setZoom((prev) => Math.max(0.5, prev - 0.1))}
             className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
@@ -582,8 +588,3 @@ const ImageViewer = memo(
 );
 
 export default ImageViewer;
-
-
-
-
-

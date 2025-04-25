@@ -22,8 +22,10 @@ const Toolbar = memo(({ selectedTool, setSelectedTool, handleRemoveLastAnnotatio
     { tool: 'undo', Icon: UndoIcon, color: 'yellow', description: 'Undo Last' },
   ];
   
+  
 
   return (
+    <>
     <div className="flex flex-col items-center gap-3 z-11 mt-10">
       {tools.map(({ tool, Icon, color, description }) => (
         <ToolButton
@@ -43,7 +45,9 @@ const Toolbar = memo(({ selectedTool, setSelectedTool, handleRemoveLastAnnotatio
         />
       ))}
     </div>
+    </>
   );
+
 });
 
 export default Toolbar;
