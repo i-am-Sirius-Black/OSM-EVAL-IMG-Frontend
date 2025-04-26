@@ -3,9 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import { Person, Logout, Dashboard, Assignment } from '@mui/icons-material';
 import { useUserIP } from '../../hooks/ShowUserIP';
 import api from '../../api/axios.js';
+import ProfileModal from './ProfileModal'; // ✅ Import
 
 export default function Navbar({ activeTab, setActiveTab , userData}) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showProfile, setShowProfile] = useState(false); // Add state
+
   const dropdownRef = useRef(null); //ref for closing when clicked outside
 
     const ipAddress =useUserIP();
@@ -50,10 +53,10 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Dashboard className="h-8 w-8 text-blue-600" />
+              <Dashboard className="icon h-8 w-8 text-blue-600" />
               <span className="ml-2 text-xl font-bold text-gray-900">OSM-Portal</span>
             </div>
-            <nav className="ml-6 flex space-x-8">
+            <nav className="ml-16 flex space-x-8">
               <button
                 onClick={() => setActiveTab('dashboard')}
                 className={`${
@@ -108,7 +111,11 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
               {dropdownOpen && (
                 <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                   <div className="py-1">
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <a
+                      href="#"
+                      onClick={() => setShowProfile(true)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
                       Your Profile
                     </a>
                     <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -138,6 +145,12 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
           </div>
         </div>
       </div>
+       {/* Profile Modal */}
+       <ProfileModal
+        isOpen={showProfile}
+        onClose={() => setShowProfile(false)} // Close modal
+        userData={userData}
+      />
     </header>
   );
 }

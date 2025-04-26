@@ -187,7 +187,7 @@
 // export default ImageViewer;
 
 
-//?v2 comment position fix (current working)
+//?v2 comment position fix (last working code)
 
 // import { memo, useState, useRef, useEffect, useCallback, useMemo } from 'react';
 // import SinglePage from './SinglePage';
@@ -397,7 +397,7 @@
 
 // export default ImageViewer;
 
-//?v2.2 separating out the logic of the drawing annotations
+//?v2.2 separating out the logic of the drawing annotations (currently working)
 import { memo, useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import SinglePage from './SinglePage';
 import LoadingSpinner from '../Common/LoadingSpinner';
@@ -405,8 +405,8 @@ import LoadingSpinner from '../Common/LoadingSpinner';
 // ImageViewer component to display 36 pages as images
 const ImageViewer = memo(
   ({ copyId, annotations, selectedTool, handleAnnotate, handleRemoveAnnotation, handleUpdateAnnotation, handleDrawAnnotation }) => {
-    const [zoom, setZoom] = useState(1);
-    const [containerWidth, setContainerWidth] = useState(0);
+    const [zoom, setZoom] = useState(1); //made default zoom 100%
+    const [containerWidth, setContainerWidth] = useState(1);
     const [commentPosition, setCommentPosition] = useState(null);
     const [commentText, setCommentText] = useState('');
 
@@ -541,18 +541,19 @@ const ImageViewer = memo(
         <div className="sticky top-0 z-10 bg-white p-2 border-b border-gray-200 flex justify-end gap-2">
           <button
             onClick={() => setZoom((prev) => Math.max(0.5, prev - 0.1))}
-            className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
+            className="px-3 py-0.5 bg-gray-200 rounded hover:bg-gray-300 text-sm"
           >
             -
           </button>
-          <span className="px-3 py-1 bg-gray-100 rounded text-sm">{Math.round(zoom * 100)}%</span>
+          <span className="px-3 py-0.5 bg-gray-100 rounded text-sm">{Math.round(zoom * 100)}%</span>
           <button
             onClick={() => setZoom((prev) => Math.min(2, prev + 0.1))}
-            className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
+            className="px-3 py-0.5 bg-gray-200 rounded hover:bg-gray-300 text-sm"
           >
             +
           </button>
         </div>
+
         {pages.length === 0 ? <LoadingSpinner /> : renderedPages}
         {commentPosition && (
           <div
@@ -584,7 +585,12 @@ const ImageViewer = memo(
         )}
       </div>
     );
+  
+  
   }
 );
 
 export default ImageViewer;
+
+
+//?v2.3 ui update (currently testing)

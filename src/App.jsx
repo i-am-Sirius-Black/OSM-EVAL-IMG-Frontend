@@ -5,6 +5,7 @@ import SubjectSelectionPage from './components/SubjectSelection/SubjectSelection
 import Dashboard from './components/Home/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useEffect, useState } from 'react';
+import Register from './Pages/Register';
 
 function App() {
   const [userData, setUserData] = useState(null);
@@ -17,6 +18,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
+        <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/dashboard"

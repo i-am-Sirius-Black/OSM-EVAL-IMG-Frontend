@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Import Link for navigation
 import api from '../api/axios.js';
-
 
 function Login() {
   const [uid, setUid] = useState('');
@@ -12,21 +11,19 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+
     setIsLoading(true);
     setError('');
-  
+
     try {
       const res = await api.post("/login", { uid, pass });
-  
+
       if (res.status === 200) {
-        // User data is returned, no need to handle token manually
         const userData = res.data.userData;
         localStorage.setItem("evalUserData", JSON.stringify(userData));
 
         console.log("Login successful:", userData);
-  
-        // Redirect to the home page
+
         navigate('/');
       } else {
         setError(res.data.error || "Login failed. Please try again.");
@@ -62,7 +59,7 @@ function Login() {
                   onChange={(e) => setUid(e.target.value)}
                   className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Enter your user ID"
-                  autoComplete='off'
+                  autoComplete="off"
                   required
                 />
               </div>
@@ -72,9 +69,6 @@ function Login() {
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                     Password
                   </label>
-                  {/* <a href="#" className="text-xs text-blue-600 hover:text-blue-800 transition-colors">
-                    Forgot password?
-                  </a> */}
                 </div>
                 <input
                   id="password"
@@ -83,7 +77,7 @@ function Login() {
                   onChange={(e) => setPass(e.target.value)}
                   className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Enter your password"
-                  autoComplete='off'
+                  autoComplete="off"
                   required
                 />
               </div>
@@ -105,6 +99,19 @@ function Login() {
           </div>
         </div>
         
+        {/* Create Account Section */}
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-500">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+            >
+              Create one
+            </Link>
+          </p>
+        </div>
+
         <div className="mt-4 text-center">
           <p className="text-xs text-gray-500">
             © 2025 TTSPL. All rights reserved.

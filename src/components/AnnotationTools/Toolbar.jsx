@@ -17,7 +17,7 @@ const Toolbar = memo(({ selectedTool, setSelectedTool, handleRemoveLastAnnotatio
     { tool: 'check', Icon: DoneIcon, color: 'green', description: 'Check' },
     { tool: 'cancel', Icon: ClearIcon, color: 'red', description: 'Cross' },
     { tool: 'comment', Icon: EditNoteIcon, color: 'gray', description: 'Comment' },
-    { tool: 'draw', Icon: DrawIcon, color: 'purple', description: 'Draw' },
+    { tool: 'draw', Icon: DrawIcon, color: 'purple', description: 'Pen' },
     { tool: 'erase', Icon: DeleteIcon, color: 'red', description: 'Erase' },
     { tool: 'undo', Icon: UndoIcon, color: 'yellow', description: 'Undo Last' },
   ];
@@ -44,6 +44,10 @@ const Toolbar = memo(({ selectedTool, setSelectedTool, handleRemoveLastAnnotatio
           }}
         />
       ))}
+             {/* Shortcut Info */}
+        <div className="absolute bottom-0 text-center text-xs text-gray-500 mt-2">
+          Zoom: <span className="font-medium">Ctrl+Scroll</span>
+        </div>
     </div>
     </>
   );

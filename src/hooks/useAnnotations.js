@@ -48,7 +48,7 @@
 
 // export default useAnnotations;
 
-//?v1.1 seprating out the logic of the drawing annotations
+//?v1.1 seprating out the logic of the drawing annotations(currently working)
 
 import { useState, useCallback } from 'react';
 

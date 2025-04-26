@@ -1,5 +1,4 @@
 import api from '../api/axios.js';
-import axios from '../api/axios.js';
 
 // Utility to separate annotations by type for database storage
 const prepareAnnotationsForSave = (annotations) => {
