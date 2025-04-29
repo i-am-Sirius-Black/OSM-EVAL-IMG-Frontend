@@ -84,15 +84,19 @@
 import Toolbar from '../AnnotationTools/Toolbar';
 import EvaluationPanel from '../EvaluationPanel/EvaluationPanel';
 import useAnnotations from '../../hooks/useAnnotations';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ImageViewer from '../PdfViewer/ImageViewer';
-import { useUserIP } from '../../hooks/ShowUserIP';
 import { saveAnnotations } from '../../services/annotationService';
+import { useParams } from 'react-router-dom';
 
 function EvaluationLayout() {
+
+  const { copyId: urlCopyId } = useParams();
+
   const {
     annotations,
     selectedTool,
+    setAnnotations,
     setSelectedTool,
     handleAnnotate,
     handleDrawAnnotation, // New draw annotation handler
@@ -101,84 +105,157 @@ function EvaluationLayout() {
     handleUpdateAnnotation,
   } = useAnnotations();
 
+  // Timer state
+  const [seconds, setSeconds] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
+  
   // Placeholder marks for evaluation panel
   const [marks, setMarks] = useState({});
-  const [copyId, setCopyId] = useState("123"); // Placeholder for copyId, replace with actual value
-  const ip = useUserIP();
 
-  const handleSaveAnnotation = async () => {
-    try {
-      const response = await saveAnnotations(copyId, annotations);
-      
-      if(response.data.success){
-        if (response.status === 201) {
-          console.log("Annotations saved successfully");
-        }else if (response.status === 200) {
-          console.log("Annotations updated successfully");
-        }
-      }else {
-        console.error("Failed to save annotations");
-      }
+// Use copyId from URL
+const [copyId, setCopyId] = useState(urlCopyId );
 
-      alert(response.data.message || "Annotations saved successfully");
+const [restored, setRestored] = useState(false); // New flag to track restoration
 
-    } catch (error) {
-      console.error("Error saving annotations:", error);
+// Restore state from localStorage when component mounts
+useEffect(() => {
+  if (urlCopyId) {
+    console.log("Copy ID from URL:", urlCopyId);
+    setCopyId(urlCopyId);
+
+    const savedState = localStorage.getItem(`evaluationState-${urlCopyId}`);
+    console.log("Saved state from localStorage:", savedState);
+
+    if (savedState) {
+      const { annotations: savedAnnotations, marks: savedMarks, seconds: savedSeconds, timerActive: savedTimerActive } = JSON.parse(savedState);
+
+      setAnnotations(savedAnnotations || []);
+      setMarks(savedMarks || {});
+      setSeconds(savedSeconds || 0);
+      setTimerActive(savedTimerActive || false);
+    } else {
+      console.log("No saved state found. Initializing default state.");
+      setAnnotations([]);
+      setMarks({});
+      setSeconds(0);
+      setTimerActive(true);
     }
+
+    setRestored(true); // Mark restoration as complete
+  }
+}, [urlCopyId]);
+
+// Save annotations and marks to localStorage whenever they change
+useEffect(() => {
+  if (restored && copyId) { // Only save after restoration is complete
+    const saveState = () => {
+      const state = {
+        annotations,
+        marks,
+        timerActive,
+        seconds,
+      };
+      console.log("Saving state:", state);
+      localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify(state));
+    };
+
+    saveState();
+  }
+}, [annotations, marks, copyId, restored]);
+
+
+// Update copyId if URL parameter changes
+useEffect(() => {
+  if (urlCopyId) {
+    console.log("Copy ID from URL:", urlCopyId);
+    setCopyId(urlCopyId);
+    
+    // Reset timer when new copy is loaded
+    setSeconds(0);
+    setTimerActive(true);
+  }
+}, [urlCopyId]);
+
+
+
+
+  // Reset handler to clear all state
+  const handleReset = () => {
+    setAnnotations([]);
+    setMarks({});
+    setSeconds(0);
+    setTimerActive(false);
+    localStorage.removeItem(`evaluationState-${copyId}`);
   };
 
-  // return (
-  //   <div className="grid grid-rows-[auto_1fr] h-screen">
-  //     {/* Header (minimal for now) */}
-  //     <div className="bg-white border-b border-gray-200 shadow-sm px-6 py-3 flex justify-between items-center">
-  //       <h1 className="text-lg font-semibold text-gray-800">OSM Evaluation</h1>
-  //       {ip && (<h2 className='text-xs'>IP Address: <span className="font-semibold">{ip}</span></h2>)}
-  //     </div>
 
-  //     {/* Main Content */}
-  //     <div className="grid grid-cols-[5%_70%_25%] h-full overflow-hidden">
-  //       {/* Toolbar */}
-  //       <div className="bg-white border-r border-gray-200 flex flex-col items-center py-4">
-  //         <Toolbar
-  //           selectedTool={selectedTool}
-  //           setSelectedTool={setSelectedTool}
-  //           handleRemoveLastAnnotation={handleRemoveLastAnnotation}
-  //         />
-  //       </div>
+    // Format time to HH:MM:SS
+    const formatTime = (totalSeconds) => {
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      
+      return [
+        hours.toString().padStart(2, '0'),
+        minutes.toString().padStart(2, '0'),
+        seconds.toString().padStart(2, '0')
+      ].join(':');
+    };
+    
+    
+    // Timer effect
+    useEffect(() => {
+      let interval = null;
+      
+      if (timerActive) {
+        interval = setInterval(() => {
+          setSeconds(seconds => seconds + 1);
+        }, 1000);
+      }
+      
+      return () => clearInterval(interval);
+    }, [timerActive]);
 
-  //       {/* Image Viewer */}
-  //       <div className="bg-gray-100 overflow-y-auto px-8 py-4">
-  //         <ImageViewer
-  //           copyId={copyId}
-  //           annotations={annotations}
-  //           selectedTool={selectedTool}
-  //           handleAnnotate={handleAnnotate}
-  //           handleDrawAnnotation={handleDrawAnnotation} // Pass the new draw handler
-  //           handleRemoveAnnotation={handleRemoveAnnotation}
-  //           handleUpdateAnnotation={handleUpdateAnnotation}
-  //         />
-  //       </div>
 
-  //       {/* Evaluation Panel */}
-  //       <div className="bg-white border-l border-gray-200 p-4 flex flex-col">
-  //         <EvaluationPanel marks={marks} setMarks={setMarks} annotations={annotations} saveAnnotations={handleSaveAnnotation}/>
-  //       </div>
-        
-  //     </div>
-  //   </div>
-  // );
 
-  //? v2.0 ui update
+
+    const handleSaveAnnotation = async () => {
+      try {
+        const response = await saveAnnotations(copyId, annotations);
+    
+        if (response.data.success) {
+          if (response.status === 201) {
+            console.log("Annotations saved successfully");
+          } else if (response.status === 200) {
+            console.log("Annotations updated successfully");
+          }
+          // Clear saved state after successful submission
+          localStorage.removeItem(`evaluationState-${copyId}`);
+        } else {
+          console.error("Failed to save annotations");
+        }
+    
+        alert(response.data.message || "Annotations saved successfully");
+      } catch (error) {
+        console.error("Error saving annotations:", error);
+      }
+    };
+
+
   return (
     <div className="flex flex-col h-screen overflow-hidden ">
-      {/* Header */}
+        {/* Header */}
       <header className="bg-white border-b border-gray-200 shadow-sm px-4 lg:px-6 py-2 flex justify-between items-center shrink-0">
         <h1 className="text-lg font-semibold text-gray-800">OSM Evaluation</h1>
-        {ip && (
-          <h2 className="text-xs">
-            IP Address: <span className="font-semibold">{ip}</span>
-          </h2>
-        )}
+        <div className="flex items-center gap-4">
+          {/* Timer with Material UI clock icon */}
+          <div title='Pause/Play' onClick={() => setTimerActive(!timerActive)}  className="flex items-center text-xs gap-1 hover:text-gray-600">
+             <svg className={`h-4 w-4 ${timerActive ? 'text-blue-600' : 'text-red-600'}`} viewBox="0 0 24 24">
+              <path fill="currentColor" d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" />
+            </svg>
+            <span className="font-medium">{formatTime(seconds)}</span>
+          </div>
+        </div>
       </header>
   
       {/* Main Content */}
@@ -189,6 +266,7 @@ function EvaluationLayout() {
             selectedTool={selectedTool}
             setSelectedTool={setSelectedTool}
             handleRemoveLastAnnotation={handleRemoveLastAnnotation}
+            handleReset={handleReset}
           />
         </div>
   

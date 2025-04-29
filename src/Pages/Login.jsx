@@ -24,7 +24,7 @@ function Login() {
 
         console.log("Login successful:", userData);
 
-        navigate('/');
+        navigate('/', { replace: true }); // Redirect to the home page after successful login
       } else {
         setError(res.data.error || "Login failed. Please try again.");
       }

@@ -46,7 +46,7 @@ const Register = () => {
 
         // Redirect to '/' after 2 seconds
         setTimeout(() => {
-          navigate('/');
+          navigate('/' , { replace: true }); // Redirect to the home page after successful registration
         }, 2000);
       } else {
         setError('Unexpected response from the server.');

@@ -11,7 +11,7 @@ import {
 
 import DrawIcon from '@mui/icons-material/Draw';
 
-const Toolbar = memo(({ selectedTool, setSelectedTool, handleRemoveLastAnnotation }) => {
+const Toolbar = memo(({ selectedTool, setSelectedTool, handleRemoveLastAnnotation, handleReset }) => {
   const tools = [
     { tool: 'mouse', Icon: MouseIcon, color: 'blue', description: 'Mouse (Left: ✓, Right: ✕)' },
     { tool: 'check', Icon: DoneIcon, color: 'green', description: 'Check' },
@@ -44,7 +44,9 @@ const Toolbar = memo(({ selectedTool, setSelectedTool, handleRemoveLastAnnotatio
           }}
         />
       ))}
-             {/* Shortcut Info */}
+   
+
+
         <div className="absolute bottom-0 text-center text-xs text-gray-500 mt-2">
           Zoom: <span className="font-medium">Ctrl+Scroll</span>
         </div>

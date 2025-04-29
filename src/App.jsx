@@ -6,25 +6,31 @@ import Dashboard from './components/Home/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useEffect, useState } from 'react';
 import Register from './Pages/Register';
+import AdminPanel from './components/AdminPanel/AdminPanel';
+import ProtectedAdminRoute from './components/AdminPanel/Protected/ProtectedAdminRoute';
+import AdminLogin from './components/AdminPanel/Login/AdminLogin';
 
 function App() {
-  const [userData, setUserData] = useState(null);
-  useEffect(() => {
-    const storedUserData = localStorage.getItem('evalUserData');
-    if (storedUserData) {
-      setUserData(JSON.parse(storedUserData));
-    }
-  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedAdminRoute>
+              <AdminPanel />
+            </ProtectedAdminRoute>
+          } 
+        />
         <Route
-          path="/dashboard"
+          path="/"
           element={
             <ProtectedRoute>
-              <Dashboard userData={userData}/>
+              <Dashboard/>
             </ProtectedRoute>
           }
         />
@@ -37,7 +43,16 @@ function App() {
           }
         />
         <Route
-          path="/"
+          path="/evaluate"
+          element={
+            <ProtectedRoute>
+              <EvaluationLayout />
+            </ProtectedRoute>
+          }
+        />
+         {/* Evaluation route with copyId parameter */}
+         <Route
+          path="/evaluate/:copyId"
           element={
             <ProtectedRoute>
               <EvaluationLayout />

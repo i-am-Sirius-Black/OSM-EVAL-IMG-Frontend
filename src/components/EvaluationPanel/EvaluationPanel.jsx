@@ -553,12 +553,11 @@
 import { memo, useState } from "react";
 import QuestionInput from "./QuestionInput";
 import RejectModal from "./RejectModal";
-
 const EvaluationPanel = memo(({ marks, setMarks, annotations, saveAnnotations }) => {
   const copyId = "12345"; // Example copy ID, replace with actual data
   const [activeTab, setActiveTab] = useState("marking");
   const [showRejectModal, setShowRejectModal] = useState(false);
-
+  const pdfUrl = "http://www.pdf995.com/samples/pdf.pdf"; // Example PDF URL, replace with actual data
 
   // Questions structure with sub-parts
   const questions = [
@@ -597,15 +596,15 @@ const EvaluationPanel = memo(({ marks, setMarks, annotations, saveAnnotations })
     // }
 
     // Validate all marks are entered and valid
-    const allMarksValid = questions.every(q => {
-      const mark = Number(marks[q.id]);
-      return !isNaN(mark) && mark >= 0 && mark <= q.maxMarks;
-    });
+    // const allMarksValid = questions.every(q => {
+    //   const mark = Number(marks[q.id]);
+    //   return !isNaN(mark) && mark >= 0 && mark <= q.maxMarks;
+    // });
     
-    if (!allMarksValid) {
-      alert("Please enter valid marks for all questions");
-      return;
-    }
+    // if (!allMarksValid) {
+    //   alert("Please enter valid marks for all questions");
+    //   return;
+    // }
 
     // Prepare data for submission
     const submissionData = {
@@ -620,6 +619,8 @@ const EvaluationPanel = memo(({ marks, setMarks, annotations, saveAnnotations })
         text: a.text
       }))
     };
+
+    saveAnnotations();
 
     console.log('Submission Data:', submissionData);
     // TODO: API call will go here
@@ -636,6 +637,19 @@ const EvaluationPanel = memo(({ marks, setMarks, annotations, saveAnnotations })
     console.log('Rejection Data:', rejectionData);
     // TODO: API call will go here
     setShowRejectModal(false);
+  };
+
+
+  const handleOpenPDFWindow = () => {
+    const width = 800;
+    const height = 600;
+    const left = window.screenX + 100;
+    const top = window.screenY + 100;
+    window.open(
+      pdfUrl,
+      "QuestionPaperWindow", // <-- window name
+      `width=${width},height=${height},left=${left},top=${top},resizable=no,toolbar=no,menubar=no,location=no,status=no,scrollbars=yes`
+    );
   };
 
 
@@ -667,24 +681,25 @@ const EvaluationPanel = memo(({ marks, setMarks, annotations, saveAnnotations })
             </div>
           </div>
         );
-      case "paper":
+        case "paper":
         return (
-          <div className="p-4" >
-            <p className="text-gray-600">This is the question paper content.</p>
+          <div className="p-4">
+            <p className="text-gray-600 mb-2">This is the question paper content.</p>
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-           >
+            onClick={handleOpenPDFWindow}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
             View Question Paper
           </button>
           </div>
         );
-
-        case "answer":
-          return (
-            <div className="p-4">
-              <p className="text-gray-600">This is the answer paper content.</p>
-            </div>
-          );
+      case "answer":
+        return (
+          <div className="p-4">
+            <p className="text-gray-600">This is the answer paper content.</p>
+            {/* You can add a similar drawer for answer key if needed */}
+          </div>
+        );
       default:
         return (
           <div className="px-4 py-2 space-y-4">
@@ -784,6 +799,7 @@ const EvaluationPanel = memo(({ marks, setMarks, annotations, saveAnnotations })
         onClose={() => setShowRejectModal(false)}
         onConfirm={handleReject}
       />
+
 
     </div>
   );

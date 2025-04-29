@@ -1317,6 +1317,8 @@ const SinglePage = memo(
           left: `${position.x}%`,
           top: `${position.y}%`,
           transform: "translate(-50%, -50%)",
+          width: `calc(1.5rem * ${width / 800})`,  // Scale icon size based on zoom
+          height: `calc(1.5rem * ${width / 800})`,
         };
         
         return (
@@ -1335,6 +1337,8 @@ const SinglePage = memo(
           left: `${position.x}%`,
           top: `${position.y}%`,
           transform: "translate(-50%, -50%)",
+          width: `calc(1.5rem * ${width / 800})`,  // Scale icon size based on zoom
+          height: `calc(1.5rem * ${width / 800})`,
         };
         
         return (
@@ -1353,6 +1357,8 @@ const SinglePage = memo(
           left: `${position.x}%`,
           top: `${position.y}%`,
           transform: "translate(-50%, -50%)",
+          // Scale font size based on container width
+          fontSize: `calc(1rem * ${width / 800})`, // Base size adjusted by zoom ratio
         };
         
         return (
