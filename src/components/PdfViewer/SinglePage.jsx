@@ -1329,6 +1329,7 @@ const SinglePage = memo(
             className="w-6 h-6 cursor-pointer"
             style={style}
             onClick={() => handleRemoveAnnotation(id)}
+            draggable="false" // Prevent image dragging
           />
         );
       } else if (type === "cancel") {
@@ -1349,7 +1350,8 @@ const SinglePage = memo(
             className="w-6 h-6 cursor-pointer"
             style={style}
             onClick={() => handleRemoveAnnotation(id)}
-          />
+            draggable="false" // Prevent image dragging
+            />
         );
       } else if (type === "comment") {
         const style = {
@@ -1431,6 +1433,7 @@ const SinglePage = memo(
                   }}
                   loading="lazy"
                   onLoad={() => setIsLoaded(true)}
+                  draggable="false"
                 />
                 {!isLoaded && (
                   <div className="absolute inset-0">

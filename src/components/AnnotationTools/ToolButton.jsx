@@ -85,7 +85,31 @@ function ToolButton({ tool, Icon, color, description, isSelected, onSelect }) {
       hover: 'hover:bg-yellow-600',
       active: 'active:bg-yellow-700',
       ring: 'ring-yellow-400'
-    }
+    },
+    orange: {
+      bg: 'bg-orange-500',
+      hover: 'hover:bg-orange-600',
+      active: 'active:bg-orange-700',
+      ring: 'ring-orange-400'
+    },
+    pink: {
+      bg: 'bg-pink-500',
+      hover: 'hover:bg-pink-600',
+      active: 'active:bg-pink-700',
+      ring: 'ring-pink-400'
+    },
+    teal: {
+      bg: 'bg-teal-500',
+      hover: 'hover:bg-teal-600',
+      active: 'active:bg-teal-700',
+      ring: 'ring-teal-400'
+    },
+    deleteRed: {
+      bg: 'bg-red-700',
+      hover: 'hover:bg-red-800',
+      active: 'active:bg-red-700',
+      ring: 'ring-black'
+    },
   };
 
   // Default to blue if color not found

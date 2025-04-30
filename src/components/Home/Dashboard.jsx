@@ -5,6 +5,7 @@ import DashboardSummary from './DashboardSummary';
 import Evaluation from './Evaluation';
 import Reports from './Reports';
 import { Link } from 'react-router-dom';
+import CheckingStatus from './CheckingStatus';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -24,6 +25,9 @@ export default function Dashboard() {
       {activeTab === 'dashboard' && (
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <DashboardSummary />
+          <div className="mt-6">
+            <CheckingStatus />
+          </div>
         </main>
       )}
       {activeTab === 'evaluation' && <Evaluation />}

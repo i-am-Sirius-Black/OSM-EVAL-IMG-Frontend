@@ -84,10 +84,11 @@
 import Toolbar from '../AnnotationTools/Toolbar';
 import EvaluationPanel from '../EvaluationPanel/EvaluationPanel';
 import useAnnotations from '../../hooks/useAnnotations';
-import { useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import ImageViewer from '../PdfViewer/ImageViewer';
 import { saveAnnotations } from '../../services/annotationService';
 import { useParams } from 'react-router-dom';
+import evaluationService from '../../services/evaluationService';
 
 function EvaluationLayout() {
 
@@ -116,6 +117,7 @@ function EvaluationLayout() {
 const [copyId, setCopyId] = useState(urlCopyId );
 
 const [restored, setRestored] = useState(false); // New flag to track restoration
+
 
 // Restore state from localStorage when component mounts
 useEffect(() => {
@@ -155,7 +157,6 @@ useEffect(() => {
         timerActive,
         seconds,
       };
-      console.log("Saving state:", state);
       localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify(state));
     };
 
@@ -175,8 +176,6 @@ useEffect(() => {
     setTimerActive(true);
   }
 }, [urlCopyId]);
-
-
 
 
   // Reset handler to clear all state
@@ -217,27 +216,83 @@ useEffect(() => {
     }, [timerActive]);
 
 
+    // const handleSaveEvaluation = async () => {
+    //   const evaluationData = {
+    //     copyid: copyId,
+    //     obt_mark: obtMark,
+    //     max_mark: maxMark,
+    //     status: 'Evaluated',
+    //     eval_time: evalTime,
+    //     eval_id: evalId,
+    //     bag_id: bagId,
+    //   };
+  
+    //   try {
+    //     const response = await evaluationService.saveEvaluation(evaluationData);
+    //     console.log('Evaluation saved successfully:', response);
+    //     alert('Evaluation saved successfully!');
+    //   } catch (error) {
+    //     console.error('Error saving evaluation:', error);
+    //     alert('Failed to save evaluation. Please try again.');
+    //   }
+    // };
 
-
-    const handleSaveAnnotation = async () => {
-      try {
-        const response = await saveAnnotations(copyId, annotations);
+    // const handleSaveAnnotation = async () => {
+    //   try {
+    //     const response = await saveAnnotations(copyId, annotations);
+        
+    //     if (response.data.success) {
+    //       if (response.status === 201) {
+    //         console.log("Annotations saved successfully");
+    //       } else if (response.status === 200) {
+    //         console.log("Annotations updated successfully");
+    //       }
+    //       // Clear saved state after successful submission
+    //       localStorage.removeItem(`evaluationState-${copyId}`);
+    //     } else {
+    //       console.error("Failed to save annotations");
+    //     }
     
-        if (response.data.success) {
-          if (response.status === 201) {
-            console.log("Annotations saved successfully");
-          } else if (response.status === 200) {
-            console.log("Annotations updated successfully");
-          }
-          // Clear saved state after successful submission
-          localStorage.removeItem(`evaluationState-${copyId}`);
+    //     alert(response.data.message || "Annotations saved successfully");
+    //   } catch (error) {
+    //     console.error("Error saving annotations:", error);
+    //   }
+    // };
+
+
+    const handleSubmitCopy = async (submissionData) => {
+      try {
+        // Step 1: Save Annotations
+        const annotationResponse = await saveAnnotations(copyId, {
+          annotations: submissionData.annotations,
+          drawAnnotations: submissionData.drawAnnotations,
+        });
+    
+        if (annotationResponse.data.success) {
+          console.log('Annotations saved successfully:', annotationResponse.data);
         } else {
-          console.error("Failed to save annotations");
+          console.error('Failed to save annotations:', annotationResponse.data.message);
+          alert(annotationResponse.data.message || 'Failed to save annotations.');
+          return; // Stop further execution if annotations fail
         }
     
-        alert(response.data.message || "Annotations saved successfully");
+        // Step 2: Save Evaluation
+        const evaluationData = {
+          copyid: copyId,
+          obt_mark: submissionData.totalMarks,
+          max_mark: 100, // Hardcoded max marks for now
+          status: 'Evaluated',
+          eval_time: seconds,
+          eval_id: submissionData.userId, // Replace with actual user ID
+          bag_id: 'BAG001', // Replace with actual bag ID if available
+        };
+    
+        const evaluationResponse = await evaluationService.saveEvaluation(evaluationData);
+        console.log('Evaluation saved successfully:', evaluationResponse);
+        alert('Evaluation submitted successfully!');
       } catch (error) {
-        console.error("Error saving annotations:", error);
+        console.error('Error during submission:', error);
+        alert('Failed to submit evaluation. Please try again.');
       }
     };
 
@@ -292,7 +347,7 @@ useEffect(() => {
               marks={marks} 
               setMarks={setMarks} 
               annotations={annotations} 
-              saveAnnotations={handleSaveAnnotation}
+              submitCopy={handleSubmitCopy}
             />
           </div>
         </div>

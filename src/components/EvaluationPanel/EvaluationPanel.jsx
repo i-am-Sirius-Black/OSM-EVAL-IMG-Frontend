@@ -552,11 +552,15 @@
 
 import { memo, useState } from "react";
 import QuestionInput from "./QuestionInput";
-import RejectModal from "./RejectModal";
-const EvaluationPanel = memo(({ marks, setMarks, annotations, saveAnnotations }) => {
+import RejectModal from "./Modals/RejectModal";
+import SubmitConfirmationModal from "./Modals/SubmitConfirmationModal";
+import prepareAnnotationsForSave from "../../utils/FilterAnnotation";
+const EvaluationPanel = memo(({ marks, setMarks, annotations, submitCopy }) => {
   const copyId = "12345"; // Example copy ID, replace with actual data
   const [activeTab, setActiveTab] = useState("marking");
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  
   const pdfUrl = "http://www.pdf995.com/samples/pdf.pdf"; // Example PDF URL, replace with actual data
 
   // Questions structure with sub-parts
@@ -586,45 +590,179 @@ const EvaluationPanel = memo(({ marks, setMarks, annotations, saveAnnotations })
   }, {});
 
 
-
-  const handleSubmit = () => {
-    // Validate all pages are annotated
-    // const allPagesAnnotated = annotatedPages.length === 36;
-    // if (!allPagesAnnotated) {
-    //   alert("Please check all pages before submitting");
-    //   return;
-    // }
-
-    // Validate all marks are entered and valid
-    // const allMarksValid = questions.every(q => {
-    //   const mark = Number(marks[q.id]);
-    //   return !isNaN(mark) && mark >= 0 && mark <= q.maxMarks;
-    // });
+  const validateEvaluation = () => {
+    // Check if all required marks are entered and valid
+    const marksValidation = questions.every(q => {
+      const mark = Number(marks[q.id]);
+      return !isNaN(mark) && mark >= 0 && mark <= q.maxMarks;
+    });
     
-    // if (!allMarksValid) {
-    //   alert("Please enter valid marks for all questions");
+    // Return validation result with specific issue if marks are invalid
+    if (!marksValidation) {
+      return { 
+        valid: false, 
+        issue: "marks",
+        message: "Please ensure all marks are entered correctly and within allowed range."
+      };
+    }
+    
+    return { valid: true };
+  };
+  
+  const validateAnnotations = () => {
+    // Check if all pages are annotated
+    const totalPages = 36; // Assuming there are 36 pages
+    const annotatedPages = Array.from(new Set(annotations.map(a => a.page)));
+    const allPagesAnnotated = annotatedPages.length === totalPages;
+    
+    // You could add more specific annotation validations here if needed
+    // For example, check if certain types of annotations exist
+    
+    // Return validation result with specific issue if annotations are invalid
+    if (!allPagesAnnotated) {
+      const missingPages = Array.from({ length: totalPages }, (_, i) => i + 1)
+        .filter(p => !annotatedPages.includes(p));
+        
+      return { 
+        valid: false, 
+        issue: "annotations",
+        message: `Please review all pages. Missing annotations on pages: ${missingPages.join(', ')}`,
+        missingPages
+      };
+    }
+    
+    return { valid: true };
+  };
+  
+  const validateComplete = () => {
+    // First check marks
+    const marksValidationResult = validateEvaluation();
+    if (!marksValidationResult.valid) {
+      return marksValidationResult;
+    }
+    
+    // Then check annotations
+    const annotationsValidationResult = validateAnnotations();
+    if (!annotationsValidationResult.valid) {
+      return annotationsValidationResult;
+    }
+    
+    // If both passed, return overall valid result
+    return { valid: true };
+  };
+
+  const handleSubmitClick = () => {
+    // Use combined validation
+    // const validationResult = validateComplete();
+    
+    // if (!validationResult.valid) {
+    //   // Show specific error based on what failed
+    //   alert(validationResult.message);
+      
+    //   // Optionally switch to relevant tab if specific part failed
+    //   if (validationResult.issue === "annotations") {
+    //     setActiveTab("copy");
+    //   } else if (validationResult.issue === "marks") {
+    //     setActiveTab("marking");
+    //   }
+      
     //   return;
     // }
+    
+    // Show confirmation modal
+    setShowSubmitModal(true);
+  };
 
-    // Prepare data for submission
+  // const handleFinalSubmit = () => {
+  //   // Prepare data for submission
+  //   const { annotations: regularAnnotations, drawAnnotations } =
+  //   prepareAnnotationsForSave(annotations);
+
+  // const submissionData = {
+  //   copyId,
+  //   totalMarks,
+  //   // marks: { ...marks },
+  //   annotations: regularAnnotations,
+  //   drawAnnotations: drawAnnotations,
+  // };
+
+  //   console.log('Submission Data:', submissionData);
+  //   // TODO: API call will go here
+    
+  //   saveAnnotations();
+  //   setShowSubmitModal(false);
+    
+  //   // Show success message or redirect
+  //   alert("Evaluation submitted successfully!");
+  // };
+
+
+  const handleFinalSubmit = async () => {
+    const { annotations: regularAnnotations, drawAnnotations } =
+      prepareAnnotationsForSave(annotations);
+
+      const UserData = localStorage.getItem("evalUserData");
+      const { userId } = JSON.parse(UserData);
+  
     const submissionData = {
       copyId,
       totalMarks,
-      marks: { ...marks },
-      annotations: annotations.map(a => ({
-        id: a.id,
-        type: a.type,
-        page: a.page,
-        position: a.position,
-        text: a.text
-      }))
+      userId,
+      annotations: regularAnnotations,
+      drawAnnotations: drawAnnotations,
     };
-
-    saveAnnotations();
-
+  
     console.log('Submission Data:', submissionData);
-    // TODO: API call will go here
+  
+    try {
+      await submitCopy(submissionData); // Call handleSubmitCopy
+      setShowSubmitModal(false);
+      alert('Evaluation submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting evaluation:', error);
+      alert('Failed to submit evaluation. Please try again.');
+    }
   };
+
+
+  // const handleSubmit = () => {
+  //   // Validate all pages are annotated
+  //   // const allPagesAnnotated = annotatedPages.length === 36;
+  //   // if (!allPagesAnnotated) {
+  //   //   alert("Please check all pages before submitting");
+  //   //   return;
+  //   // }
+
+  //   // Validate all marks are entered and valid
+  //   // const allMarksValid = questions.every(q => {
+  //   //   const mark = Number(marks[q.id]);
+  //   //   return !isNaN(mark) && mark >= 0 && mark <= q.maxMarks;
+  //   // });
+    
+  //   // if (!allMarksValid) {
+  //   //   alert("Please enter valid marks for all questions");
+  //   //   return;
+  //   // }
+
+  //   // Prepare data for submission
+  //   const submissionData = {
+  //     copyId,
+  //     totalMarks,
+  //     marks: { ...marks },
+  //     annotations: annotations.map(a => ({
+  //       id: a.id,
+  //       type: a.type,
+  //       page: a.page,
+  //       position: a.position,
+  //       text: a.text
+  //     }))
+  //   };
+
+  //   saveAnnotations();
+
+  //   console.log('Submission Data:', submissionData);
+  //   // TODO: API call will go here
+  // };
 
   const handleReject = ({ reason, description }) => {
     const rejectionData = {
@@ -783,7 +921,7 @@ const EvaluationPanel = memo(({ marks, setMarks, annotations, saveAnnotations })
             Reject
           </button>
           <button
-            onClick={handleSubmit}
+            onClick={handleSubmitClick}
             className="px-6 h-9 text-sm font-medium bg-blue-600 text-white 
               hover:bg-blue-700 rounded-lg transition-colors"
           >
@@ -800,7 +938,15 @@ const EvaluationPanel = memo(({ marks, setMarks, annotations, saveAnnotations })
         onConfirm={handleReject}
       />
 
-
+        
+      {/* Submit Confirmation Modal */}
+      <SubmitConfirmationModal
+        isOpen={showSubmitModal}
+        onClose={() => setShowSubmitModal(false)}
+        onConfirm={handleFinalSubmit}
+        marks={marks}
+        questions={questions}
+      />
     </div>
   );
 });

@@ -9,14 +9,23 @@ import Register from './Pages/Register';
 import AdminPanel from './components/AdminPanel/AdminPanel';
 import ProtectedAdminRoute from './components/AdminPanel/Protected/ProtectedAdminRoute';
 import AdminLogin from './components/AdminPanel/Login/AdminLogin';
+import PublicRoute from './components/PublicRoute';
 
 function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/register"  element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          } />
+        <Route path="/login"  element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          } />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route 
           path="/admin" 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; // Import Link for navigation
 import api from '../api/axios.js';
 
@@ -8,6 +8,13 @@ function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current.focus();
+  }, []);
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -53,6 +60,7 @@ function Login() {
                   User ID
                 </label>
                 <input
+                  ref={inputRef}
                   id="userId"
                   type="text"
                   value={uid}

@@ -31,13 +31,13 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
     };
   }, []);
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     try {
-      const response = await api.post('/logout')
-
+      const response = await api.post('/logout');
+  
       if (response.status === 200) {
         localStorage.removeItem('evalUserData'); // Clear user data from local storage
-        window.location.href = '/login'; // Redirect to login page
+        window.location.replace('/login'); // Redirect to login page and clear browser history
       } else {
         console.error('Logout failed:');
       }
