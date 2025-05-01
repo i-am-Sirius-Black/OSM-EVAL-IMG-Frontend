@@ -76,6 +76,7 @@ import Navbar from '../Home/Navbar';
 import EvaluatorStatus from './tabs/EvaluatorStatus';
 import AssignSubjects from './tabs/AssignSubjects';
 import CheckedCopies from './tabs/CheckedCopies';
+import RejectedCopies from './tabs/RejectedCopies';
 
 const AdminPanel = ({ userData }) => {
   const [activeTab, setActiveTab] = useState('evaluators');
@@ -114,6 +115,14 @@ const AdminPanel = ({ userData }) => {
                 >
                   Checked Copies
                 </button>
+                <button
+                  onClick={() => setActiveTab('rejected')}
+                  className={`${
+                    activeTab === 'rejected' ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                >
+                  Rejected Copies
+                </button>
               </nav>
             </div>
             <div className="flex items-center">
@@ -130,6 +139,7 @@ const AdminPanel = ({ userData }) => {
           {activeTab === 'evaluators' && <EvaluatorStatus />}
           {activeTab === 'assign' && <AssignSubjects />}
           {activeTab === 'copies' && <CheckedCopies />}
+          {activeTab === 'rejected' && <RejectedCopies />}
         </div>
       </main>
     </div>

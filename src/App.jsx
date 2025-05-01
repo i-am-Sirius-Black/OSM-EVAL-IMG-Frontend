@@ -10,10 +10,15 @@ import AdminPanel from './components/AdminPanel/AdminPanel';
 import ProtectedAdminRoute from './components/AdminPanel/Protected/ProtectedAdminRoute';
 import AdminLogin from './components/AdminPanel/Login/AdminLogin';
 import PublicRoute from './components/PublicRoute';
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './components/context/AuthContext';
 
 function App() {
 
   return (
+    <>
+    <AuthProvider>
+    <Toaster position="top-center" reverseOrder={false} />
     <div className="min-h-screen bg-gray-50">
       <Routes>
         <Route path="/register"  element={
@@ -70,6 +75,8 @@ function App() {
         />
       </Routes>
     </div>
+    </AuthProvider>
+    </>
   );
 }
 

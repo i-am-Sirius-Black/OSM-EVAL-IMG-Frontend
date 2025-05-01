@@ -1317,8 +1317,8 @@ const SinglePage = memo(
           left: `${position.x}%`,
           top: `${position.y}%`,
           transform: "translate(-50%, -50%)",
-          width: `calc(1.5rem * ${width / 800})`,  // Scale icon size based on zoom
-          height: `calc(1.5rem * ${width / 800})`,
+          width: `calc(2rem * ${width / 800})`,  // Scale icon size based on zoom
+          height: `calc(2rem * ${width / 800})`, //? changed from 1.5rem to 2 rem
         };
         
         return (
@@ -1338,8 +1338,8 @@ const SinglePage = memo(
           left: `${position.x}%`,
           top: `${position.y}%`,
           transform: "translate(-50%, -50%)",
-          width: `calc(1.5rem * ${width / 800})`,  // Scale icon size based on zoom
-          height: `calc(1.5rem * ${width / 800})`,
+          width: `calc(2rem * ${width / 800})`,  // Scale icon size based on zoom
+          height: `calc(2rem * ${width / 800})`, //? changed from 1.5rem to 2 rem
         };
         
         return (

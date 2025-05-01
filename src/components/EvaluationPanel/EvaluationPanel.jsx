@@ -555,11 +555,19 @@ import QuestionInput from "./QuestionInput";
 import RejectModal from "./Modals/RejectModal";
 import SubmitConfirmationModal from "./Modals/SubmitConfirmationModal";
 import prepareAnnotationsForSave from "../../utils/FilterAnnotation";
+import { useNavigate } from "react-router-dom";
+import copyService from "../../services/copyService";
+import toast from "react-hot-toast";
+
+
+
 const EvaluationPanel = memo(({ marks, setMarks, annotations, submitCopy }) => {
   const copyId = "12345"; // Example copy ID, replace with actual data
   const [activeTab, setActiveTab] = useState("marking");
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+
+  const navigate= useNavigate();
   
   const pdfUrl = "http://www.pdf995.com/samples/pdf.pdf"; // Example PDF URL, replace with actual data
 
@@ -673,110 +681,99 @@ const EvaluationPanel = memo(({ marks, setMarks, annotations, submitCopy }) => {
     setShowSubmitModal(true);
   };
 
-  // const handleFinalSubmit = () => {
-  //   // Prepare data for submission
+
+
+  // const handleFinalSubmit = async () => {
   //   const { annotations: regularAnnotations, drawAnnotations } =
-  //   prepareAnnotationsForSave(annotations);
+  //     prepareAnnotationsForSave(annotations);
 
-  // const submissionData = {
-  //   copyId,
-  //   totalMarks,
-  //   // marks: { ...marks },
-  //   annotations: regularAnnotations,
-  //   drawAnnotations: drawAnnotations,
-  // };
-
-  //   console.log('Submission Data:', submissionData);
-  //   // TODO: API call will go here
+  //   const { uid } = JSON.parse(localStorage.getItem("evalUserData"));
     
-  //   saveAnnotations();
-  //   setShowSubmitModal(false);
-    
-  //   // Show success message or redirect
-  //   alert("Evaluation submitted successfully!");
-  // };
-
-
-  const handleFinalSubmit = async () => {
-    const { annotations: regularAnnotations, drawAnnotations } =
-      prepareAnnotationsForSave(annotations);
-
-      const UserData = localStorage.getItem("evalUserData");
-      const { userId } = JSON.parse(UserData);
-  
-    const submissionData = {
-      copyId,
-      totalMarks,
-      userId,
-      annotations: regularAnnotations,
-      drawAnnotations: drawAnnotations,
-    };
-  
-    console.log('Submission Data:', submissionData);
-  
-    try {
-      await submitCopy(submissionData); // Call handleSubmitCopy
-      setShowSubmitModal(false);
-      alert('Evaluation submitted successfully!');
-    } catch (error) {
-      console.error('Error submitting evaluation:', error);
-      alert('Failed to submit evaluation. Please try again.');
-    }
-  };
-
-
-  // const handleSubmit = () => {
-  //   // Validate all pages are annotated
-  //   // const allPagesAnnotated = annotatedPages.length === 36;
-  //   // if (!allPagesAnnotated) {
-  //   //   alert("Please check all pages before submitting");
-  //   //   return;
-  //   // }
-
-  //   // Validate all marks are entered and valid
-  //   // const allMarksValid = questions.every(q => {
-  //   //   const mark = Number(marks[q.id]);
-  //   //   return !isNaN(mark) && mark >= 0 && mark <= q.maxMarks;
-  //   // });
-    
-  //   // if (!allMarksValid) {
-  //   //   alert("Please enter valid marks for all questions");
-  //   //   return;
-  //   // }
-
-  //   // Prepare data for submission
+      
   //   const submissionData = {
   //     copyId,
   //     totalMarks,
-  //     marks: { ...marks },
-  //     annotations: annotations.map(a => ({
-  //       id: a.id,
-  //       type: a.type,
-  //       page: a.page,
-  //       position: a.position,
-  //       text: a.text
-  //     }))
+  //     userId: uid,
+  //     annotations: regularAnnotations,
+  //     drawAnnotations: drawAnnotations,
   //   };
-
-  //   saveAnnotations();
-
+  
   //   console.log('Submission Data:', submissionData);
-  //   // TODO: API call will go here
+  
+  //   try {
+  //     await submitCopy(submissionData);
+  //     setShowSubmitModal(false);
+  //   } catch (error) {
+  //     console.error('Error submitting evaluation:', error);
+  //     alert('Failed to submit evaluation. Please try again.');
+  //   }
   // };
 
-  const handleReject = ({ reason, description }) => {
-    const rejectionData = {
+//?v2 testing phase.....
+const handleFinalSubmit = async () => {
+  
+  try {
+    const { annotations: regularAnnotations, drawAnnotations } =
+      prepareAnnotationsForSave(annotations);
+
+    const { uid } = JSON.parse(localStorage.getItem("evalUserData"));
+    
+    const submissionData = {
       copyId,
-      reason,
-      description,
-      timestamp: new Date().toISOString()
+      totalMarks,
+      userId: uid,
+      annotations: regularAnnotations,
+      drawAnnotations: drawAnnotations,
+    };
+
+    const success = await submitCopy(submissionData);
+    console.log("submit copy response success", success);
+    
+    setShowSubmitModal(false);
+    if (success) {
+      navigate('/', { replace: true });
+    }
+
+  } catch (error) {
+    console.error('Error submitting evaluation:', error);
+  }
+};
+
+const handleReject = async ({ reason, description }) => {
+  try {
+    const { uid } = JSON.parse(localStorage.getItem("evalUserData"));
+
+    const rejectReason = description ? reason + ", " + description : reason;
+
+    const rejectionData = {
+      copyId: copyId,               
+      reason: rejectReason,        
+      userId: uid,                  
+      bagId: "testBagId",           
+      copyStatus: "REJECTED"       
     };
 
     console.log('Rejection Data:', rejectionData);
-    // TODO: API call will go here
-    setShowRejectModal(false);
-  };
-
+    
+    const response = await copyService.rejectCopy(rejectionData);
+    console.log('Rejection Response:', response);
+    
+    // Access fields based on API response structure
+    if (response.success) {
+      setShowRejectModal(false);
+      toast.success('Copy rejected successfully.');
+      
+      // Navigate away after successful rejection
+      navigate('/', { replace: true });
+    } else {
+      // Handle API success=false response
+      toast.error(response.message || 'Failed to reject copy');
+    }
+  } catch (error) {
+    console.error('Error rejecting copy:', error);
+    toast.error('Failed to reject copy. Please try again.');
+  }
+};
 
   const handleOpenPDFWindow = () => {
     const width = 800;

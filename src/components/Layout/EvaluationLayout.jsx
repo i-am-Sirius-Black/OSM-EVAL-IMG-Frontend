@@ -87,8 +87,13 @@ import useAnnotations from '../../hooks/useAnnotations';
 import { use, useCallback, useEffect, useState } from 'react';
 import ImageViewer from '../PdfViewer/ImageViewer';
 import { saveAnnotations } from '../../services/annotationService';
-import { useParams } from 'react-router-dom';
+import { replace, useNavigate, useParams } from 'react-router-dom';
 import evaluationService from '../../services/evaluationService';
+import Timer from './Timer';
+import toast from 'react-hot-toast';
+
+import CloudDoneIcon from '@mui/icons-material/CloudDone';
+import CachedIcon from '@mui/icons-material/Cached';
 
 function EvaluationLayout() {
 
@@ -104,7 +109,7 @@ function EvaluationLayout() {
     handleRemoveAnnotation,
     handleRemoveLastAnnotation,
     handleUpdateAnnotation,
-  } = useAnnotations();
+  } = useAnnotations()
 
   // Timer state
   const [seconds, setSeconds] = useState(0);
@@ -116,12 +121,17 @@ function EvaluationLayout() {
 // Use copyId from URL
 const [copyId, setCopyId] = useState(urlCopyId );
 
-const [restored, setRestored] = useState(false); // New flag to track restoration
+const [restored, setRestored] = useState(false); // New flag to track restoration of session
+
+const [loadingSessionData, setLoadingSessionData] = useState(false); // New flag to track loading session data
+
+const navigate = useNavigate();
 
 
 // Restore state from localStorage when component mounts
 useEffect(() => {
   if (urlCopyId) {
+    setLoadingSessionData(true); // Start loading session data
     console.log("Copy ID from URL:", urlCopyId);
     setCopyId(urlCopyId);
 
@@ -144,12 +154,16 @@ useEffect(() => {
     }
 
     setRestored(true); // Mark restoration as complete
+    setLoadingSessionData(false); // Stop loading session data
   }
 }, [urlCopyId]);
 
 // Save annotations and marks to localStorage whenever they change
 useEffect(() => {
+
   if (restored && copyId) { // Only save after restoration is complete
+    setLoadingSessionData(true);
+
     const saveState = () => {
       const state = {
         annotations,
@@ -161,6 +175,7 @@ useEffect(() => {
     };
 
     saveState();
+    setLoadingSessionData(false);
   }
 }, [annotations, marks, copyId, restored]);
 
@@ -180,136 +195,169 @@ useEffect(() => {
 
   // Reset handler to clear all state
   const handleReset = () => {
-    setAnnotations([]);
-    setMarks({});
-    setSeconds(0);
-    setTimerActive(false);
-    localStorage.removeItem(`evaluationState-${copyId}`);
+    try {
+      setAnnotations([]);
+      setMarks({});
+      setSeconds(0);
+      setTimerActive(true);
+      setSelectedTool(null);
+      localStorage.removeItem(`evaluationState-${copyId}`);
+      toast('All Cleared!', {
+        icon: '🗑️',
+      });
+    } catch (error) {
+      toast.error('Error resetting state. Please try again.');
+      console.error('Error during reset:', error);
+    }
   };
 
 
-    // Format time to HH:MM:SS
-    const formatTime = (totalSeconds) => {
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      
-      return [
-        hours.toString().padStart(2, '0'),
-        minutes.toString().padStart(2, '0'),
-        seconds.toString().padStart(2, '0')
-      ].join(':');
-    };
-    
-    
-    // Timer effect
-    useEffect(() => {
-      let interval = null;
-      
-      if (timerActive) {
-        interval = setInterval(() => {
-          setSeconds(seconds => seconds + 1);
-        }, 1000);
-      }
-      
-      return () => clearInterval(interval);
-    }, [timerActive]);
-
-
-    // const handleSaveEvaluation = async () => {
-    //   const evaluationData = {
-    //     copyid: copyId,
-    //     obt_mark: obtMark,
-    //     max_mark: maxMark,
-    //     status: 'Evaluated',
-    //     eval_time: evalTime,
-    //     eval_id: evalId,
-    //     bag_id: bagId,
-    //   };
-  
+    // const handleSubmitCopy = async (submissionData) => {
     //   try {
-    //     const response = await evaluationService.saveEvaluation(evaluationData);
-    //     console.log('Evaluation saved successfully:', response);
-    //     alert('Evaluation saved successfully!');
-    //   } catch (error) {
-    //     console.error('Error saving evaluation:', error);
-    //     alert('Failed to save evaluation. Please try again.');
-    //   }
-    // };
-
-    // const handleSaveAnnotation = async () => {
-    //   try {
-    //     const response = await saveAnnotations(copyId, annotations);
-        
-    //     if (response.data.success) {
-    //       if (response.status === 201) {
-    //         console.log("Annotations saved successfully");
-    //       } else if (response.status === 200) {
-    //         console.log("Annotations updated successfully");
-    //       }
-    //       // Clear saved state after successful submission
-    //       localStorage.removeItem(`evaluationState-${copyId}`);
+    //     // Step 1: Save Annotations
+    //     const annotationResponse = await saveAnnotations(copyId, {
+    //       annotations: submissionData.annotations,
+    //       drawAnnotations: submissionData.drawAnnotations,
+    //     });
+    
+    //     if (annotationResponse.data.success) {
+    //       console.log('Annotations saved successfully:', annotationResponse.data);
     //     } else {
-    //       console.error("Failed to save annotations");
+    //       console.error('Failed to save annotations:', annotationResponse.data.message);
+    //       alert(annotationResponse.data.message || 'Failed to save annotations.');
+    //       return; // Stop further execution if annotations fail
     //     }
     
-    //     alert(response.data.message || "Annotations saved successfully");
+    //     // Step 2: Save Evaluation
+    //     const evaluationData = {
+    //       copyid: copyId,
+    //       obt_mark: submissionData.totalMarks,
+    //       max_mark: 100, // Hardcoded max marks for now
+    //       status: 'Evaluated',
+    //       eval_time: seconds,
+    //       eval_id: submissionData.userId, // Replace with actual user ID
+    //       bag_id: 'BAG001', // Replace with actual bag ID if available
+    //     };
+    
+    //     const evaluationResponse = await evaluationService.saveEvaluation(evaluationData);
+    //     console.log('Evaluation saved successfully:', evaluationResponse);
     //   } catch (error) {
-    //     console.error("Error saving annotations:", error);
+    //     console.error('Error during submission:', error);
+    //     alert('Failed to submit evaluation. Please try again.');
     //   }
     // };
 
+  //?using toast.promise to show loading and success/error messages
+  // const handleSubmitCopy = async (submissionData) => {
+  //   return toast.promise(
+  //     // Promise chain to be monitored by toast
+  //     (async () => {
+  //       // Step 1: Save Annotations
+  //       const annotationResponse = await saveAnnotations(copyId, {
+  //         annotations: submissionData.annotations,
+  //         drawAnnotations: submissionData.drawAnnotations,
+  //       });
+        
+  //       if (!annotationResponse.data.success) {
+  //         throw new Error(annotationResponse.data.message || 'Failed to save annotations.');
+  //       }
+        
+  //       // Step 2: Save Evaluation
+  //       const evaluationData = {
+  //         copyid: copyId,
+  //         obt_mark: submissionData.totalMarks,
+  //         max_mark: 100, // Hardcoded max marks for now
+  //         status: 'Evaluated',
+  //         eval_time: seconds,
+  //         eval_id: submissionData.userId,
+  //         bag_id: 'BAG001',
+  //       };
+        
+  //       const evaluationResponse = await evaluationService.saveEvaluation(evaluationData);
+        
+  //       // Clear local storage after successful submission
+  //       localStorage.removeItem(`evaluationState-${copyId}`);
+        
+  //       // Add a short delay before navigating to home page
+  //       setTimeout(() => {
+  //         navigate('/');
+  //       }, 1500); // 1.5 second delay to let the success message be visible
+        
+  //       return { annotationResponse, evaluationResponse };
+  //     })(),
+  //     {
+  //       loading: 'Submitting evaluation...',
+  //       success: 'Evaluation submitted successfully!',
+  //       error: (err) => `Submission failed: ${err.message}`,
+  //     }
+  //   );
+  // };
 
-    const handleSubmitCopy = async (submissionData) => {
-      try {
-        // Step 1: Save Annotations
-        const annotationResponse = await saveAnnotations(copyId, {
-          annotations: submissionData.annotations,
-          drawAnnotations: submissionData.drawAnnotations,
-        });
+
+
+  //?v1.2 simple toast message
+
+  const handleSubmitCopy = async (submissionData) => {
     
-        if (annotationResponse.data.success) {
-          console.log('Annotations saved successfully:', annotationResponse.data);
-        } else {
-          console.error('Failed to save annotations:', annotationResponse.data.message);
-          alert(annotationResponse.data.message || 'Failed to save annotations.');
-          return; // Stop further execution if annotations fail
-        }
-    
-        // Step 2: Save Evaluation
-        const evaluationData = {
-          copyid: copyId,
-          obt_mark: submissionData.totalMarks,
-          max_mark: 100, // Hardcoded max marks for now
-          status: 'Evaluated',
-          eval_time: seconds,
-          eval_id: submissionData.userId, // Replace with actual user ID
-          bag_id: 'BAG001', // Replace with actual bag ID if available
-        };
-    
-        const evaluationResponse = await evaluationService.saveEvaluation(evaluationData);
-        console.log('Evaluation saved successfully:', evaluationResponse);
-        alert('Evaluation submitted successfully!');
-      } catch (error) {
-        console.error('Error during submission:', error);
-        alert('Failed to submit evaluation. Please try again.');
+    try {
+      // Step 1: Save Annotations
+      const annotationResponse = await saveAnnotations(copyId, {
+        annotations: submissionData.annotations,
+        drawAnnotations: submissionData.drawAnnotations,
+      });
+  
+      if (!annotationResponse.data.success) {
+        toast.error(annotationResponse.data.message || 'Failed to save annotations.');
+        return false; // Indicate failure to caller
       }
-    };
+  
+      // Step 2: Save Evaluation
+      const evaluationData = {
+        copyid: copyId,
+        obt_mark: submissionData.totalMarks,
+        max_mark: 100, // Hardcoded max marks for now
+        status: 'Evaluated',
+        eval_time: seconds,
+        eval_id: submissionData.userId, // Replace with actual user ID
+        bag_id: 'BAG001', // Replace with actual bag ID if available
+      };
+  
+      const evaluationResponse = await evaluationService.saveEvaluation(evaluationData);
+      console.log('evaluationResponse for evaluation layout:', evaluationResponse);
+      
+      // Clear localStorage after successful submission
+      localStorage.removeItem(`evaluationState-${copyId}`);
+      
+      toast.success('Evaluation submitted successfully!');
+      return true; // Indicate success to caller
+    } catch (error) {
+      console.error('Error during submission:', error);
+      toast.error(`Submission failed: ${error.message || 'Unknown error occurred'}`);
+      return false; // Indicate failure to caller
+    }
+  };
 
+
+  const handleLogoClick = () => {
+    if (window.confirm('Are you sure you want to navigate to the home page?')) {
+      navigate('/', { replace: true });
+    }
+  }
 
   return (
     <div className="flex flex-col h-screen overflow-hidden ">
         {/* Header */}
       <header className="bg-white border-b border-gray-200 shadow-sm px-4 lg:px-6 py-2 flex justify-between items-center shrink-0">
-        <h1 className="text-lg font-semibold text-gray-800">OSM Evaluation</h1>
+        <h1 onClick={handleLogoClick} className="text-lg font-semibold text-gray-800">OSM Evaluation</h1>
         <div className="flex items-center gap-4">
+         {loadingSessionData ? <CachedIcon className='animate-spin'/> : <CloudDoneIcon color='disabled'/>}
           {/* Timer with Material UI clock icon */}
-          <div title='Pause/Play' onClick={() => setTimerActive(!timerActive)}  className="flex items-center text-xs gap-1 hover:text-gray-600">
-             <svg className={`h-4 w-4 ${timerActive ? 'text-blue-600' : 'text-red-600'}`} viewBox="0 0 24 24">
-              <path fill="currentColor" d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" />
-            </svg>
-            <span className="font-medium">{formatTime(seconds)}</span>
-          </div>
+          {/* <Timer 
+      initialSeconds={seconds}
+      isActive={timerActive}
+      onToggle={(isActive) => setTimerActive(isActive)}
+      onTimeUpdate={(newSeconds) => setSeconds(newSeconds)}
+    /> */}
         </div>
       </header>
   
@@ -358,3 +406,4 @@ useEffect(() => {
 }
 
 export default EvaluationLayout;
+

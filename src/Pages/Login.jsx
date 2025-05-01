@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; // Import Link for navigation
 import api from '../api/axios.js';
+import { useAuth } from '../components/context/AuthContext.jsx';
 
 function Login() {
   const [uid, setUid] = useState('');
@@ -10,6 +11,8 @@ function Login() {
   const navigate = useNavigate();
 
   const inputRef = useRef(null);
+
+  const { setAuthenticatedUser } = useAuth(); // Get setAuthenticatedUser from context
 
   useEffect(() => {
     inputRef.current.focus();
@@ -27,9 +30,9 @@ function Login() {
 
       if (res.status === 200) {
         const userData = res.data.userData;
-        localStorage.setItem("evalUserData", JSON.stringify(userData));
 
-        console.log("Login successful:", userData);
+        // Update authentication state in context
+        setAuthenticatedUser(userData);
 
         navigate('/', { replace: true }); // Redirect to the home page after successful login
       } else {

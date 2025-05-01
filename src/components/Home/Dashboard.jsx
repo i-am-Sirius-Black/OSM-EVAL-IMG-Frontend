@@ -6,34 +6,36 @@ import Evaluation from './Evaluation';
 import Reports from './Reports';
 import { Link } from 'react-router-dom';
 import CheckingStatus from './CheckingStatus';
+import { useAuth } from '../context/AuthContext';
+import Loader from '../Common/Loader';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [userData, setUserData] = useState(null);
-  useEffect(() => {
-    const storedUserData = localStorage.getItem('evalUserData');
-    if (storedUserData) {
-      setUserData(JSON.parse(storedUserData));
-    }
-  }, []);
 
-  console.log("userData in Dashboard:", userData); // Log userData to check its value
+  const { user, loading } = useAuth();
+
+  console.log("userData in Dashboard:", user); // Log userData to check its value
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} userData={userData}/>
-      {activeTab === 'dashboard' && (
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <DashboardSummary />
-          <div className="mt-6">
-            <CheckingStatus />
-          </div>
-        </main>
+      {loading ? <Loader/> : (
+        <>
+              <Navbar activeTab={activeTab} setActiveTab={setActiveTab} userData={user}/>
+              {activeTab === 'dashboard' && (
+                <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                  <DashboardSummary />
+                  <div className="mt-6">
+                    <CheckingStatus />
+                  </div>
+                </main>
+              )}
+              {activeTab === 'evaluation' && <Evaluation />}
+              {activeTab === 'reports' && <Reports />}
+              <div className="nav-item">
+        </div>
+        </>
       )}
-      {activeTab === 'evaluation' && <Evaluation />}
-      {activeTab === 'reports' && <Reports />}
-      <div className="nav-item">
-</div>
+
     </div>
   );
 }

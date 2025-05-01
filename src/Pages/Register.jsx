@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
+import { useAuth } from '../components/context/AuthContext';
+import toast from 'react-hot-toast';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +15,8 @@ const Register = () => {
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const { setAuthenticatedUser } = useAuth(); // Get authentication context
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,11 +46,18 @@ const Register = () => {
 
       if (response.status === 201) {
         setSuccess(response.data.message || 'Registration successful!');
+        toast.success('Registration successful! Redirecting...');
+        const userData = response.data.userData;
+        
+        // Update auth context
+        setAuthenticatedUser(userData);
+        
+        // Clear form
         setFormData({ name: '', email: '', phoneNumber: '', uid: '', pass: '' });
 
         // Redirect to '/' after 2 seconds
         setTimeout(() => {
-          navigate('/' , { replace: true }); // Redirect to the home page after successful registration
+          navigate('/', { replace: true }); 
         }, 2000);
       } else {
         setError('Unexpected response from the server.');
@@ -54,7 +65,7 @@ const Register = () => {
     } catch (err) {
       setError(err.response?.data?.error || 'Internal server error. Please try again later.');
     }
-};
+  };
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-50">

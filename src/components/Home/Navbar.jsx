@@ -32,6 +32,11 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
   }, []);
 
   const handleLogout = async () => {
+
+    //TODO: Make it proper by using a modal
+    const confirmLogout = window.confirm('Are you sure you want to logout?');
+    if (!confirmLogout) return; // If user cancels, do nothing
+
     try {
       const response = await api.post('/logout');
   
@@ -118,12 +123,12 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
                     >
                       Your Profile
                     </a>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    {/* <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                       Settings
-                    </a>
+                    </a> */}
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-red-100"
                     >
                       Logout
                     </button>
