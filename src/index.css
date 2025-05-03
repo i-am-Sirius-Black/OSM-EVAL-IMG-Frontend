@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+body {
+  user-select: none;
+}
+
+/* Custom cursor for drawing */
+.draw-cursor {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z' fill='%23ff0000'/></svg>") 0 24, auto;
+  }
+
+/* for evaluation panel*/
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(4px); }
+    75% { transform: translateX(-4px); }
+  }
+  
+  .animate-shake {
+    animation: shake 0.2s ease-in-out 0s 2;
+  }
+
+  
