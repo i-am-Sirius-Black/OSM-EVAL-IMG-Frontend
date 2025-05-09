@@ -2,23 +2,41 @@
 
 //? Fixing the Page Scrolling Issue in AdminPanel
 import React, { useState } from "react";
-import Navbar from "../Home/Navbar";
 
 // Import tab components
 import EvaluatorStatus from "./tabs/EvaluatorStatus";
 import AssignSubjects from "./tabs/AssignSubjects";
 import CheckedCopies from "./tabs/CheckedCopies";
 import RejectedCopies from "./tabs/RejectedCopies";
-import { useAuth } from "../context/AuthContext";
 import { Logout } from "@mui/icons-material";
+import api from "../../api/axios";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import API_ROUTES from "../../api/routes";
+import { useAuth } from "../context/AuthContext";
 
 const AdminPanel = ({ userData }) => {
   const [activeTab, setActiveTab] = useState("evaluators");
-  const { logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-  };
+    // Get adminLogout function from AuthContext
+    const { adminLogout } = useAuth();
+    const navigate = useNavigate();
+  
+    const handleLogout = async () => {
+      try {
+        // 1. Call server to clear the HTTP-only cookie
+        const response = await api.post(API_ROUTES.ADMIN.ADMIN_LOGOUT);
+        toast.success(response.data.message || "Logged out successfully");
+      } catch (error) {
+        console.error("Logout error:", error);
+        toast.error("Server logout failed, but you've been logged out locally");
+      } finally {
+        // 2. Call AuthContext function to clear local storage and state
+        adminLogout();
+        // 3. Navigate to login page
+        navigate("/admin-login", { replace: true });
+      }
+    };
 
 
   
@@ -78,12 +96,6 @@ const AdminPanel = ({ userData }) => {
               </nav>
             </div>
             <div className="flex items-center">
-              <a
-                href="/"
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600"
-              >
-                Back to Dashboard
-              </a>
               <button
               onClick={handleLogout}
               className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-red-400  flex items-center"

@@ -1,8 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
 @import "tailwindcss";
 
 body {
   user-select: none;
+  font-family: 'Roboto', sans-serif;
 }
+
+
+
+
 
 /* Custom cursor for drawing */
 .draw-cursor {
@@ -20,4 +27,34 @@ body {
     animation: shake 0.2s ease-in-out 0s 2;
   }
 
+/* Custom cursor for eraser */
+  .eraser-cursor {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 20H7L3 16c-.8-.8-.8-2 0-2.8L13.8 2.4c.8-.8 2-.8 2.8 0L20 6'/%3E%3Cpath d='m18 14 2 2'/%3E%3Cpath d='M15 7 9 13'/%3E%3C/svg%3E") 0 24, auto;
+  }  
+
+
+
+  /* Custom scrollbar */
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #8a8a8a;
+    border-radius: 20px;
+  }
+
+
+
+  /* Back btn confirmation */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+  }

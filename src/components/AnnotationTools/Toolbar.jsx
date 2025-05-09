@@ -15,15 +15,16 @@ import ResetConfirmationModal from './Modal/ResetConfirmationModal';
 const Toolbar = memo(({ selectedTool, setSelectedTool, handleRemoveLastAnnotation, handleReset }) => {
   const [showResetModal, setShowResetModal] = useState(false);
  
+  // Define the tools with their respective icons, colors, and descriptions
   const tools = [
     { tool: 'mouse', Icon: MouseIcon, color: 'blue', description: 'Mouse (Left: ✓, Right: ✕)' },
     { tool: 'check', Icon: DoneIcon, color: 'green', description: 'Check' },
     { tool: 'cancel', Icon: ClearIcon, color: 'red', description: 'Cross' },
     { tool: 'comment', Icon: EditNoteIcon, color: 'gray', description: 'Comment' },
     { tool: 'draw', Icon: DrawIcon, color: 'purple', description: 'Pen' },
-    { tool: 'erase', Icon: DeleteIcon, color: 'deleteRed', description: 'Del' },
+    { tool: 'erase', Icon: DeleteIcon, color: 'deleteRed', description: 'Erase' },
     { tool: 'undo', Icon: UndoIcon, color: 'yellow', description: 'Undo Last' },
-    { tool: 'reset', Icon: AutoFixHighSharpIcon, color: 'pink', description: 'Reset All' },
+    { tool: 'reset', Icon: AutoFixHighSharpIcon, color: 'pink', description: 'Reset All Pages' },
   ];
   
   const handleToolClick = (tool) => {

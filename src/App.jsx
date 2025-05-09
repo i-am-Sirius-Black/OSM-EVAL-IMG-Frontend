@@ -4,7 +4,6 @@ import Login from './Pages/Login';
 import SubjectSelectionPage from './components/SubjectSelection/SubjectSelectionPage';
 import Dashboard from './components/Home/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import { useEffect, useState } from 'react';
 import Register from './Pages/Register';
 import AdminPanel from './components/AdminPanel/AdminPanel';
 import ProtectedAdminRoute from './components/AdminPanel/Protected/ProtectedAdminRoute';
@@ -12,6 +11,7 @@ import AdminLogin from './components/AdminPanel/Login/AdminLogin';
 import PublicRoute from './components/PublicRoute';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './components/context/AuthContext';
+import ChangePassword from './Pages/ChangePassword';
 
 function App() {
 
@@ -27,12 +27,16 @@ function App() {
               <Register />
             </PublicRoute>
           } />
+
         <Route path="/login"  element={
             <PublicRoute>
               <Login />
             </PublicRoute>
           } />
+        <Route path="/change-password" element={<ChangePassword />} />
+        
         <Route path="/admin-login" element={<AdminLogin />} />
+        
         <Route 
           path="/admin" 
           element={

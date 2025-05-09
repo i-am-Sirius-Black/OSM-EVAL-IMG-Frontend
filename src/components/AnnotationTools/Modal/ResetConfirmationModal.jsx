@@ -7,7 +7,7 @@ const ResetConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
         <div className="bg-white rounded-lg shadow-lg p-5 w-80">
           <h3 className="text-lg font-medium text-gray-900 mb-3">Reset Annotation Markings</h3>
           <p className="text-sm text-gray-600 mb-4">
-            Are you sure you want to reset all annotations and marks on this copy?
+            Are you sure you want to reset all annotations on this copy?
           </p>
           <div className="flex justify-end gap-3">
             <button

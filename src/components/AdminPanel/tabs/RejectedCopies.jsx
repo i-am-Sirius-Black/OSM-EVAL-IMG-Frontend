@@ -3,7 +3,7 @@ import api from '../../../api/axios';
 import toast from 'react-hot-toast';
 import API_ROUTES from '../../../api/routes';
 
-const { COPY_MANAGEMENT } = API_ROUTES;
+const { ADMIN } = API_ROUTES;
 
 const RejectedCopies = () => {
   const [rejectedCopies, setRejectedCopies] = useState([]);
@@ -20,7 +20,7 @@ const RejectedCopies = () => {
   const fetchRejectedCopies = async () => {
     try {
       setLoading(true);
-      const response = await api.get(COPY_MANAGEMENT.GET_REJECTED);
+      const response = await api.get(ADMIN.GET_REJECTED_COPIES);
       console.log("Rejected copies response:", response.data);
       
       setRejectedCopies(response.data || []);
@@ -51,7 +51,7 @@ const RejectedCopies = () => {
     try {
       setUnrejectingCopyId(copyid);
       
-      const response = await api.post(COPY_MANAGEMENT.UNREJECT, {
+      const response = await api.post(ADMIN.UNREJECT_COPIES, {
         copyId: copyid,
       });
       console.log("Unreject response:", response.data);

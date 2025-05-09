@@ -551,7 +551,7 @@ const ImageViewer = memo(
     return (
       <div
         ref={containerRef}
-        className="w-full h-full bg-white rounded-lg shadow-sm overflow-y-auto"
+        className="w-full h-full bg-zinc-700 rounded-lg shadow-sm overflow-y-auto"
       >
         {/* Zoom Controls */}
         {/* <div className="sticky top-0 z-10 bg-white p-2 border-b border-gray-200 flex justify-end gap-2">
@@ -635,7 +635,7 @@ const ImageViewer = memo(
           </div>
         )} */}
 
-//?v2.3 updated ui comment input popup
+{/* v2.3 updated ui comment input popup */}
 {commentPosition && (
   <div
     className="absolute bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-md z-50"
@@ -689,6 +689,8 @@ const ImageViewer = memo(
 );
 
 export default ImageViewer;
+
+
 
 
 

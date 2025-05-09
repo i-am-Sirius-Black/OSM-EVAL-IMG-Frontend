@@ -84,13 +84,17 @@
 import Toolbar from '../AnnotationTools/Toolbar';
 import EvaluationPanel from '../EvaluationPanel/EvaluationPanel';
 import useAnnotations from '../../hooks/useAnnotations';
-import { use, useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useRef, useState } from 'react';
 import ImageViewer from '../PdfViewer/ImageViewer';
 import { saveAnnotations } from '../../services/annotationService';
 import { replace, useNavigate, useParams } from 'react-router-dom';
 import evaluationService from '../../services/evaluationService';
 import toast from 'react-hot-toast';
 import Timer from './Timer';
+import CloudIcon from '@mui/icons-material/Cloud';
+import CloudDoneIcon from '@mui/icons-material/CloudDone';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ConfirmationPopup from './Popup/ConfirmationPopup';
 
 function EvaluationLayout() {
 
@@ -108,9 +112,6 @@ function EvaluationLayout() {
     handleUpdateAnnotation,
   } = useAnnotations()
 
-  // Timer state
-  const [seconds, setSeconds] = useState(0);
-  const [timerActive, setTimerActive] = useState(false);
   
   // Placeholder marks for evaluation panel
   const [marks, setMarks] = useState({});
@@ -121,9 +122,30 @@ const [copyId, setCopyId] = useState(urlCopyId );
 const [restored, setRestored] = useState(false); // New flag to track restoration of session
 
 const [isSaving, setIsSaving] = useState(false); // Tracking if saving is in progress
-const navigate = useNavigate();
+const [showSaveIcon, setShowSaveIcon] = useState(false);
+const [showBackConfirmation, setShowBackConfirmation] = useState(false);
 
+//timer
+const timerRef = useRef(null);
+
+
+const hideIconTimerRef = useRef(null);
+
+const navigate = useNavigate();
 console.log("Eval Layout rerendering");
+
+
+  // Clear the timer when component unmounts
+  useEffect(() => {
+    return () => {
+      if (hideIconTimerRef.current) {
+        clearTimeout(hideIconTimerRef.current);
+      }
+    };
+  }, []);
+
+
+
 
 
 // Restore state from localStorage when component mounts
@@ -135,21 +157,16 @@ useEffect(() => {
     setIsSaving(true); // Indicate that the state is being restored
 
     const savedState = localStorage.getItem(`evaluationState-${urlCopyId}`);
-    console.log("Saved state from localStorage:", savedState);
 
     if (savedState) {
-      const { annotations: savedAnnotations, marks: savedMarks, seconds: savedSeconds, timerActive: savedTimerActive } = JSON.parse(savedState);
+      const { annotations: savedAnnotations, marks: savedMarks, seconds: savedSeconds } = JSON.parse(savedState);
 
       setAnnotations(savedAnnotations || []);
       setMarks(savedMarks || {});
-      setSeconds(savedSeconds || 0);
-      setTimerActive(savedTimerActive || false);
     } else {
       console.log("No saved state found. Initializing default state.");
       setAnnotations([]);
       setMarks({});
-      setSeconds(0);
-      setTimerActive(true);
     }
 
     setRestored(true); // Mark restoration as complete
@@ -157,51 +174,74 @@ useEffect(() => {
   }
 }, [urlCopyId]);
 
-// Save annotations and marks to localStorage whenever they change
+
+//* Save annotations and marks to localStorage with debounce
 // useEffect(() => {
-
 //   if (restored && copyId) { // Only save after restoration is complete
-//     setLoadingSessionData(true);
-
-//     const saveState = () => {
+//     const debounceTimeout = 3000; // 3 seconds debounce time
+//     setIsSaving(true); // Start saving process
+//     console.log("Saving state to localStorage...");
+    
+//     const saveTimeout = setTimeout(() => {
 //       const state = {
 //         annotations,
 //         marks,
-//         timerActive,
-//         seconds,
 //       };
 //       localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify(state));
-//     };
+//       console.log("State saved to localStorage:", state);
+//       setIsSaving(false); // Save process complete
+//     }, debounceTimeout);
 
-//     saveState();
-//     setLoadingSessionData(false);
+//     return () => {
+//       clearTimeout(saveTimeout); // Clear timeout if dependencies change
+//       setIsSaving(false); // Reset saving state if interrupted
+//     };
 //   }
 // }, [annotations, marks, copyId, restored]);
 
-
-//* Save annotations and marks to localStorage with debounce
-useEffect(() => {
-  if (restored && copyId) { // Only save after restoration is complete
+//?v2, with hiding save icon
+ // Save annotations with debounce and handle icon visibility
+ 
+ useEffect(() => {
+  if (restored && copyId) {
     const debounceTimeout = 3000; // 3 seconds debounce time
-    setIsSaving(true); // Start saving process
-
+    
+    // Show the saving icon immediately
+    setIsSaving(true);
+    setShowSaveIcon(true);
+    console.log("Saving state to localStorage...");
+    
     const saveTimeout = setTimeout(() => {
       const state = {
         annotations,
         marks,
-        timerActive,
       };
       localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify(state));
       console.log("State saved to localStorage:", state);
-      setIsSaving(false); // Save process complete
+      
+      // Show the success icon
+      setIsSaving(false);
+      
+      // Set a timer to hide the success icon after 3 seconds
+      if (hideIconTimerRef.current) {
+        clearTimeout(hideIconTimerRef.current);
+      }
+      
+      hideIconTimerRef.current = setTimeout(() => {
+        setShowSaveIcon(false);
+      }, 3000); // Hide after 3 seconds
     }, debounceTimeout);
 
     return () => {
-      clearTimeout(saveTimeout); // Clear timeout if dependencies change
-      setIsSaving(false); // Reset saving state if interrupted
+      clearTimeout(saveTimeout);
+      if (hideIconTimerRef.current) {
+        clearTimeout(hideIconTimerRef.current);
+      }
+      setIsSaving(false);
     };
   }
-}, [annotations, marks, copyId, restored, timerActive]);
+}, [annotations, marks, copyId, restored]);
+
 
 
 // Update copyId if URL parameter changes
@@ -210,28 +250,102 @@ useEffect(() => {
     console.log("Copy ID from URL:", urlCopyId);
     setCopyId(urlCopyId);
     
-    // Reset timer when new copy is loaded
-    setSeconds(0);
-    setTimerActive(true);
   }
 }, [urlCopyId]);
 
 
   // Reset handler to clear all state
-  const handleReset = () => {
+  // const handleResetAnnotations = () => {
+  //   try {
+  //     setAnnotations([]);
+  //     setMarks({});
+  //     setSeconds(0);
+  //     setSelectedTool(null);
+  //     localStorage.removeItem(`evaluationState-${copyId}`);
+  //     toast('All Annotations Cleared!', {
+  //       icon: '🗑️',
+  //     });
+  //   } catch (error) {
+  //     toast.error('Error resetting state. Please try again.');
+  //     console.error('Error during reset:', error);
+  //   }
+  // };
+
+
+
+  const handleResetAnnotations = () => {
     try {
+      // Only reset annotations, preserve marks
       setAnnotations([]);
-      setMarks({});
-      setSeconds(0);
-      setTimerActive(true);
       setSelectedTool(null);
-      localStorage.removeItem(`evaluationState-${copyId}`);
-      toast('All Cleared!', {
+      
+      // Update localStorage with empty annotations but keep existing marks
+      const currentState = JSON.parse(localStorage.getItem(`evaluationState-${copyId}`) || '{}');
+      localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify({
+        annotations: [],
+        marks: currentState.marks || marks,
+        seconds
+      }));
+      
+      // Show success message
+      toast('Annotations Cleared! Marks preserved.', {
         icon: '🗑️',
       });
+      
+      // Trigger save icon to show "saved" state
+      setIsSaving(true);
+      setShowSaveIcon(true);
+      setTimeout(() => {
+        setIsSaving(false);
+        if (hideIconTimerRef.current) {
+          clearTimeout(hideIconTimerRef.current);
+        }
+        hideIconTimerRef.current = setTimeout(() => {
+          setShowSaveIcon(false);
+        }, 3000);
+      }, 500);
+      
     } catch (error) {
-      toast.error('Error resetting state. Please try again.');
-      console.error('Error during reset:', error);
+      toast.error('Error resetting annotations. Please try again.');
+      console.error('Error during annotation reset:', error);
+    }
+  };
+
+
+  const handleResetEval = () => {
+    try {
+      // Only reset marks, preserve annotations
+      setMarks({});
+      
+      // Update localStorage with empty marks but keep existing annotations
+      const currentState = JSON.parse(localStorage.getItem(`evaluationState-${copyId}`) || '{}');
+      localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify({
+        annotations: currentState.annotations || annotations,
+        marks: {},
+        seconds
+      }));
+      
+      // Show success message
+      toast('All Marks Reset!', {
+        icon: '🧹',
+      });
+      
+      // Trigger save icon to show "saved" state
+      setIsSaving(true);
+      setShowSaveIcon(true);
+      setTimeout(() => {
+        setIsSaving(false);
+        if (hideIconTimerRef.current) {
+          clearTimeout(hideIconTimerRef.current);
+        }
+        hideIconTimerRef.current = setTimeout(() => {
+          setShowSaveIcon(false);
+        }, 3000);
+      }, 500);
+      
+    } catch (error) {
+      toast.error('Error resetting marks. Please try again.');
+      console.error('Error during marks reset:', error);
     }
   };
 
@@ -334,6 +448,8 @@ useEffect(() => {
         toast.error(annotationResponse.data.message || 'Failed to save annotations.');
         return false; // Indicate failure to caller
       }
+
+      const seconds = getElapsedTime();
   
       // Step 2: Save Evaluation
       const evaluationData = {
@@ -362,25 +478,44 @@ useEffect(() => {
   };
 
 
-  const handleLogoClick = () => {
-    if (window.confirm('Are you sure you want to navigate to the home page?')) {
-      navigate('/', { replace: true });
-    }
+  const getElapsedTime = () => {
+    return timerRef.current?.getCurrentTime() || 0;
   }
+ 
+  const handleBack = () => {
+    setShowBackConfirmation(true); // Show confirmation popup, include time in message if needed
+  };
+  
+  const confirmBack = () => {
+    setShowBackConfirmation(false);
+    navigate(-1);
+  };
 
-  return (
-    <div className="flex flex-col h-screen overflow-hidden ">
+
+  return (  
+    <div className="flex flex-col h-screen overflow-hidden">
         {/* Header */}
       <header className="bg-white border-b border-gray-200 shadow-sm px-4 lg:px-6 py-2 flex justify-between items-center shrink-0">
-        <h1 onClick={handleLogoClick} className="text-lg font-semibold text-gray-800">OSM Evaluation</h1>
+        <div className='flex items-center gap-4'>
+        <button className='hover:text-red-500 hover:animate-pulse' onClick={handleBack}><ArrowBackIcon/></button>
+        <h1 onClick={handleBack} className="text-lg font-semibold text-gray-800">OSM Evaluation</h1>
+        </div>
         <div className="flex items-center gap-4">
-          {/* Timer with Material UI clock icon */}
-          {/* <Timer 
-          initialSeconds={seconds}
-          isActive={timerActive}
-          onToggle={(isActive) => setTimerActive(isActive)}
-          onTimeUpdate={(newSeconds) => setSeconds(newSeconds)}
-        /> */}  
+
+          {showSaveIcon && (
+            isSaving ? (
+              <CloudIcon className="text-gray-300 animate-pulse" />
+            ) : (
+              <CloudDoneIcon className="text-green-500" />
+            )
+          )}
+
+        <Timer
+            ref={timerRef}
+            isActive={true}
+            onToggle={(active) => console.log(active)}
+            showControls={true}
+          />
         </div>
       </header>
   
@@ -392,7 +527,7 @@ useEffect(() => {
             selectedTool={selectedTool}
             setSelectedTool={setSelectedTool}
             handleRemoveLastAnnotation={handleRemoveLastAnnotation}
-            handleReset={handleReset}
+            handleReset={handleResetAnnotations}
           />
         </div>
   
@@ -420,10 +555,22 @@ useEffect(() => {
               setMarks={setMarks} 
               annotations={annotations} 
               submitCopy={handleSubmitCopy}
+              handleRemoveAnnotation={handleRemoveAnnotation}
+              handleReset={handleResetEval}
             />
           </div>
         </div>
       </div>
+
+
+  {/* Back confirmation popup */}
+  <ConfirmationPopup
+    isOpen={showBackConfirmation}
+    onClose={() => setShowBackConfirmation(false)}
+    onConfirm={confirmBack}
+    message="Are you sure you want to go back? Any unsaved changes will be lost."
+  />
+
     </div>
   );
 

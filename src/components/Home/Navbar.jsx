@@ -6,6 +6,7 @@ import api from '../../api/axios.js';
 import ProfileModal from './ProfileModal'; // ✅ Import
 import { useAuth } from '../context/AuthContext.jsx';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 export default function Navbar({ activeTab, setActiveTab , userData}) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
 
   const username = userData?.name || 'User'; // Get the username from userData or set a default value
     
+  const navigate = useNavigate();
 
 
   // Step 2: Click outside handler
@@ -41,6 +43,10 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
     logout(); // Call the logout function from AuthContext
     toast.success('Logged out successfully!');
   };
+
+  const handleChangePassword = async () => {
+    navigate('/change-password'); // Navigate to the change password page
+  }
 
   return (
     <header className="bg-white shadow">
@@ -121,6 +127,12 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
                       className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-red-100"
                     >
                       Logout
+                    </button>
+                    <button
+                      onClick={handleChangePassword}
+                      className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-red-100"
+                    >
+                      Change-Password
                     </button>
                     {ipAddress&&(<a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                        <h2 className='text-sm'>IP Address: <span className="font-semibold">{ipAddress}</span></h2> 

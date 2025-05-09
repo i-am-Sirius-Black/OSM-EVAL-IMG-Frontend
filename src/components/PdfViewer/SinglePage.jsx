@@ -1184,6 +1184,287 @@
 // export default SinglePage;
 
 //?v2.0 (working)
+// import { memo, useRef, useEffect, useState, useCallback } from "react";
+// import checkImage from "/check.png";
+// import cancelImage from "/cross.png";
+// import PageSkeleton from "../Common/PageSkeleton";
+
+// const SinglePage = memo(
+//   ({
+//     pageNumber,
+//     imageUrl,
+//     width,
+//     height,
+//     onPageClick,
+//     annotations,
+//     selectedTool,
+//     handleRemoveAnnotation,
+//     handleUpdateAnnotation,
+//     handleDrawAnnotation,
+//   }) => {
+//     const pageRef = useRef(null);
+//     const imageContainerRef = useRef(null);
+//     const [isVisible, setIsVisible] = useState(false);
+//     const [isLoaded, setIsLoaded] = useState(false);
+//     const isDrawing = useRef(false);
+//     const currentPath = useRef([]);
+//     const currentAnnotationId = useRef(null);
+
+//     // Lazy load images using Intersection Observer
+//     useEffect(() => {
+//       const observer = new IntersectionObserver(
+//         ([entry]) => {
+//           if (entry.isIntersecting) {
+//             setIsVisible(true);
+//             observer.disconnect();
+//           }
+//         },
+//         { threshold: 0.1 }
+//       );
+
+//       if (pageRef.current) {
+//         observer.observe(pageRef.current);
+//       }
+
+//       return () => observer.disconnect();
+//     }, []);
+
+//     // Start drawing - only within image bounds
+//     const handleMouseDown = useCallback(
+//       (e) => {
+//         if (selectedTool !== "draw") return;
+
+//         e.preventDefault();
+//         isDrawing.current = true;
+
+//         // Make sure we're using the image container bounds
+//         const rect = imageContainerRef.current.getBoundingClientRect();
+//         const x = Math.round(((e.clientX - rect.left) / rect.width) * 100 * 10) / 10;
+//         const y = Math.round(((e.clientY - rect.top) / rect.height) * 100 * 10) / 10;
+
+//         // Only start drawing if within bounds
+//         if (x >= 0 && x <= 100 && y >= 0 && y <= 100) {
+//           currentPath.current = [{ x, y }];
+          
+//           // Create a temporary annotation ID for this drawing session
+//           currentAnnotationId.current = `${pageNumber}-${Date.now()}`;
+          
+//           // Initialize the draw annotation with the first point
+//           handleDrawAnnotation(
+//             "start", 
+//             currentAnnotationId.current, 
+//             pageNumber, 
+//             [...currentPath.current]
+//           );
+//         }
+//       },
+//       [selectedTool, pageNumber, handleDrawAnnotation]
+//     );
+
+//     // Continue drawing - constrain to image bounds
+//     const handleMouseMove = useCallback(
+//       (e) => {
+//         if (!isDrawing.current || selectedTool !== "draw") return;
+
+//         const rect = imageContainerRef.current.getBoundingClientRect();
+//         const x = Math.round(((e.clientX - rect.left) / rect.width) * 100 * 10) / 10;
+//         const y = Math.round(((e.clientY - rect.top) / rect.height) * 100 * 10) / 10;
+
+//         // Constrain coordinates to image area (0-100%)
+//         const constrainedX = Math.max(0, Math.min(100, x));
+//         const constrainedY = Math.max(0, Math.min(100, y));
+
+//         currentPath.current.push({ x: constrainedX, y: constrainedY });
+        
+//         // Update the path in real-time
+//         handleDrawAnnotation(
+//           "update", 
+//           currentAnnotationId.current, 
+//           pageNumber, 
+//           [...currentPath.current]
+//         );
+//       },
+//       [selectedTool, handleDrawAnnotation, pageNumber]
+//     );
+
+//     // Stop drawing
+//     const handleMouseUp = useCallback(() => {
+//       if (!isDrawing.current || selectedTool !== "draw") return;
+
+//       isDrawing.current = false;
+      
+//       if (currentPath.current.length > 1) {
+//         // Finalize the drawing session
+//         handleDrawAnnotation(
+//           "end", 
+//           currentAnnotationId.current, 
+//           pageNumber, 
+//           [...currentPath.current]
+//         );
+//       }
+      
+//       currentPath.current = [];
+//       currentAnnotationId.current = null;
+//     }, [selectedTool, handleDrawAnnotation, pageNumber]);
+
+//     // Render annotations
+//     const renderAnnotation = (annotation) => {
+//       const { id, type, position, text } = annotation;
+      
+//       if (type === "check") {
+//         const style = {
+//           position: "absolute",
+//           left: `${position.x}%`,
+//           top: `${position.y}%`,
+//           transform: "translate(-50%, -50%)",
+//           width: `calc(2rem * ${width / 800})`,  // Scale icon size based on zoom
+//           height: `calc(2rem * ${width / 800})`, //? changed from 1.5rem to 2 rem
+//         };
+        
+//         return (
+//           <img
+//             key={id}
+//             src={checkImage}
+//             alt="Check"
+//             className="w-6 h-6 cursor-pointer"
+//             style={style}
+//             onClick={() => handleRemoveAnnotation(id)}
+//             draggable="false" // Prevent image dragging
+//           />
+//         );
+//       } else if (type === "cancel") {
+//         const style = {
+//           position: "absolute",
+//           left: `${position.x}%`,
+//           top: `${position.y}%`,
+//           transform: "translate(-50%, -50%)",
+//           width: `calc(2rem * ${width / 800})`,  // Scale icon size based on zoom
+//           height: `calc(2rem * ${width / 800})`, //? changed from 1.5rem to 2 rem
+//         };
+        
+//         return (
+//           <img
+//             key={id}
+//             src={cancelImage}
+//             alt="Cross"
+//             className="w-6 h-6 cursor-pointer"
+//             style={style}
+//             onClick={() => handleRemoveAnnotation(id)}
+//             draggable="false" // Prevent image dragging
+//             />
+//         );
+//       } else if (type === "comment") {
+//         const style = {
+//           position: "absolute",
+//           left: `${position.x}%`,
+//           top: `${position.y}%`,
+//           transform: "translate(-50%, -50%)",
+//           // Scale font size based on container width
+//           fontSize: `calc(1rem * ${width / 800})`, // Base size adjusted by zoom ratio
+//         };
+        
+//         return (
+//           <div
+//             key={id}
+//             className="p-2 rounded text-xl font-semibold text-red-500 cursor-pointer select-none"
+//             style={style}
+//             onClick={() => handleRemoveAnnotation(id)}
+//           >
+//             {text}
+//           </div>
+//         );
+//       } else if (type === "draw" && position.path) {
+//         return (
+//           <svg
+//             key={id}
+//             className="absolute top-0 left-0 w-full h-full pointer-events-none"
+//             style={{ zIndex: 10, cursor: 'pointer' }}
+//             viewBox="0 0 100 100" // Use percentage-based viewBox
+//             preserveAspectRatio="none"
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               handleRemoveAnnotation(id);
+//             }}
+//           >
+//             <polyline
+//               points={position.path
+//                 .map((p) => `${p.x},${p.y}`)
+//                 .join(" ")}
+//               stroke="red"
+//               strokeWidth="0.2"
+//               fill="none"
+//               onClick={(e) => {
+//                 e.stopPropagation();
+//                 handleRemoveAnnotation(id);
+//               }}
+//             />
+//           </svg>
+//         );
+//       }
+//       return null;
+//     };
+
+//     return (
+//       <div className="relative mb-8" ref={pageRef}>
+//         {/* Page container */}
+//         <div className="flex flex-col bg-white shadow-md mx-auto" style={{ width: `${width}px` }}>
+//           {/* Image container - drawing events attached here */}
+//           <div 
+//             ref={imageContainerRef}
+//             className={`relative ${selectedTool === "draw" ? 'draw-cursor' : ''}`}
+//             style={{ width: '100%', aspectRatio: '1/1.414' }} // A4 aspect ratio
+//             onClick={onPageClick}
+//             onMouseDown={selectedTool === "draw" ? handleMouseDown : undefined}
+//             onMouseMove={selectedTool === "draw" ? handleMouseMove : undefined}
+//             onMouseUp={selectedTool === "draw" ? handleMouseUp : undefined}
+//             onMouseLeave={selectedTool === "draw" ? handleMouseUp : undefined}
+//             onContextMenu={onPageClick}
+//           >
+//             {isVisible ? (
+//               <>
+//                 <img
+//                   src={imageUrl}
+//                   alt={`Page ${pageNumber}`}
+//                   style={{
+//                     width: "100%",
+//                     height: "100%",
+//                     display: "block",
+//                     opacity: isLoaded ? 1 : 0,
+//                   }}
+//                   loading="lazy"
+//                   onLoad={() => setIsLoaded(true)}
+//                   draggable="false"
+//                 />
+//                 {!isLoaded && (
+//                   <div className="absolute inset-0">
+//                     <PageSkeleton width={width} />
+//                   </div>
+//                 )}
+//               </>
+//             ) : (
+//               <PageSkeleton width={width} pageNumber={pageNumber} />
+//             )}
+//             {/* Annotations contained within image area */}
+//             {annotations.map(renderAnnotation)}
+//           </div>
+          
+//           {/* Page number - separate from image container */}
+//           {isLoaded && (
+//             <div className="text-center py-1 text-gray-600 text-sm font-bold">
+//               Page {pageNumber}
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     );
+//   }
+// );
+
+// export default SinglePage;
+
+
+//? (v2.1) Testing (working)-> Erase functionality for drawing
+
 import { memo, useRef, useEffect, useState, useCallback } from "react";
 import checkImage from "/check.png";
 import cancelImage from "/cross.png";
@@ -1209,6 +1490,7 @@ const SinglePage = memo(
     const isDrawing = useRef(false);
     const currentPath = useRef([]);
     const currentAnnotationId = useRef(null);
+    const isErasing = useRef(false); // Track erasing state
 
     // Lazy load images using Intersection Observer
     useEffect(() => {
@@ -1229,83 +1511,182 @@ const SinglePage = memo(
       return () => observer.disconnect();
     }, []);
 
+
     // Start drawing - only within image bounds
-    const handleMouseDown = useCallback(
+    // const handleMouseDown = useCallback(
+    //   (e) => {
+    //     if (selectedTool !== "draw") return;
+
+    //     e.preventDefault();
+    //     isDrawing.current = true;
+
+    //     // Make sure we're using the image container bounds
+    //     const rect = imageContainerRef.current.getBoundingClientRect();
+    //     const x = Math.round(((e.clientX - rect.left) / rect.width) * 100 * 10) / 10;
+    //     const y = Math.round(((e.clientY - rect.top) / rect.height) * 100 * 10) / 10;
+
+    //     // Only start drawing if within bounds
+    //     if (x >= 0 && x <= 100 && y >= 0 && y <= 100) {
+    //       currentPath.current = [{ x, y }];
+          
+    //       // Create a temporary annotation ID for this drawing session
+    //       currentAnnotationId.current = `${pageNumber}-${Date.now()}`;
+          
+    //       // Initialize the draw annotation with the first point
+    //       handleDrawAnnotation(
+    //         "start", 
+    //         currentAnnotationId.current, 
+    //         pageNumber, 
+    //         [...currentPath.current]
+    //       );
+    //     }
+    //   },
+    //   [selectedTool, pageNumber, handleDrawAnnotation]
+    // );
+
+    //: Start erasing/drawing
+      const handleMouseDown = useCallback(
+        (e) => {
+          e.preventDefault();
+          
+          if (selectedTool === "draw") {
+            isDrawing.current = true;
+  
+            // Make sure we're using the image container bounds
+            const rect = imageContainerRef.current.getBoundingClientRect();
+            const x = Math.round(((e.clientX - rect.left) / rect.width) * 100 * 10) / 10;
+            const y = Math.round(((e.clientY - rect.top) / rect.height) * 100 * 10) / 10;
+  
+            // Only start drawing if within bounds
+            if (x >= 0 && x <= 100 && y >= 0 && y <= 100) {
+              currentPath.current = [{ x, y }];
+              
+              // Create a temporary annotation ID for this drawing session
+              currentAnnotationId.current = `${pageNumber}-${Date.now()}`;
+              
+              // Initialize the draw annotation with the first point
+              handleDrawAnnotation(
+                "start", 
+                currentAnnotationId.current, 
+                pageNumber, 
+                [...currentPath.current]
+              );
+            }
+          } else if (selectedTool === "erase") {
+            isErasing.current = true;
+            checkForErasableAnnotation(e);
+          }
+        },
+        [selectedTool, pageNumber, handleDrawAnnotation]
+      );
+
+    // Check if mouse is over an erasable annotation (drawing)
+    const checkForErasableAnnotation = useCallback(
       (e) => {
-        if (selectedTool !== "draw") return;
+        if (!isErasing.current || selectedTool !== "erase") return;
 
-        e.preventDefault();
-        isDrawing.current = true;
-
-        // Make sure we're using the image container bounds
         const rect = imageContainerRef.current.getBoundingClientRect();
-        const x = Math.round(((e.clientX - rect.left) / rect.width) * 100 * 10) / 10;
-        const y = Math.round(((e.clientY - rect.top) / rect.height) * 100 * 10) / 10;
+        const mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+        const mouseY = ((e.clientY - rect.top) / rect.height) * 100;
+        
+        // Find any drawing annotations near the mouse cursor
+        const drawingAnnotations = annotations.filter(
+          annotation => annotation.type === "draw" && annotation.position.path
+        );
+        
+        // Check each drawing annotation to see if mouse is over a line
+        for (const annotation of drawingAnnotations) {
+          const path = annotation.position.path;
+          
+          // Check if mouse is close to any line segment
+          for (let i = 0; i < path.length - 1; i++) {
+            const p1 = path[i];
+            const p2 = path[i + 1];
+            
+            // Calculate distance from point to line segment
+            if (isPointNearLineSegment(mouseX, mouseY, p1.x, p1.y, p2.x, p2.y, 3)) {
+              handleRemoveAnnotation(annotation.id);
+              return; // Found and removed one annotation, stop checking
+            }
+          }
+        }
+      },
+      [selectedTool, annotations, handleRemoveAnnotation]
+    );
 
-        // Only start drawing if within bounds
-        if (x >= 0 && x <= 100 && y >= 0 && y <= 100) {
-          currentPath.current = [{ x, y }];
+    // Helper function to calculate distance from point to line segment
+    const isPointNearLineSegment = (px, py, x1, y1, x2, y2, tolerance) => {
+      // Calculate squared length of line segment
+      const lengthSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+      if (lengthSquared === 0) return false; // Line segment is a point
+
+      // Calculate projection of point onto line segment
+      let t = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / lengthSquared;
+      t = Math.max(0, Math.min(1, t)); // Clamp t to [0,1]
+
+      // Calculate closest point on line segment
+      const projX = x1 + t * (x2 - x1);
+      const projY = y1 + t * (y2 - y1);
+
+      // Calculate squared distance to closest point
+      const distanceSquared = (px - projX) * (px - projX) + (py - projY) * (py - projY);
+
+      // Convert tolerance from percentage to actual distance
+      const toleranceSquared = (tolerance * tolerance);
+
+      return distanceSquared <= toleranceSquared;
+    };
+
+    // Continue drawing or erasing
+    const handleMouseMove = useCallback(
+      (e) => {
+        if (isDrawing.current && selectedTool === "draw") {
+          const rect = imageContainerRef.current.getBoundingClientRect();
+          const x = Math.round(((e.clientX - rect.left) / rect.width) * 100 * 10) / 10;
+          const y = Math.round(((e.clientY - rect.top) / rect.height) * 100 * 10) / 10;
+
+          // Constrain coordinates to image area (0-100%)
+          const constrainedX = Math.max(0, Math.min(100, x));
+          const constrainedY = Math.max(0, Math.min(100, y));
+
+          currentPath.current.push({ x: constrainedX, y: constrainedY });
           
-          // Create a temporary annotation ID for this drawing session
-          currentAnnotationId.current = `${pageNumber}-${Date.now()}`;
-          
-          // Initialize the draw annotation with the first point
+          // Update the path in real-time
           handleDrawAnnotation(
-            "start", 
+            "update", 
+            currentAnnotationId.current, 
+            pageNumber, 
+            [...currentPath.current]
+          );
+        } else if (isErasing.current && selectedTool === "erase") {
+          checkForErasableAnnotation(e);
+        }
+      },
+      [selectedTool, handleDrawAnnotation, pageNumber, checkForErasableAnnotation]
+    );
+
+    // Stop drawing or erasing
+    const handleMouseUp = useCallback(() => {
+      if (isDrawing.current && selectedTool === "draw") {
+        isDrawing.current = false;
+        
+        if (currentPath.current.length > 1) {
+          // Finalize the drawing session
+          handleDrawAnnotation(
+            "end", 
             currentAnnotationId.current, 
             pageNumber, 
             [...currentPath.current]
           );
         }
-      },
-      [selectedTool, pageNumber, handleDrawAnnotation]
-    );
-
-    // Continue drawing - constrain to image bounds
-    const handleMouseMove = useCallback(
-      (e) => {
-        if (!isDrawing.current || selectedTool !== "draw") return;
-
-        const rect = imageContainerRef.current.getBoundingClientRect();
-        const x = Math.round(((e.clientX - rect.left) / rect.width) * 100 * 10) / 10;
-        const y = Math.round(((e.clientY - rect.top) / rect.height) * 100 * 10) / 10;
-
-        // Constrain coordinates to image area (0-100%)
-        const constrainedX = Math.max(0, Math.min(100, x));
-        const constrainedY = Math.max(0, Math.min(100, y));
-
-        currentPath.current.push({ x: constrainedX, y: constrainedY });
         
-        // Update the path in real-time
-        handleDrawAnnotation(
-          "update", 
-          currentAnnotationId.current, 
-          pageNumber, 
-          [...currentPath.current]
-        );
-      },
-      [selectedTool, handleDrawAnnotation, pageNumber]
-    );
-
-    // Stop drawing
-    const handleMouseUp = useCallback(() => {
-      if (!isDrawing.current || selectedTool !== "draw") return;
-
-      isDrawing.current = false;
-      
-      if (currentPath.current.length > 1) {
-        // Finalize the drawing session
-        handleDrawAnnotation(
-          "end", 
-          currentAnnotationId.current, 
-          pageNumber, 
-          [...currentPath.current]
-        );
+        currentPath.current = [];
+        currentAnnotationId.current = null;
+      } else if (isErasing.current && selectedTool === "erase") {
+        isErasing.current = false;
       }
-      
-      currentPath.current = [];
-      currentAnnotationId.current = null;
     }, [selectedTool, handleDrawAnnotation, pageNumber]);
+
 
     // Render annotations
     const renderAnnotation = (annotation) => {
@@ -1375,30 +1756,62 @@ const SinglePage = memo(
         );
       } else if (type === "draw" && position.path) {
         return (
+          // <svg
+          //   key={id}
+          //   className="absolute top-0 left-0 w-full h-full pointer-events-none"
+          //   style={{ zIndex: 10, cursor: 'pointer' }}
+          //   viewBox="0 0 100 100" // Use percentage-based viewBox
+          //   preserveAspectRatio="none"
+          //   onClick={(e) => {
+          //     e.stopPropagation();
+          //     handleRemoveAnnotation(id);
+          //   }}
+          // >
+          //   <polyline
+          //     points={position.path
+          //       .map((p) => `${p.x},${p.y}`)
+          //       .join(" ")}
+          //     stroke="red"
+          //     strokeWidth="0.2"
+          //     fill="none"
+          //     onClick={(e) => {
+          //       e.stopPropagation();
+          //       handleRemoveAnnotation(id);
+          //     }}
+          //   />
+          // </svg>
           <svg
-            key={id}
-            className="absolute top-0 left-0 w-full h-full pointer-events-none"
-            style={{ zIndex: 10, cursor: 'pointer' }}
-            viewBox="0 0 100 100" // Use percentage-based viewBox
-            preserveAspectRatio="none"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRemoveAnnotation(id);
-            }}
-          >
-            <polyline
-              points={position.path
-                .map((p) => `${p.x},${p.y}`)
-                .join(" ")}
-              stroke="red"
-              strokeWidth="0.2"
-              fill="none"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRemoveAnnotation(id);
-              }}
-            />
-          </svg>
+  key={id}
+  className="absolute top-0 left-0 w-full h-full pointer-events-none"
+  style={{ zIndex: 10, cursor: 'pointer' }}
+  viewBox="0 0 100 100"
+  preserveAspectRatio="none"
+  onClick={(e) => {
+    e.stopPropagation();
+    handleRemoveAnnotation(id);
+  }}
+>
+  {position.path.length === 1 ? (
+    <circle
+      cx={position.path[0].x}
+      cy={position.path[0].y}
+      r="0.1" // small visible dot
+      fill="red"
+    />
+  ) : (
+    <polyline
+      points={position.path.map((p) => `${p.x},${p.y}`).join(" ")}
+      stroke="red"
+      strokeWidth="0.2"
+      fill="none"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleRemoveAnnotation(id);
+      }}
+    />
+  )}
+</svg>
+
         );
       }
       return null;
@@ -1411,15 +1824,16 @@ const SinglePage = memo(
           {/* Image container - drawing events attached here */}
           <div 
             ref={imageContainerRef}
-            className={`relative ${selectedTool === "draw" ? 'draw-cursor' : ''}`}
+            className={`relative ${selectedTool === "draw" ? 'draw-cursor' : ''} ${selectedTool === "erase" ? 'eraser-cursor' : ''}`}
             style={{ width: '100%', aspectRatio: '1/1.414' }} // A4 aspect ratio
-            onClick={onPageClick}
-            onMouseDown={selectedTool === "draw" ? handleMouseDown : undefined}
-            onMouseMove={selectedTool === "draw" ? handleMouseMove : undefined}
-            onMouseUp={selectedTool === "draw" ? handleMouseUp : undefined}
-            onMouseLeave={selectedTool === "draw" ? handleMouseUp : undefined}
+            onClick={selectedTool !== "erase" ? onPageClick : undefined}
+            onMouseDown={selectedTool === "draw" || selectedTool === "erase" ? handleMouseDown : undefined}
+            onMouseMove={selectedTool === "draw" || selectedTool === "erase" ? handleMouseMove : undefined}
+            onMouseUp={selectedTool === "draw" || selectedTool === "erase" ? handleMouseUp : undefined}
+            onMouseLeave={selectedTool === "draw" || selectedTool === "erase" ? handleMouseUp : undefined}
             onContextMenu={onPageClick}
           >
+            {/* ...existing image and annotations rendering... */}
             {isVisible ? (
               <>
                 <img
@@ -1462,4 +1876,378 @@ const SinglePage = memo(
 
 export default SinglePage;
 
+
+//? (v2.2) (Testing)->Masking 1st 2 pages
+
+// import { memo, useRef, useEffect, useState, useCallback } from "react";
+// import checkImage from "/check.png";
+// import cancelImage from "/cross.png";
+// import PageSkeleton from "../Common/PageSkeleton";
+
+// const SinglePage = memo(
+//   ({
+//     pageNumber,
+//     imageUrl,
+//     width,
+//     height,
+//     onPageClick,
+//     annotations,
+//     selectedTool,
+//     handleRemoveAnnotation,
+//     handleUpdateAnnotation,
+//     handleDrawAnnotation,
+//   }) => {
+//     const pageRef = useRef(null);
+//     const imageContainerRef = useRef(null);
+//     const [isVisible, setIsVisible] = useState(false);
+//     const [isLoaded, setIsLoaded] = useState(false);
+//     const isDrawing = useRef(false);
+//     const currentPath = useRef([]);
+//     const currentAnnotationId = useRef(null);
+//     const isErasing = useRef(false); // Track erasing state
+
+//     // Check if this page should be masked (page 1 and 2)
+//     const shouldMaskPage = pageNumber === 1 || pageNumber === 2;
+
+//     // Lazy load images using Intersection Observer
+//     useEffect(() => {
+//       const observer = new IntersectionObserver(
+//         ([entry]) => {
+//           if (entry.isIntersecting) {
+//             setIsVisible(true);
+//             observer.disconnect();
+//           }
+//         },
+//         { threshold: 0.1 }
+//       );
+
+//       if (pageRef.current) {
+//         observer.observe(pageRef.current);
+//       }
+
+//       return () => observer.disconnect();
+//     }, []);
+
+//     // Start erasing/drawing
+//     const handleMouseDown = useCallback(
+//       (e) => {
+//         // Don't allow drawing or erasing on masked pages
+//         if (shouldMaskPage) return;
+        
+//         e.preventDefault();
+        
+//         if (selectedTool === "draw") {
+//           isDrawing.current = true;
+
+//           // Make sure we're using the image container bounds
+//           const rect = imageContainerRef.current.getBoundingClientRect();
+//           const x = Math.round(((e.clientX - rect.left) / rect.width) * 100 * 10) / 10;
+//           const y = Math.round(((e.clientY - rect.top) / rect.height) * 100 * 10) / 10;
+
+//           // Only start drawing if within bounds
+//           if (x >= 0 && x <= 100 && y >= 0 && y <= 100) {
+//             currentPath.current = [{ x, y }];
+            
+//             // Create a temporary annotation ID for this drawing session
+//             currentAnnotationId.current = `${pageNumber}-${Date.now()}`;
+            
+//             // Initialize the draw annotation with the first point
+//             handleDrawAnnotation(
+//               "start", 
+//               currentAnnotationId.current, 
+//               pageNumber, 
+//               [...currentPath.current]
+//             );
+//           }
+//         } else if (selectedTool === "erase") {
+//           isErasing.current = true;
+//           checkForErasableAnnotation(e);
+//         }
+//       },
+//       [selectedTool, pageNumber, handleDrawAnnotation, shouldMaskPage]
+//     );
+
+//     // Check if mouse is over an erasable annotation (drawing)
+//     const checkForErasableAnnotation = useCallback(
+//       (e) => {
+//         if (!isErasing.current || selectedTool !== "erase") return;
+
+//         const rect = imageContainerRef.current.getBoundingClientRect();
+//         const mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+//         const mouseY = ((e.clientY - rect.top) / rect.height) * 100;
+        
+//         // Find any drawing annotations near the mouse cursor
+//         const drawingAnnotations = annotations.filter(
+//           annotation => annotation.type === "draw" && annotation.position.path
+//         );
+        
+//         // Check each drawing annotation to see if mouse is over a line
+//         for (const annotation of drawingAnnotations) {
+//           const path = annotation.position.path;
+          
+//           // Check if mouse is close to any line segment
+//           for (let i = 0; i < path.length - 1; i++) {
+//             const p1 = path[i];
+//             const p2 = path[i + 1];
+            
+//             // Calculate distance from point to line segment
+//             if (isPointNearLineSegment(mouseX, mouseY, p1.x, p1.y, p2.x, p2.y, 3)) {
+//               handleRemoveAnnotation(annotation.id);
+//               return; // Found and removed one annotation, stop checking
+//             }
+//           }
+//         }
+//       },
+//       [selectedTool, annotations, handleRemoveAnnotation]
+//     );
+
+//     // Helper function to calculate distance from point to line segment
+//     const isPointNearLineSegment = (px, py, x1, y1, x2, y2, tolerance) => {
+//       // Calculate squared length of line segment
+//       const lengthSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+//       if (lengthSquared === 0) return false; // Line segment is a point
+
+//       // Calculate projection of point onto line segment
+//       let t = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / lengthSquared;
+//       t = Math.max(0, Math.min(1, t)); // Clamp t to [0,1]
+
+//       // Calculate closest point on line segment
+//       const projX = x1 + t * (x2 - x1);
+//       const projY = y1 + t * (y2 - y1);
+
+//       // Calculate squared distance to closest point
+//       const distanceSquared = (px - projX) * (px - projX) + (py - projY) * (py - projY);
+
+//       // Convert tolerance from percentage to actual distance
+//       const toleranceSquared = (tolerance * tolerance);
+
+//       return distanceSquared <= toleranceSquared;
+//     };
+
+//     // Continue drawing or erasing
+//     const handleMouseMove = useCallback(
+//       (e) => {
+//         // Don't handle mouse moves on masked pages
+//         if (shouldMaskPage) return;
+        
+//         if (isDrawing.current && selectedTool === "draw") {
+//           const rect = imageContainerRef.current.getBoundingClientRect();
+//           const x = Math.round(((e.clientX - rect.left) / rect.width) * 100 * 10) / 10;
+//           const y = Math.round(((e.clientY - rect.top) / rect.height) * 100 * 10) / 10;
+
+//           // Constrain coordinates to image area (0-100%)
+//           const constrainedX = Math.max(0, Math.min(100, x));
+//           const constrainedY = Math.max(0, Math.min(100, y));
+
+//           currentPath.current.push({ x: constrainedX, y: constrainedY });
+          
+//           // Update the path in real-time
+//           handleDrawAnnotation(
+//             "update", 
+//             currentAnnotationId.current, 
+//             pageNumber, 
+//             [...currentPath.current]
+//           );
+//         } else if (isErasing.current && selectedTool === "erase") {
+//           checkForErasableAnnotation(e);
+//         }
+//       },
+//       [selectedTool, handleDrawAnnotation, pageNumber, checkForErasableAnnotation, shouldMaskPage]
+//     );
+
+//     // Stop drawing or erasing
+//     const handleMouseUp = useCallback(() => {
+//       if (shouldMaskPage) return;
+      
+//       if (isDrawing.current && selectedTool === "draw") {
+//         isDrawing.current = false;
+        
+//         if (currentPath.current.length > 1) {
+//           // Finalize the drawing session
+//           handleDrawAnnotation(
+//             "end", 
+//             currentAnnotationId.current, 
+//             pageNumber, 
+//             [...currentPath.current]
+//           );
+//         }
+        
+//         currentPath.current = [];
+//         currentAnnotationId.current = null;
+//       } else if (isErasing.current && selectedTool === "erase") {
+//         isErasing.current = false;
+//       }
+//     }, [selectedTool, handleDrawAnnotation, pageNumber, shouldMaskPage]);
+
+//     // Render annotations
+//     const renderAnnotation = (annotation) => {
+//       // Don't show annotations on masked pages
+//       if (shouldMaskPage) return null;
+      
+//       const { id, type, position, text } = annotation;
+      
+//       if (type === "check") {
+//         const style = {
+//           position: "absolute",
+//           left: `${position.x}%`,
+//           top: `${position.y}%`,
+//           transform: "translate(-50%, -50%)",
+//           width: `calc(2rem * ${width / 800})`,  // Scale icon size based on zoom
+//           height: `calc(2rem * ${width / 800})`, 
+//         };
+        
+//         return (
+//           <img
+//             key={id}
+//             src={checkImage}
+//             alt="Check"
+//             className="w-6 h-6 cursor-pointer"
+//             style={style}
+//             onClick={() => handleRemoveAnnotation(id)}
+//             draggable="false" // Prevent image dragging
+//           />
+//         );
+//       } else if (type === "cancel") {
+//         const style = {
+//           position: "absolute",
+//           left: `${position.x}%`,
+//           top: `${position.y}%`,
+//           transform: "translate(-50%, -50%)",
+//           width: `calc(2rem * ${width / 800})`,
+//           height: `calc(2rem * ${width / 800})`,
+//         };
+        
+//         return (
+//           <img
+//             key={id}
+//             src={cancelImage}
+//             alt="Cross"
+//             className="w-6 h-6 cursor-pointer"
+//             style={style}
+//             onClick={() => handleRemoveAnnotation(id)}
+//             draggable="false"
+//           />
+//         );
+//       } else if (type === "comment") {
+//         const style = {
+//           position: "absolute",
+//           left: `${position.x}%`,
+//           top: `${position.y}%`,
+//           transform: "translate(-50%, -50%)",
+//           fontSize: `calc(1rem * ${width / 800})`,
+//         };
+        
+//         return (
+//           <div
+//             key={id}
+//             className="p-2 rounded text-xl font-semibold text-red-500 cursor-pointer select-none"
+//             style={style}
+//             onClick={() => handleRemoveAnnotation(id)}
+//           >
+//             {text}
+//           </div>
+//         );
+//       } else if (type === "draw" && position.path) {
+//         return (
+//           <svg
+//             key={id}
+//             className="absolute top-0 left-0 w-full h-full pointer-events-none"
+//             style={{ zIndex: 10, cursor: 'pointer' }}
+//             viewBox="0 0 100 100"
+//             preserveAspectRatio="none"
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               handleRemoveAnnotation(id);
+//             }}
+//           >
+//             {position.path.length === 1 ? (
+//               <circle
+//                 cx={position.path[0].x}
+//                 cy={position.path[0].y}
+//                 r="0.1"
+//                 fill="red"
+//               />
+//             ) : (
+//               <polyline
+//                 points={position.path.map((p) => `${p.x},${p.y}`).join(" ")}
+//                 stroke="red"
+//                 strokeWidth="0.2"
+//                 fill="none"
+//                 onClick={(e) => {
+//                   e.stopPropagation();
+//                   handleRemoveAnnotation(id);
+//                 }}
+//               />
+//             )}
+//           </svg>
+//         );
+//       }
+//       return null;
+//     };
+
+//     return (
+//       <div className="relative mb-8" ref={pageRef}>
+//         {/* Page container */}
+//         <div className="flex flex-col bg-white shadow-md mx-auto" style={{ width: `${width}px` }}>
+//           {/* Image container - drawing events attached here */}
+//           <div 
+//             ref={imageContainerRef}
+//             className={`relative ${selectedTool === "draw" ? 'draw-cursor' : ''} ${selectedTool === "erase" ? 'eraser-cursor' : ''}`}
+//             style={{ width: '100%', aspectRatio: '1/1.414' }} // A4 aspect ratio
+//             onClick={shouldMaskPage ? undefined : (selectedTool !== "erase" ? onPageClick : undefined)}
+//             onMouseDown={shouldMaskPage ? undefined : (selectedTool === "draw" || selectedTool === "erase" ? handleMouseDown : undefined)}
+//             onMouseMove={shouldMaskPage ? undefined : (selectedTool === "draw" || selectedTool === "erase" ? handleMouseMove : undefined)}
+//             onMouseUp={shouldMaskPage ? undefined : (selectedTool === "draw" || selectedTool === "erase" ? handleMouseUp : undefined)}
+//             onMouseLeave={shouldMaskPage ? undefined : (selectedTool === "draw" || selectedTool === "erase" ? handleMouseUp : undefined)}
+//             onContextMenu={shouldMaskPage ? undefined : onPageClick}
+//           >
+//             {/* Conditional rendering - either show masked overlay or the image */}
+//             {shouldMaskPage ? (
+//               // Masked page overlay
+//               <div className="absolute inset-0 bg-gray-400 flex items-center justify-center">
+//                 <p className="text-white text-2xl font-bold select-none">This Page is MASKED</p>
+//               </div>
+//             ) : (
+//               // Normal page content
+//               isVisible ? (
+//                 <>
+//                   <img
+//                     src={imageUrl}
+//                     alt={`Page ${pageNumber}`}
+//                     style={{
+//                       width: "100%",
+//                       height: "100%",
+//                       display: "block",
+//                       opacity: isLoaded ? 1 : 0,
+//                     }}
+//                     loading="lazy"
+//                     onLoad={() => setIsLoaded(true)}
+//                     draggable="false"
+//                   />
+//                   {!isLoaded && (
+//                     <div className="absolute inset-0">
+//                       <PageSkeleton width={width} />
+//                     </div>
+//                   )}
+//                 </>
+//               ) : (
+//                 <PageSkeleton width={width} pageNumber={pageNumber} />
+//               )
+//             )}
+            
+//             {/* Only show annotations on non-masked pages */}
+//             {!shouldMaskPage && annotations.map(renderAnnotation)}
+//           </div>
+          
+//           {/* Page number - separate from image container */}
+//           <div className="text-center py-1 text-gray-600 text-sm font-bold">
+//             Page {pageNumber} {shouldMaskPage && "(Masked)"}
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+// );
+
+// export default SinglePage;
 

@@ -83,6 +83,7 @@ const useAnnotations = () => {
         text: '',
       };
       setAnnotations((prev) => [...prev, newAnnotation]);
+      
     } else if (action === 'update') {
       // Update existing drawing annotation
       setAnnotations((prev) => 
@@ -102,6 +103,8 @@ const useAnnotations = () => {
 
   // Remove annotation by ID
   const handleRemoveAnnotation = useCallback((id) => {
+    console.log("Removing annotation with ID:", id);
+    
     setAnnotations((prev) => prev.filter((a) => a.id !== id));
   }, []);
 

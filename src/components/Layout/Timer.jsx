@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 
-const Timer = ({ 
-  initialSeconds = 0, 
-  isActive = false, 
-  onToggle, 
-  onTimeUpdate,
-  showControls = true,
-}) => {
-  const [seconds, setSeconds] = useState(initialSeconds);
+// Use forwardRef to expose methods to parent
+const Timer = forwardRef(({ isActive = false, onToggle, showControls = true }, ref) => {
+  const [seconds, setSeconds] = useState(0);
   const [timerActive, setTimerActive] = useState(isActive);
+
+  // Expose the getCurrentTime method to parent via ref
+  useImperativeHandle(ref, () => ({
+    getCurrentTime: () => seconds
+  }));
 
   // Format time to HH:MM:SS
   const formatTime = (totalSeconds) => {
@@ -46,13 +46,6 @@ const Timer = ({
     };
   }, [timerActive]);
 
-  // Notify parent of time updates
-  useEffect(() => {
-    if (onTimeUpdate) {
-      onTimeUpdate(seconds);
-    }
-  }, [seconds, onTimeUpdate]);
-
   return (
     <div className="inline-flex items-center text-xs gap-1">
       {showControls && (
@@ -69,6 +62,6 @@ const Timer = ({
       <span className="font-medium">{formatTime(seconds)}</span>
     </div>
   );
-};
+});
 
 export default Timer;

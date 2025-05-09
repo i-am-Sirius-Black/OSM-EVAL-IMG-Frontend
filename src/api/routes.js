@@ -15,9 +15,9 @@ const API_ROUTES = {
     AUTH: {
       REGISTER: '/auth/register',
       LOGIN: '/auth/login',
-      ADMIN_LOGIN: '/admin-login', //: not made yet
       CHECK: '/auth/check',
       GET_NEW_UID: '/auth/uid/new',
+      CHANGE_PASSWORD: '/auth/change-password',
     },
   
     // Exam routes
@@ -56,8 +56,17 @@ const API_ROUTES = {
     // Copy management routes
     COPY_MANAGEMENT: {
       REJECT: '/api/evaluations/reject',
-      UNREJECT: '/api/evaluations/unreject',
-      GET_REJECTED: '/api/evaluations/rejected',
+    },
+
+    // Admin routes
+    ADMIN: {
+      ADMIN_LOGIN: '/api/admin/login',
+      ADMIN_LOGOUT: '/api/admin/logout',
+      GET_EVALUATORS: '/api/admin/evaluators',
+      ASSIGN_SUBJECT: '/api/admin/assign-subject', //: not made yet
+      GET_ASSIGNMENTS: '/api/admin/assignments', //: not made yet
+      GET_REJECTED_COPIES: '/api/evaluations/rejected', //get rejected copies
+      UNREJECT_COPIES: '/api/evaluations/unreject',//unreject copy
     },
   };
   

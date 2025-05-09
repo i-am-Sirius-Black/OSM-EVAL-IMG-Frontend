@@ -2,12 +2,21 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import api from '../../api/axios';
 import API_ROUTES from '../../api/routes';
 
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [adminLoading, setAdminLoading] = useState(true);
+  const [isAdmin, setIsAdminState] = useState(false);
+
+// Update isAdmin when admin state changes
+  useEffect(() => {
+    setIsAdminState(admin && admin.role === 'admin');
+  }, [admin]);
 
   // Check for existing auth on mount
   useEffect(() => {
@@ -38,7 +47,37 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
 
-  console.log("AuthContext", isAuthenticated, user, loading);
+ // Check for existing admin auth on mount
+useEffect(() => {
+  const checkAdminAuth = async () => {
+    // First check localStorage for admin
+    const storedAdmin = localStorage.getItem('adminUser');
+    
+    if (storedAdmin) {
+      try {
+        const adminData = JSON.parse(storedAdmin);
+        
+        // Verify admin with backend (you can create a dedicated admin check endpoint)
+        try {
+          await api.get(API_ROUTES.AUTH.CHECK);
+          // Admin auth is valid, set admin data
+          setAdmin(adminData); // IMPORTANT: Only set admin after verification
+        } catch (err) {
+          // Admin token invalid or expired
+          localStorage.removeItem('adminUser');
+        }
+      } catch (err) {
+        // JSON parse error or other issue
+        localStorage.removeItem('adminUser');
+      }
+    }
+    
+    // Always set loading to false, regardless of outcome
+    setAdminLoading(false);
+  };
+  
+  checkAdminAuth();
+}, []); 
   
   
 // Function to update user data after login
@@ -51,6 +90,16 @@ const setAuthenticatedUser = (userData) => {
     setIsAuthenticated(true);
   };
 
+  // Function to update admin data after admin login
+const setAuthenticatedAdmin = (adminData) => {
+  // Store admin data in localStorage first
+  localStorage.setItem("adminUser", JSON.stringify(adminData));
+  
+  // Then update state (do this in one operation)
+  setAdmin(adminData);
+  setAdminLoading(false); // Make sure loading is false
+};
+
   // Function to clear auth on logout
   const logout = () => {
     localStorage.removeItem('evalUserData');
@@ -58,13 +107,24 @@ const setAuthenticatedUser = (userData) => {
     setIsAuthenticated(false);
   };
 
+    // Function to clear admin auth on admin logout
+    const adminLogout = () => {
+      localStorage.removeItem('adminUser');
+      setAdmin(null);
+    };
+
   return (
     <AuthContext.Provider value={{ 
       isAuthenticated,
       user,
+      admin,
+      isAdmin,
+      adminLoading,
       loading,
       setAuthenticatedUser,
-      logout
+      setAuthenticatedAdmin,
+      logout,
+      adminLogout,
     }}>
       {children}
     </AuthContext.Provider>
