@@ -55,17 +55,10 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Dashboard className="icon h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">OSM-Portal</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">OSM</span>
             </div>
             <nav className="ml-16 flex space-x-8">
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`${
-                  activeTab === 'dashboard' ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
-              >
-                Dashboard
-              </button>
+              
               <button
                 onClick={() => setActiveTab('evaluation')}
                 className={`${
@@ -76,13 +69,21 @@ export default function Navbar({ activeTab, setActiveTab , userData}) {
                 Evaluation
               </button>
               <button
+                onClick={() => setActiveTab('status')}
+                className={`${
+                  activeTab === 'status' ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+              >
+                Status
+              </button>
+              {/* <button
                 onClick={() => setActiveTab('reports')}
                 className={`${
                   activeTab === 'reports' ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
               >
                 Reports
-              </button>
+              </button> */}
             </nav>
           </div>
           <div className="flex items-center">

@@ -4,12 +4,12 @@ import Navbar from './Navbar';
 import DashboardSummary from './DashboardSummary';
 import Evaluation from './Evaluation';
 import Reports from './Reports';
-import CheckingStatus from './CheckingStatus';
+import EvaluationStatus from './EvaluationStatus';
 import { useAuth } from '../context/AuthContext';
 import Loader from '../Common/Loader';
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('evaluation');
 
   const { user, loading } = useAuth();
 
@@ -22,16 +22,16 @@ export default function Dashboard() {
       {loading ? <Loader/> : (
         <>
               <Navbar activeTab={activeTab} setActiveTab={setActiveTab} userData={user}/>
-              {activeTab === 'dashboard' && (
+              {activeTab === 'status' && (
                 <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                  <DashboardSummary />
-                  <div className="mt-6">
-                    <CheckingStatus />
+                  {/* <DashboardSummary /> */}
+                  <div className="mt-1">
+                    <EvaluationStatus />
                   </div>
                 </main>
               )}
               {activeTab === 'evaluation' && <Evaluation />}
-              {activeTab === 'reports' && <Reports />}
+              {/* {activeTab === 'reports' && <Reports />} */}
               <div className="nav-item">
         </div>
         </>

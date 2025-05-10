@@ -135,6 +135,8 @@ const navigate = useNavigate();
 console.log("Eval Layout rerendering");
 
 
+
+
   // Clear the timer when component unmounts
   useEffect(() => {
     return () => {
@@ -278,7 +280,7 @@ useEffect(() => {
       // Only reset annotations, preserve marks
       setAnnotations([]);
       setSelectedTool(null);
-      
+      const seconds = getElapsedTime();
       // Update localStorage with empty annotations but keep existing marks
       const currentState = JSON.parse(localStorage.getItem(`evaluationState-${copyId}`) || '{}');
       localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify({
@@ -316,7 +318,7 @@ useEffect(() => {
     try {
       // Only reset marks, preserve annotations
       setMarks({});
-      
+      const seconds = getElapsedTime();
       // Update localStorage with empty marks but keep existing annotations
       const currentState = JSON.parse(localStorage.getItem(`evaluationState-${copyId}`) || '{}');
       localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify({
@@ -436,7 +438,13 @@ useEffect(() => {
   //?v1.2 simple toast message
 
   const handleSubmitCopy = async (submissionData) => {
-    
+      
+    const seconds = getElapsedTime();
+    if(seconds < 600) {
+      toast.error('Evaluation time is less than 10 minutes.');
+      return false; // Indicate failure to caller
+    }
+
     try {
       // Step 1: Save Annotations
       const annotationResponse = await saveAnnotations(copyId, {
@@ -449,7 +457,6 @@ useEffect(() => {
         return false; // Indicate failure to caller
       }
 
-      const seconds = getElapsedTime();
   
       // Step 2: Save Evaluation
       const evaluationData = {
@@ -481,6 +488,8 @@ useEffect(() => {
   const getElapsedTime = () => {
     return timerRef.current?.getCurrentTime() || 0;
   }
+
+  
  
   const handleBack = () => {
     setShowBackConfirmation(true); // Show confirmation popup, include time in message if needed

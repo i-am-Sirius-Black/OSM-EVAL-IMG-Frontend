@@ -1075,9 +1075,9 @@ const EvaluationPanel = memo(
 
       // Then check annotations
       const annotationsValidationResult = validateAnnotations();
-      // if (!annotationsValidationResult.valid) {
-      //   return annotationsValidationResult;
-      // }
+      if (!annotationsValidationResult.valid) {
+        return annotationsValidationResult;
+      }
 
       // If both passed, return overall valid result
       return { valid: true };
@@ -1265,7 +1265,7 @@ const EvaluationPanel = memo(
                 >
                   <div className="flex items-baseline mb-2">
                     <span className="text-sm font-semibold text-gray-800">
-                      Q-{groupNum}
+                      Section-{groupNum}
                     </span>
                     <span className="ml-auto text-xs text-gray-500">
                       {groupQuestions.reduce((sum, q) => sum + q.maxMark, 0)}{" "}

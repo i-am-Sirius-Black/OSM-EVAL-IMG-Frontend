@@ -1,165 +1,8 @@
 
-// import React from 'react';
-
-// const CheckingStatus = () => {
-//   // Mock data for each status column
-//   const mockData = {
-//     checked: [
-//       { id: 'CP001', subjectName: 'Mathematics', date: '2025-04-26', score: '85/100' },
-//       { id: 'CP003', subjectName: 'Physics', date: '2025-04-27', score: '92/100' },
-//       { id: 'CP007', subjectName: 'Chemistry', date: '2025-04-28', score: '78/100' },
-//     ],
-//     partiallyChecked: [
-//       { id: 'CP002', subjectName: 'Mathematics', date: '2025-04-26', progress: '60%' },
-//       { id: 'CP005', subjectName: 'Biology', date: '2025-04-28', progress: '45%' },
-//     ],
-//     pending: [
-//       { id: 'CP004', subjectName: 'Physics', date: '2025-04-27', status: 'Not Started' },
-//       { id: 'CP006', subjectName: 'Chemistry', date: '2025-04-28', status: 'Assigned' },
-//       { id: 'CP008', subjectName: 'Biology', date: '2025-04-29', status: 'Assigned' },
-//       { id: 'CP009', subjectName: 'Mathematics', date: '2025-04-29', status: 'Not Started' },
-//     ]
-//   };
-
-//   return (
-//     <div className="bg-white rounded-lg shadow">
-//       <div className="px-4 py-4 border-b border-gray-200">
-//         <h3 className="text-lg font-medium text-gray-900">Evaluation Status</h3>
-//       </div>
-      
-//       <div className="h-[40vh] overflow-x-hidden overflow-y-auto">
-//         <table className="min-w-full divide-y divide-gray-200">
-//           <thead className="bg-gray-50">
-//             <tr>
-//               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                 Copy ID
-//               </th>
-//               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                 Subject
-//               </th>
-//               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                 Date
-//               </th>
-//               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                 Status
-//               </th>
-//               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                 Details
-//               </th>
-//             </tr>
-//           </thead>
-//           <tbody className="bg-white divide-y divide-gray-200">
-//             {/* Checked Copies */}
-//             {mockData.checked.map((copy) => (
-//               <tr key={copy.id} className="hover:bg-gray-50">
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-//                   {copy.id}
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-//                   {copy.subjectName}
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-//                   {copy.date}
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap">
-//                   <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-//                     Checked
-//                   </span>
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-//                   {copy.score}
-//                 </td>
-//               </tr>
-//             ))}
-            
-//             {/* Partially Checked Copies */}
-//             {mockData.partiallyChecked.map((copy) => (
-//               <tr key={copy.id} className="hover:bg-gray-50">
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-//                   {copy.id}
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-//                   {copy.subjectName}
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-//                   {copy.date}
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap">
-//                   <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-//                     Partial
-//                   </span>
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap">
-//                   <div className="w-24 bg-gray-200 rounded-full h-1.5">
-//                     <div 
-//                       className="bg-yellow-500 h-1.5 rounded-full" 
-//                       style={{ width: copy.progress }}
-//                     ></div>
-//                   </div>
-//                   <span className="text-xs text-gray-500 ml-1">{copy.progress}</span>
-//                 </td>
-//               </tr>
-//             ))}
-            
-//             {/* Pending Copies */}
-//             {mockData.pending.map((copy) => (
-//               <tr key={copy.id} className="hover:bg-gray-50">
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-//                   {copy.id}
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-//                   {copy.subjectName}
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-//                   {copy.date}
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap">
-//                   <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-//                     Pending
-//                   </span>
-//                 </td>
-//                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-//                   {copy.status}
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-      
-//       {/* Summary Section */}
-//       <div className="px-4 py-3 bg-gray-50 text-xs text-gray-500 border-t border-gray-200">
-//         <div className="flex space-x-4">
-//           <div>
-//             <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1"></span>
-//             Checked: {mockData.checked.length}
-//           </div>
-//           <div>
-//             <span className="inline-block w-3 h-3 rounded-full bg-yellow-500 mr-1"></span>
-//             Partial: {mockData.partiallyChecked.length}
-//           </div>
-//           <div>
-//             <span className="inline-block w-3 h-3 rounded-full bg-gray-400 mr-1"></span>
-//             Pending: {mockData.pending.length}
-//           </div>
-//           <div className="ml-auto">
-//             Total: {mockData.checked.length + mockData.partiallyChecked.length + mockData.pending.length}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CheckingStatus;
-
-
-
-//?
-
 import React, { useState, useMemo } from 'react';
+import Evaluation from './Evaluation';
 
-const CheckingStatus = () => {
+const EvaluationStatus = () => {
   const [sortConfig, setSortConfig] = useState({
     key: null,
     direction: 'ascending'
@@ -265,7 +108,7 @@ const CheckingStatus = () => {
         </div>
       </div>
       
-      <div className="h-[40vh] overflow-x-hidden overflow-y-auto">
+      <div className="h-[60vh] overflow-x-hidden overflow-y-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
@@ -390,4 +233,4 @@ const CheckingStatus = () => {
   );
 };
 
-export default CheckingStatus;
+export default EvaluationStatus;

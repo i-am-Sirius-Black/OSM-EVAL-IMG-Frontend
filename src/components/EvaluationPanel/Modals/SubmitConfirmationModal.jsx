@@ -224,7 +224,7 @@ const SubmitConfirmationModal = ({ isOpen, onClose, onConfirm, marks, questions 
                       <React.Fragment key={groupNum}>
                         <tr className="bg-gray-50">
                           <td colSpan="3" className="px-3 py-2">
-                            <div className="font-medium text-sm text-gray-700">Question {groupNum}</div>
+                            <div className="font-medium text-sm text-gray-700">Section {groupNum}</div>
                           </td>
                         </tr>
                         {groupQuestions.map((q) => (

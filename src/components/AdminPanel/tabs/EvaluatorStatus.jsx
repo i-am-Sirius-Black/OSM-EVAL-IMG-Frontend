@@ -1,27 +1,44 @@
 import React, { useState, useEffect } from 'react';
+import API_ROUTES from '../../../api/routes';
+import api from '../../../api/axios.js'; 
 
 const EvaluatorStatus = () => {
   const [evaluators, setEvaluators] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Fetch evaluators data from API
-    fetch('/api/evaluators') // Replace with your API endpoint
-      .then((res) => res.json())
-      .then((data) => {
-        setEvaluators(data);
-        setLoading(false);
-      })
-      .catch(error => {
+
+useEffect(() => {
+    const fetchEvaluatorsStatus = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get(API_ROUTES.ADMIN.GET_EVALUATORS_STATUS);
+        const data = response.data.evaluators;
+
+        console.log("Fetched evaluators data:", data);
+        
+        // Transform the API data to match your component's expected structure
+        const formattedEvaluators = data.map(evaluator => ({
+          id: evaluator.evaluatorId,
+          name: evaluator.name || evaluator.evaluatorId, // Use ID as fallback if name is missing
+          checked: evaluator.checked,
+          remaining: evaluator.pending,
+          total: evaluator.totalAssigned,
+          email: evaluator.email || ""
+        }));
+        
+        setEvaluators(formattedEvaluators);
+        console.log("Set evaluators data:", formattedEvaluators);
+        
+      } catch (error) {
         console.error('Error fetching evaluators:', error);
+        // Set empty array in case of error
+        setEvaluators([]);
+      } finally {
         setLoading(false);
-        // For demo purposes, add some sample data
-        setEvaluators([
-          { id: 1, name: 'John Doe', checkedCopies: 45, remainingCopies: 15, subject: 'Mathematics' },
-          { id: 2, name: 'Jane Smith', checkedCopies: 32, remainingCopies: 28, subject: 'Physics' },
-          { id: 3, name: 'Mike Johnson', checkedCopies: 56, remainingCopies: 0, subject: 'Chemistry' }
-        ]);
-      });
+      }
+    };
+    
+    fetchEvaluatorsStatus();
   }, []);
 
   return (
@@ -39,16 +56,19 @@ const EvaluatorStatus = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Evaluator Name
+                    Name
+                  </th>
+                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    ID
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Subject
+                    Assigned
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Checked Copies
+                    Checked
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Remaining Copies
+                    Remaining
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Progress
@@ -57,22 +77,25 @@ const EvaluatorStatus = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {evaluators.map((evaluator) => {
-                  const total = evaluator.checkedCopies + evaluator.remainingCopies;
-                  const progress = total > 0 ? (evaluator.checkedCopies / total) * 100 : 100;
+                  const total = evaluator.total;
+                  const progress = total > 0 ? (evaluator.checked / total) * 100 : 100;
                   
                   return (
                     <tr key={evaluator.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-medium text-gray-900">{evaluator.name}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{evaluator.subject}</div>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{evaluator.id}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{evaluator.checkedCopies}</div>
+                        <div className="text-sm font-semibold text-blue-600">{evaluator.total}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{evaluator.remainingCopies}</div>
+                        <div className="text-sm text-gray-900">{evaluator.checked}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{evaluator.remaining}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="w-full bg-gray-200 rounded-full h-2.5">

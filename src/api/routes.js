@@ -45,6 +45,8 @@ const API_ROUTES = {
     EVALUATION: {
     //   GET_COPY: (copyId) => `/api/evaluate/${copyId}`, //: not made yet
       SAVE: '/api/evaluations',
+      GET_COPIES: '/api/evaluations/fetchAssignedCopies', //get assigned copies to evaluate
+      GET_EVALUATION_STATS: '/api/evaluations/stats', //get evaluation stats for a specific evaluator
     },
   
     // Annotation routes
@@ -66,7 +68,8 @@ const API_ROUTES = {
       ASSIGN_SUBJECT: '/api/admin/assign-subject', //: not made yet
       GET_ASSIGNMENTS: '/api/admin/assignments', //: not made yet
       GET_REJECTED_COPIES: '/api/evaluations/rejected', //get rejected copies
-      UNREJECT_COPIES: '/api/evaluations/unreject',//unreject copy
+      UNREJECT_COPIES: '/api/evaluations/unreject',//unreject copies
+      GET_EVALUATORS_STATUS: '/api/admin/get-evaluators-status', //get all evaluators status
     },
   };
   
