@@ -572,7 +572,7 @@ const ImageViewer = memo(
         </div> */}
 
         {/* Zoom Controls */}
-        <div className="sticky top-0 z-10 bg-white px-2 py-1 border-b border-gray-200 flex justify-end items-center">
+        <div className="sticky top-0 z-20 bg-white px-2 py-1 border-b border-gray-200 flex justify-end items-center">
           <div className="flex items-center bg-gray-50 rounded-md border border-gray-200 shadow-sm">
             <button
               onClick={() => setZoom((prev) => Math.max(0.5, prev - 0.1))}

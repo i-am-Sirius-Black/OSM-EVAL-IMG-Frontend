@@ -219,7 +219,7 @@ useEffect(() => {
         marks,
       };
       localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify(state));
-      console.log("State saved to localStorage:", state);
+      console.log("State saved to localStorage:", copyId, "state->", state);
       
       // Show the success icon
       setIsSaving(false);
@@ -272,7 +272,6 @@ useEffect(() => {
   //     console.error('Error during reset:', error);
   //   }
   // };
-
 
 
   const handleResetAnnotations = () => {

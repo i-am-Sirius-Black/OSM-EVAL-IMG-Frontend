@@ -12,8 +12,17 @@ import PublicRoute from './components/PublicRoute';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './components/context/AuthContext';
 import ChangePassword from './Pages/ChangePassword';
+import { useEffect } from 'react';
 
 function App() {
+
+  // Disable right-click context menu on the entire document
+  // This is to prevent the default context menu from appearing
+   useEffect(() => {
+    const disableContextMenu = (e) => e.preventDefault();
+    document.addEventListener('contextmenu', disableContextMenu);
+    return () => document.removeEventListener('contextmenu', disableContextMenu);
+  }, []);
 
   return (
     <>

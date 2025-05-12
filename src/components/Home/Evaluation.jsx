@@ -876,144 +876,17 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CheckIcon from "@mui/icons-material/Check";
 import { useNavigate } from "react-router-dom";
-import api from "../../api/axios";
-import API_ROUTES from "../../api/routes";
-import { useAuth } from "../context/AuthContext";
 
-export default function Evaluation() {
-  const [assignedCopies, setAssignedCopies] = useState([]);
-  const [filteredCopies, setFilteredCopies] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [evaluatedStats, setEvaluatedStats] = useState({
-    evaluated: 0,
-    pending: 0,
-    total: 0,
-  });
 
-  const itemsPerPage = 10;
-
-  const { user } = useAuth();
-  const userId = user?.uid || "";
+export default function Evaluation({currentCopies, filteredCopies, evaluatedStats, searchTerm, setSearchTerm, page, setPage, itemsPerPage, error, loading}) {
 
   const navigate = useNavigate();
-
-  // Update your fetchAssignedCopies function to handle the new data structure
-  useEffect(() => {
-    const fetchAssignedCopies = async () => {
-      setLoading(true);
-      try {
-        const evaluatorId = userId || "current-user";
-        const response = await api.get(API_ROUTES.EVALUATION.GET_COPIES, {
-          params: { evaluatorId },
-        });
-
-        // Handle different response formats
-        let copies = [];
-        if (response.data && Array.isArray(response.data)) {
-          copies = response.data;
-        } else if (
-          response.data &&
-          response.data.copies &&
-          Array.isArray(response.data.copies)
-        ) {
-          copies = response.data.copies;
-        } else if (response.data && typeof response.data === "object") {
-          const possibleArrays = Object.values(response.data).filter(
-            (val) => Array.isArray(val) && val.length > 0
-          );
-
-          if (possibleArrays.length > 0) {
-            copies = possibleArrays[0];
-          }
-        }
-
-        // Format the data to handle both string IDs and object with copyId & assignedAt
-        const formattedCopies = copies.map((copy) => {
-          if (typeof copy === "string") {
-            return { copyId: copy, assignedAt: new Date().toISOString() };
-          }
-          return copy;
-        });
-
-        // Sort copies alphanumerically by copyId
-        formattedCopies.sort((a, b) => {
-          const idA = a.copyId || a;
-          const idB = b.copyId || b;
-          return idA.localeCompare(idB);
-        });
-
-        setAssignedCopies(formattedCopies);
-        setFilteredCopies(formattedCopies);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch assigned copies:", err);
-        setError("Failed to load your assigned copies. Please try again.");
-        setAssignedCopies([]);
-        setFilteredCopies([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAssignedCopies();
-  }, [userId]);
-
-
-
-  useEffect(() => {
-    try {
-      const fetchEvaluationStats = async () => {
-        const evaluatorId = userId || "";
-        const response = await api.get(API_ROUTES.EVALUATION.GET_EVALUATION_STATS, {
-          params: { evaluatorId },
-        });
-        console.log("Evaluation stats:", response.data.stats);
-        const evalStat = response.data.stats;
-        setEvaluatedStats({
-          evaluated: evalStat.evaluated || 0,
-          pending: evalStat.pending || 0,
-          total: evalStat.total || 0,
-        });
-        
-      };
-      fetchEvaluationStats();
-    } catch (error) {
-      console.error("Error fetching evaluated count:", error.message);
-      setError("Failed to fetch evaluated count");
-    }
-  }, [assignedCopies]);
-
-
-
-  useEffect(() => {
-    if (!assignedCopies.length) return;
-
-    if (searchTerm) {
-      const filtered = assignedCopies.filter((copy) => {
-        const copyId = copy.copyId || copy;
-        return copyId.toLowerCase().includes(searchTerm.toLowerCase());
-      });
-      setFilteredCopies(filtered);
-    } else {
-      setFilteredCopies(assignedCopies);
-    }
-
-    setPage(1); // Reset to first page when filter changes
-  }, [searchTerm, assignedCopies]);
 
   const handleEvaluate = (copy) => {
     const copyId = copy.copyId || copy;
     navigate(`/evaluate/${copyId}`);
   };
 
-  // Calculate copies for current page
-  const currentCopies = filteredCopies.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
 
   return (
     <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -1030,7 +903,6 @@ export default function Evaluation() {
           </div>
 
           <div className="flex items-center">
-            
             <TextField
               placeholder="Search by copy ID..."
               size="small"
@@ -1087,7 +959,9 @@ export default function Evaluation() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Evaluated</p>
-                <p className="text-xl font-semibold mt-1">{evaluatedStats.evaluated}</p>
+                <p className="text-xl font-semibold mt-1">
+                  {evaluatedStats.evaluated}
+                </p>
               </div>
               <div className="h-10 w-10 bg-green-50 rounded-lg flex items-center justify-center">
                 <CheckIcon className="h-6 w-6 text-green-600" />
@@ -1103,7 +977,7 @@ export default function Evaluation() {
                   {loading ? (
                     <CircularProgress size={24} />
                   ) : (
-                    assignedCopies.length
+                    evaluatedStats.pending
                   )}
                 </p>
               </div>
@@ -1117,9 +991,11 @@ export default function Evaluation() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">
-                  Partially-Checked - work on this
+                  Partially-Checked
                 </p>
-                <p className="text-xl font-semibold mt-1">0</p>
+                <p className="text-xl font-semibold mt-1">
+                  {evaluatedStats.partial}
+                </p>
               </div>
               <div className="h-10 w-10 bg-yellow-50 rounded-lg flex items-center justify-center">
                 <PendingActionsIcon className="h-6 w-6 text-yellow-600" />
@@ -1237,8 +1113,14 @@ export default function Evaluation() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                            Pending
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              copy.partial
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {copy.partial ? "Partially Checked" : "Pending"}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -1256,20 +1138,24 @@ export default function Evaluation() {
                             />
                           </button> */}
 
-
-
-<button
-  onClick={() => handleEvaluate(copy)}
-  className="inline-flex items-center px-5 py-1.5 text-xs uppercase tracking-wider font-medium text-gray-800 border hover:bg-blue-100 border-gray-300 hover:border-gray-800 rounded-sm transition-all duration-150"
->
-  Evaluate
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-2" viewBox="0 0 20 20" fill="currentColor">
-    <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-  </svg>
-</button>
-
-
-
+                          <button
+                            onClick={() => handleEvaluate(copy)}
+                            className={`inline-flex items-center px-5 py-1.5 text-xs uppercase tracking-wider font-medium ${copy.partial ? "text-yellow-800 border hover:bg-yellow-100 border-gray-300 hover:border-gray-800" : "text-gray-800 border hover:bg-blue-100 border-gray-300 hover:border-gray-800"} rounded-sm transition-all duration-150`}
+                          >
+                            {copy.partial ? "Continue" : "Evaluate"}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3 w-3 ml-2"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
                         </td>
                       </tr>
                     );

@@ -104,10 +104,10 @@ function ToolButton({ tool, Icon, color, description, isSelected, onSelect }) {
       active: 'active:bg-teal-700',
       ring: 'ring-teal-400'
     },
-    deleteRed: {
-      bg: 'bg-red-700',
-      hover: 'hover:bg-red-800',
-      active: 'active:bg-red-700',
+    erase: {
+      bg: 'bg-zinc-700',
+      hover: 'hover:bg-zinc-800',
+      active: 'active:bg-zinc-700',
       ring: 'ring-black'
     },
   };

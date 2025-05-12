@@ -986,6 +986,7 @@ const EvaluationPanel = memo(
 
     // Calculate max marks from all questions
     const maxTotalMarks = questions.reduce((sum, q) => sum + q.maxMark, 0);
+    
 
     const validateEvaluation = () => {
       // Check if all required marks are entered and valid

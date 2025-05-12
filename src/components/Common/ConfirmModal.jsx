@@ -1,13 +1,13 @@
 
-const ResetConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
+const ConfirmModal = ({ isOpen, onClose, onConfirm, title="Confirm Action", titleStyle, text, action }) => {
     if (!isOpen) return null;
   
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-300 bg-opacity-30">
         <div className="bg-white rounded-lg shadow-lg p-5 w-80">
-          <h3 className="text-lg font-bold text-red-600 mb-3">Reset Annotation Markings?</h3>
+          <h3 className={titleStyle || "text-lg font-bold text-red-600 mb-3"}>{title}</h3>
           <p className="text-sm text-gray-900 mb-4">
-            Are you sure you want to reset all annotations on this copy?
+            {text || "Are you sure you want to proceed with this action?"}
           </p>
           <div className="flex justify-end gap-3">
             <button
@@ -20,7 +20,7 @@ const ResetConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
               onClick={onConfirm}
               className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
             >
-              Reset All
+             {action || "Confirm"}
             </button>
           </div>
         </div>
@@ -28,4 +28,4 @@ const ResetConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
     );
   };
 
-  export default ResetConfirmationModal;
+  export default ConfirmModal;

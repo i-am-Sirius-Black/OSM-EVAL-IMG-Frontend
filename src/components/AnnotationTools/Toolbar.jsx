@@ -11,20 +11,23 @@ import {
 import DrawIcon from '@mui/icons-material/Draw';
 import AutoFixHighSharpIcon from '@mui/icons-material/AutoFixHighSharp';
 import ResetConfirmationModal from './Modal/ResetConfirmationModal';
+import EraserIcon from './Svg/EraserIcon';
+
+
 
 const Toolbar = memo(({ selectedTool, setSelectedTool, handleRemoveLastAnnotation, handleReset }) => {
   const [showResetModal, setShowResetModal] = useState(false);
  
   // Define the tools with their respective icons, colors, and descriptions
   const tools = [
-    { tool: 'mouse', Icon: MouseIcon, color: 'blue', description: 'Mouse (Left: ✓, Right: ✕)' },
+    { tool: 'mouse', Icon: MouseIcon, color: 'blue', description: 'Mouse-Click (Left:✓,Right:✕)' },
     { tool: 'check', Icon: DoneIcon, color: 'green', description: 'Check' },
     { tool: 'cancel', Icon: ClearIcon, color: 'red', description: 'Cross' },
-    { tool: 'comment', Icon: EditNoteIcon, color: 'gray', description: 'Comment' },
-    { tool: 'draw', Icon: DrawIcon, color: 'purple', description: 'Pen' },
-    { tool: 'erase', Icon: DeleteIcon, color: 'deleteRed', description: 'Erase' },
-    { tool: 'undo', Icon: UndoIcon, color: 'yellow', description: 'Undo Last' },
-    { tool: 'reset', Icon: AutoFixHighSharpIcon, color: 'pink', description: 'Reset All Pages' },
+    { tool: 'comment', Icon: EditNoteIcon, color: 'gray', description: 'Text_Input' },
+    { tool: 'draw', Icon: DrawIcon, color: 'purple', description: 'Pen_Tool' },
+    { tool: 'erase', Icon: EraserIcon, color: 'erase', description: 'Erase_Drawing' },
+    { tool: 'undo', Icon: UndoIcon, color: 'yellow', description: 'Undo_Last_Annotation' },
+    { tool: 'reset', Icon: AutoFixHighSharpIcon, color: 'pink', description: 'Reset_Annotations On All_Pages' },
   ];
   
   const handleToolClick = (tool) => {
@@ -55,7 +58,7 @@ const Toolbar = memo(({ selectedTool, setSelectedTool, handleRemoveLastAnnotatio
 
   return (
     <>
-    <div className="flex flex-col items-center gap-3 z-11 mt-10">
+    <div className="flex flex-col items-center gap-3 z-10 mt-10">
       {tools.map(({ tool, Icon, color, description }) => (
         <ToolButton
           key={tool}
