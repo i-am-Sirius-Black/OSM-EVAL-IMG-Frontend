@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import API_ROUTES from '../../../api/routes';
-import api from '../../../api/axios.js'; 
+import API_ROUTES from '../../../../api/routes';
+import api from '../../../../api/axios.js'; 
 
 const EvaluatorStatus = () => {
   const [evaluators, setEvaluators] = useState([]);

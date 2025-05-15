@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import api from '../../../api/axios';
+import api from '../../../../api/axios';
 import toast from 'react-hot-toast';
-import API_ROUTES from '../../../api/routes';
+import API_ROUTES from '../../../../api/routes.js';
 
 const { ADMIN } = API_ROUTES;
 

@@ -287,6 +287,8 @@ function AdminLogin() {
       if (response.data && response.data.userData) {
         const adminData = response.data.userData;
         console.log('Admin login successful:', adminData);
+        
+        localStorage.removeItem("evalUserData");// Clear previous user data
 
         // Use the context function instead of directly setting localStorage
         setAuthenticatedAdmin(adminData);

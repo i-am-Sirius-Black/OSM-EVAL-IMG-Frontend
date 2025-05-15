@@ -605,7 +605,10 @@ export default function Navbar({ activeTab, setActiveTab, userData }) {
                 <div className="h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center">
                   <Person fontSize="small" className=" text-white" />
                 </div>
-                <span className="text-sm text-gray-700">{username}</span>
+                <span className="text-sm font-semibold text-gray-700 max-w-[120px] truncate inline-block align-middle">
+                  {username}
+                </span>
+
                 <span
                   className={`text-xs text-gray-400 transition-transform duration-150 ${
                     dropdownOpen ? "rotate-180" : ""
@@ -632,6 +635,8 @@ export default function Navbar({ activeTab, setActiveTab, userData }) {
 
                     <a
                       href="/contact"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       Contact Support

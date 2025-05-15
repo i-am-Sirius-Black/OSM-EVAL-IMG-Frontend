@@ -60,8 +60,16 @@ const API_ROUTES = {
       REJECT: '/api/evaluations/reject',
     },
 
+    // Autosave routes
+    AUTOSAVE: {
+      SAVE: '/api/autosave/save', //save autosave data
+      GET: (evaluatorId, copyId) => `/api/autosave/getSaved?evaluatorId=${evaluatorId}&copyId=${copyId}`, //get autosave data
+      DELETE: (evaluatorId, copyId) => `/api/autosave/deleteSaved?evaluatorId=${evaluatorId}&copyId=${copyId}`, //delete autosave data
+    },
+
     // Admin routes
     ADMIN: {
+      AUTH_CHECK: '/api/admin/check', //check if admin is logged in
       ADMIN_LOGIN: '/api/admin/login',
       ADMIN_LOGOUT: '/api/admin/logout',
       GET_EVALUATORS: '/api/admin/evaluators',
@@ -70,6 +78,7 @@ const API_ROUTES = {
       GET_REJECTED_COPIES: '/api/evaluations/rejected', //get rejected copies
       UNREJECT_COPIES: '/api/evaluations/unreject',//unreject copies
       GET_EVALUATORS_STATUS: '/api/admin/get-evaluators-status', //get all evaluators status
+      GET_EVALUATED_COPIES: '/api/admin/get-evaluated-copies', //get evaluated copies
     },
   };
   

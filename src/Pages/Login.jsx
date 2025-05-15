@@ -36,6 +36,8 @@ function Login() {
         // Update authentication state in context
         setAuthenticatedUser(userData);
 
+        localStorage.removeItem("adminUser");
+
         navigate("/", { replace: true }); // Redirect to the home page after successful login
       } else {
         setError(res.data.error || "Login failed. Please try again.");
@@ -158,3 +160,5 @@ function Login() {
 }
 
 export default Login;
+
+

@@ -39,7 +39,6 @@ export default function Dashboard() {
 
         // Directly access the copies array from the response
         const copies = response.data.copies || [];
-        console.log("Fetched copies data:", copies);
 
         // Sort copies alphanumerically by copyId
         copies.sort((a, b) => {
@@ -73,7 +72,6 @@ export default function Dashboard() {
             params: { evaluatorId },
           }
         );
-        console.log("Evaluation stats:", response.data.stats);
         const evalStat = response.data.stats;
         setEvaluatedStats({
           evaluated: evalStat.evaluated || 0,

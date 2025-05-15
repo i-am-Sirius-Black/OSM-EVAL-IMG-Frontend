@@ -13,6 +13,8 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './components/context/AuthContext';
 import ChangePassword from './Pages/ChangePassword';
 import { useEffect } from 'react';
+import ContactForm from './components/Common/ContactForm';
+import NotFound from './components/Common/NotFound';
 
 function App() {
 
@@ -54,6 +56,7 @@ function App() {
             </ProtectedAdminRoute>
           } 
         />
+
         <Route
           path="/"
           element={
@@ -87,6 +90,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/contact"
+          element={
+            <ProtectedRoute>
+              <ContactForm />
+            </ProtectedRoute>
+          }
+        />
+
+       {/* Not Found route - must be last */}
+       <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
     </AuthProvider>

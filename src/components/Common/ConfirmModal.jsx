@@ -3,10 +3,10 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title="Confirm Action", titl
     if (!isOpen) return null;
   
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-300 bg-opacity-30">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
         <div className="bg-white rounded-lg shadow-lg p-5 w-80">
           <h3 className={titleStyle || "text-lg font-bold text-red-600 mb-3"}>{title}</h3>
-          <p className="text-sm text-gray-900 mb-4">
+          <p className="text-sm font-semibold text-gray-900 mb-4">
             {text || "Are you sure you want to proceed with this action?"}
           </p>
           <div className="flex justify-end gap-3">

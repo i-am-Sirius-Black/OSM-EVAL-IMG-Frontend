@@ -188,7 +188,7 @@ export default function ProfileModal({ isOpen, onClose, userData }) {
             </div>
             
             <div>
-              <h2 className="text-lg font-medium text-gray-900">{userData.name}</h2>
+              <h2 className="text-lg font-medium text-gray-900 max-w-[200px] truncate inline-block align-middle">{userData.name}</h2>
               <div className="space-y-1 mt-1">
                 <p className="text-gray-500 text-sm flex items-center">
                   <span className="w-12 text-xs text-gray-400">UID:</span>

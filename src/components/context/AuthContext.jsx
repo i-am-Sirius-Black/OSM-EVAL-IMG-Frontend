@@ -52,6 +52,8 @@ useEffect(() => {
   const checkAdminAuth = async () => {
     // First check localStorage for admin
     const storedAdmin = localStorage.getItem('adminUser');
+    console.log("checking admin auth");
+    console.log("Stored Admin:", storedAdmin);
     
     if (storedAdmin) {
       try {
@@ -59,15 +61,16 @@ useEffect(() => {
         
         // Verify admin with backend (you can create a dedicated admin check endpoint)
         try {
-          await api.get(API_ROUTES.AUTH.CHECK);
+          await api.get(API_ROUTES.ADMIN.AUTH_CHECK);
+
           // Admin auth is valid, set admin data
           setAdmin(adminData); // IMPORTANT: Only set admin after verification
         } catch (err) {
-          // Admin token invalid or expired
-          localStorage.removeItem('adminUser');
+          console.error("Admin verification failed:", err.response?.data || err.message);
+           localStorage.removeItem('adminUser');
         }
       } catch (err) {
-        // JSON parse error or other issue
+        // JSON parse error
         localStorage.removeItem('adminUser');
       }
     }

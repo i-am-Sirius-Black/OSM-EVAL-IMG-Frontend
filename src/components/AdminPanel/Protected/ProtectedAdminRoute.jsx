@@ -37,6 +37,9 @@ import { useAuth } from '../../context/AuthContext';
 const ProtectedAdminRoute = ({ children }) => {
   const location = useLocation();
   const { isAdmin, adminLoading } = useAuth();
+  console.log("Admin Loading:", adminLoading);
+  console.log("Is Admin:", isAdmin);
+  
 
   if (adminLoading) {
     return <Loader />;

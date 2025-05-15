@@ -861,7 +861,7 @@
 //   );
 // }
 
-//?Copies with date of assignment from api
+//*Working version with all features
 
 import { useState, useEffect } from "react";
 import {
@@ -877,16 +877,24 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CheckIcon from "@mui/icons-material/Check";
 import { useNavigate } from "react-router-dom";
 
-
-export default function Evaluation({currentCopies, filteredCopies, evaluatedStats, searchTerm, setSearchTerm, page, setPage, itemsPerPage, error, loading}) {
-
+export default function Evaluation({
+  currentCopies,
+  filteredCopies,
+  evaluatedStats,
+  searchTerm,
+  setSearchTerm,
+  page,
+  setPage,
+  itemsPerPage,
+  error,
+  loading,
+}) {
   const navigate = useNavigate();
 
   const handleEvaluate = (copy) => {
     const copyId = copy.copyId || copy;
     navigate(`/evaluate/${copyId}`);
   };
-
 
   return (
     <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -1099,7 +1107,7 @@ export default function Evaluation({currentCopies, filteredCopies, evaluatedStat
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-md flex items-center justify-center text-blue-600">
+                            <div className={`flex-shrink-0 h-10 w-10 rounded-md flex items-center justify-center ${copy.partial ? "text-yellow-600 bg-yellow-100" : "text-blue-600 bg-blue-100"}`}>
                               <Assignment />
                             </div>
                             <div className="ml-4">
@@ -1126,23 +1134,18 @@ export default function Evaluation({currentCopies, filteredCopies, evaluatedStat
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {formattedDate}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          {/* <button
-                            onClick={() => handleEvaluate(copy)}
-                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-150"
-                          >
-                            Evaluate
-                            <ArrowForwardIos
-                              className="ml-1.5"
-                              style={{ fontSize: "12px" }}
-                            />
-                          </button> */}
 
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
                             onClick={() => handleEvaluate(copy)}
-                            className={`inline-flex items-center px-5 py-1.5 text-xs uppercase tracking-wider font-medium ${copy.partial ? "text-yellow-800 border hover:bg-yellow-100 border-gray-300 hover:border-gray-800" : "text-gray-800 border hover:bg-blue-100 border-gray-300 hover:border-gray-800"} rounded-sm transition-all duration-150`}
+                            className={`inline-flex items-center px-5 py-1.5 text-xs uppercase tracking-wider font-medium hover:translate-x-0.5 ${
+                              copy.partial
+                                ? "text-gray-800 border hover:bg-yellow-100 border-gray-300 hover:border-gray-800"
+                                : "text-gray-800 border hover:bg-blue-100 border-gray-300 hover:border-gray-800"
+                            } rounded-sm transition-all duration-150`}
                           >
                             {copy.partial ? "Continue" : "Evaluate"}
+                            
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               className="h-3 w-3 ml-2"

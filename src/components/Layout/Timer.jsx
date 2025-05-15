@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 
 // Use forwardRef to expose methods to parent
-const Timer = forwardRef(({ isActive = false, onToggle, showControls = true }, ref) => {
-  const [seconds, setSeconds] = useState(0);
+const Timer = forwardRef(({ isActive = false, onToggle, showControls = true,  initialSeconds = 0,  }, ref) => {
+    // const [seconds, setSeconds] = useState(0);
+    const [seconds, setSeconds] = useState(initialSeconds);
   const [timerActive, setTimerActive] = useState(isActive);
 
+    // Initialize timer with initialSeconds when it changes
+  useEffect(() => {
+    setSeconds(initialSeconds);
+  }, [initialSeconds]);
+  
   // Expose the getCurrentTime method to parent via ref
   useImperativeHandle(ref, () => ({
     getCurrentTime: () => seconds
