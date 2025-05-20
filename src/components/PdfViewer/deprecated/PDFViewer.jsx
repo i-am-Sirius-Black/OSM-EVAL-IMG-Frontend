@@ -2,8 +2,8 @@ import { memo, useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
-import SinglePage from './SinglePage';
-import LoadingSpinner from '../Common/LoadingSpinner';
+import SinglePage from '../SinglePage';
+import LoadingSpinner from '../../Common/LoadingSpinner';
 // import checkImage from '/assets/icons/check.png';
 // import cancelImage from '/cross.png';
 

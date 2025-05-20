@@ -1,7 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import EvaluationLayout from './components/Layout/EvaluationLayout';
 import Login from './Pages/Login';
-import SubjectSelectionPage from './components/SubjectSelection/SubjectSelectionPage';
 import Dashboard from './components/Home/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Register from './Pages/Register';
@@ -66,14 +65,6 @@ function App() {
           }
         />
         <Route
-          path="/subject-selection"
-          element={
-            <ProtectedRoute>
-              <SubjectSelectionPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/evaluate"
           element={
             <ProtectedRoute>
@@ -99,6 +90,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
 
        {/* Not Found route - must be last */}
        <Route path="*" element={<NotFound />} />

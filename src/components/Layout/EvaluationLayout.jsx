@@ -96,7 +96,7 @@
 
 // function EvaluationLayout() {
 
-//   const { copyId: urlCopyId } = useParams();
+//   const { copyId: copyId } = useParams();
 
 //   const {
 //     annotations,
@@ -114,7 +114,7 @@
 //   const [marks, setMarks] = useState({});
 
 // // Use copyId from URL
-// const [copyId, setCopyId] = useState(urlCopyId );
+// const [copyId, setCopyId] = useState(copyId );
 
 // const [restored, setRestored] = useState(false); // New flag to track restoration of session
 
@@ -141,13 +141,13 @@
 
 // // Restore state from localStorage when component mounts
 // useEffect(() => {
-//   if (urlCopyId) {
-//     console.log("Copy ID from URL:", urlCopyId);
-//     setCopyId(urlCopyId);
+//   if (copyId) {
+//     console.log("Copy ID from URL:", copyId);
+//     setCopyId(copyId);
 
 //     setIsSaving(true); // Indicate that the state is being restored
 
-//     const savedState = localStorage.getItem(`evaluationState-${urlCopyId}`);
+//     const savedState = localStorage.getItem(`evaluationState-${copyId}`);
 
 //     if (savedState) {
 //       const { annotations: savedAnnotations, marks: savedMarks, seconds: savedSeconds } = JSON.parse(savedState);
@@ -163,7 +163,7 @@
 //     setRestored(true); // Mark restoration as complete
 //     setIsSaving(false); // Indicate that the restoration is complete
 //   }
-// }, [urlCopyId]);
+// }, [copyId]);
 
 // //?v2, with hiding save icon
 //  // Save annotations with debounce and handle icon visibility
@@ -209,12 +209,12 @@
 
 // // Update copyId if URL parameter changes
 // useEffect(() => {
-//   if (urlCopyId) {
-//     console.log("Copy ID from URL:", urlCopyId);
-//     setCopyId(urlCopyId);
+//   if (copyId) {
+//     console.log("Copy ID from URL:", copyId);
+//     setCopyId(copyId);
 
 //   }
-// }, [urlCopyId]);
+// }, [copyId]);
 
 //   const handleResetAnnotations = () => {
 //     try {
@@ -444,7 +444,7 @@ import useAnnotations from "../../hooks/useAnnotations";
 import { useEffect, useRef, useState } from "react";
 import ImageViewer from "../PdfViewer/ImageViewer";
 import { saveAnnotations } from "../../services/annotationService";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import evaluationService from "../../services/evaluationService";
 import toast from "react-hot-toast";
 import Timer from "./Timer";
@@ -458,7 +458,15 @@ import api from "../../api/axios";
 import { constants } from "../../utils/constants";
 
 function EvaluationLayout() {
-  const { copyId: urlCopyId } = useParams();
+    const navigate = useNavigate();
+  // const { copyId: urlCopyId } = useParams();
+
+    const location = useLocation();
+  
+  // Get copyId from location state instead of URL params
+  const { copyId: stateCopyId } = location.state || {};
+
+
   const { user } = useAuth();
   const evaluatorId = user?.uid || null;
 
@@ -479,8 +487,11 @@ function EvaluationLayout() {
   // Placeholder marks for evaluation panel
   const [marks, setMarks] = useState({});
 
-  // Use copyId from URL
-  const [copyId, setCopyId] = useState(urlCopyId || null);
+// Use copyId from URL
+// const [copyId, setCopyId] = useState(urlCopyId || null);
+
+  const [copyId, setCopyId] = useState(stateCopyId || null);
+  
 
   const [restored, setRestored] = useState(false); // New flag to track restoration of session
 
@@ -495,7 +506,7 @@ function EvaluationLayout() {
 
   const hideIconTimerRef = useRef(null);
 
-  const navigate = useNavigate();
+
   console.log("Eval Layout rerendering");
 
 
@@ -545,13 +556,13 @@ useEffect(() => {
   //*Hybrid Restore System
   // Restore state from localStorage or server when component mounts
   useEffect(() => {
-    if (urlCopyId && urlCopyId !== "undefined") {
-      console.log("Copy ID from URL:", urlCopyId);
-      setCopyId(urlCopyId);
+    if (copyId && copyId !== "undefined") {
+      console.log("Copy ID from URL:", copyId);
+      setCopyId(copyId);
       setIsSaving(true); // Indicate that the state is being restored
 
       // First try to get data from localStorage (fastest)
-      const savedState = localStorage.getItem(`evaluationState-${urlCopyId}`);
+      const savedState = localStorage.getItem(`evaluationState-${copyId}`);
 
       if (savedState) {
         try {
@@ -657,7 +668,7 @@ useEffect(() => {
         setIsSaving(false);
       }
     }
-  }, [urlCopyId, setAnnotations, evaluatorId, copyId]);
+  }, [copyId, setAnnotations, evaluatorId, copyId]);
 
   //* Hybrid Autosave System
   // Save annotations with debounce - hybrid approach (localStorage + server)
@@ -741,11 +752,11 @@ useEffect(() => {
 
   // Update copyId if URL parameter changes
   useEffect(() => {
-    if (urlCopyId) {
-      console.log("Copy ID from URL:", urlCopyId);
-      setCopyId(urlCopyId);
+    if (copyId) {
+      console.log("Copy ID from URL:", copyId);
+      setCopyId(copyId);
     }
-  }, [urlCopyId]);
+  }, [copyId]);
 
   const handleResetAnnotations = async () => {
     try {

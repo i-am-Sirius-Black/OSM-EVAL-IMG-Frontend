@@ -226,16 +226,8 @@ const AdminPanel = () => {
         return <RejectedCopies />;
       case "reEvaluation":
         return <Reevaluation />;
-      case "moderation":
-        return <Moderation />;
-      case "audit":
-        return <AuditTrail />;
-      case "final":
-        return <FinalMarkReview />;
       case "stats":
         return <Stats />;
-      case "studentResults":
-        return <StudentResults />;
       // Add more cases for other tabs as needed
       default:
         return <div>Select a tab</div>;
@@ -277,8 +269,7 @@ const AdminPanel = () => {
                   <SwapHoriz fontSize="small" className="h-4.5 w-4.5 mr-1" />
                   Advanced
                 </button>
-                <span className="mx-2 text-gray-300">|</span>
-                <button
+                {/* <button
                   onClick={() => handlePanelSwitch("tertiary")}
                   className={`px-3 py-1.5 rounded text-sm font-medium transition-colors flex items-center hover:cursor-pointer ${
                     activePanel === "tertiary"
@@ -288,7 +279,7 @@ const AdminPanel = () => {
                 >
                   <SwapHoriz fontSize="small" className="h-4.5 w-4.5 mr-1" />
                   Student
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -354,7 +345,7 @@ const AdminPanel = () => {
                 >
                   Rejected Copies
                 </button>
-                {/* <button
+                <button
                   onClick={() => setActiveTab("reEvaluation")}
                   className={`${
                     activeTab === "reEvaluation"
@@ -363,37 +354,8 @@ const AdminPanel = () => {
                   } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
                 >
                   Re-Evaluation
-                </button> */}
-                <button
-                  onClick={() => setActiveTab("moderation")}
-                  className={`${
-                    activeTab === "moderation"
-                      ? "border-blue-500 text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                  } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
-                >
-                  Moderation
                 </button>
-                <button
-                  onClick={() => setActiveTab("audit")}
-                  className={`${
-                    activeTab === "audit"
-                      ? "border-blue-500 text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                  } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
-                >
-                  Audit
-                </button>
-                <button
-                  onClick={() => setActiveTab("final")}
-                  className={`${
-                    activeTab === "final"
-                      ? "border-blue-500 text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                  } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
-                >
-                  Final
-                </button>
+
                 <button
                   onClick={() => setActiveTab("stats")}
                   className={`${
@@ -407,7 +369,7 @@ const AdminPanel = () => {
               </>
             )}
 
-            {/* Tertiary Panel Tabs */}
+            {/* Tertiary Panel Tabs
             {activePanel === "tertiary" && (
               <>
                 <button
@@ -421,7 +383,7 @@ const AdminPanel = () => {
                   Results Analysis
                 </button>
               </>
-            )}
+            )} */}
           </nav>
         </div>
 

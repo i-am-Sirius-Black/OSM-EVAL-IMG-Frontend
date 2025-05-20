@@ -383,6 +383,9 @@ import { memo, useState, useRef, useEffect, useCallback, useMemo } from "react";
 import SinglePage from "./SinglePage";
 import LoadingSpinner from "../Common/LoadingSpinner";
 import { getImageUrl } from "../../services/imageService";
+import { constants } from "../../utils/constants";
+
+const { COPY_PAGE_COUNT } = constants;
 
 // ImageViewer component to display 36 pages as images
 const ImageViewer = memo(
@@ -407,7 +410,7 @@ const ImageViewer = memo(
     // Generate pages 1 to 36
     const pages = useMemo(
       () =>
-        Array.from({ length: 36 }, (_, i) => ({
+        Array.from({ length: COPY_PAGE_COUNT }, (_, i) => ({
           page_number: i + 1,
         })),
       []

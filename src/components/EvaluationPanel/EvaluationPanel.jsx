@@ -920,6 +920,7 @@ import { useAuth } from "../context/AuthContext";
 import api from "../../api/axios";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CachedIcon from "@mui/icons-material/Cached";
+import { constants } from "../../utils/constants";
 
 // Define pages to skip from annotation checking
 const PAGES_TO_SKIP = [1, 2]; // Skip pages 1 and 2 
@@ -1039,7 +1040,7 @@ const EvaluationPanel = memo(
 
     const validateAnnotations = () => {
       // Check if all required pages are annotated (excluding skipped pages)
-      const totalPages = 36; // Assuming there are 36 pages
+      const totalPages = constants.COPY_PAGE_COUNT; // Assuming there are 36 pages
       const annotatedPages = Array.from(
         new Set(annotations.map((a) => a.page))
       );

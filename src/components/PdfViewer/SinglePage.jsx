@@ -1756,30 +1756,6 @@ const SinglePage = memo(
         );
       } else if (type === "draw" && position.path) {
         return (
-          // <svg
-          //   key={id}
-          //   className="absolute top-0 left-0 w-full h-full pointer-events-none"
-          //   style={{ zIndex: 10, cursor: 'pointer' }}
-          //   viewBox="0 0 100 100" // Use percentage-based viewBox
-          //   preserveAspectRatio="none"
-          //   onClick={(e) => {
-          //     e.stopPropagation();
-          //     handleRemoveAnnotation(id);
-          //   }}
-          // >
-          //   <polyline
-          //     points={position.path
-          //       .map((p) => `${p.x},${p.y}`)
-          //       .join(" ")}
-          //     stroke="red"
-          //     strokeWidth="0.2"
-          //     fill="none"
-          //     onClick={(e) => {
-          //       e.stopPropagation();
-          //       handleRemoveAnnotation(id);
-          //     }}
-          //   />
-          // </svg>
           <svg
   key={id}
   className="absolute top-0 left-0 w-full h-full pointer-events-none"
