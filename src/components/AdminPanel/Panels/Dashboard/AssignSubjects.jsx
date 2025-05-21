@@ -580,7 +580,7 @@ const AssignSubjects = () => {
     
     fetchAssignedSubjects();
   }, [selectedEvaluator]);
-  
+   
   // Handle subject selection from dropdown
   const handleSubjectSelect = (e) => {
     setSelectedSubject(e.target.value);
@@ -639,9 +639,18 @@ const AssignSubjects = () => {
         }]);
       }
       
-      // Reset selection state
-      setSelectedSubject('');
-      setViewMode('select');
+          // Update UI with success message
+    setSuccess(`Successfully assigned ${subjectDetails?.subject || selectedSubject} to ${evaluatorName}`);
+    
+    // Reset all selection states
+    setSelectedSubject('');
+    setSelectedCourse('');
+    setSubjects([]); // Clear subjects since no course is selected
+    setViewMode('select');
+    
+    // Optionally, keep the same evaluator selected to allow multiple assignments to the same person
+    // If you prefer to reset everything, uncomment the next line:
+    // setSelectedEvaluator(null);
       
       // Auto clear success after delay
       setTimeout(() => setSuccess(null), 5000);

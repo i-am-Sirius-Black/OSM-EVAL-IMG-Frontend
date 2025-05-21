@@ -737,6 +737,10 @@ export default function Evaluation({setActiveTab}) {
   });
   const [error, setError] = useState(null);
 
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  }
+
   // First, fetch all assigned subjects with isCopyAssigned flag
   useEffect(() => {
     const fetchAssignedSubjects = async () => {
@@ -807,7 +811,7 @@ export default function Evaluation({setActiveTab}) {
 // Frontend: Navigate with state (secure)
 const handleEvaluate = (copyBarcode) => {
   navigate("/evaluate", {
-    state: { copyId: copyBarcode }, // 🔒 Hidden from URL
+    state: { copyId: copyBarcode, subjectCode: selectedSubject }, // 🔒 Hidden from URL
   });
 };
 
@@ -842,7 +846,9 @@ const handleEvaluate = (copyBarcode) => {
           
           {/* Subject Dropdown Selector */}
           {activeSubjects.length > 0 && (
-            <div className="relative subject-dropdown">
+            <div className="flex items-center gap-4">
+              <div className="text-sm font-black text-gray-800">Subject:</div>
+              <div className="relative subject-dropdown">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center justify-between w-full md:w-56 px-4 py-2 text-sm bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -874,6 +880,7 @@ const handleEvaluate = (copyBarcode) => {
                 </div>
               )}
             </div>
+            </div>
           )}
         </div>
       </div>
@@ -886,7 +893,7 @@ const handleEvaluate = (copyBarcode) => {
       )}
 
       {/* Active batch info */}
-      {!loading.subjects && activeBatch && (
+      {/* {!loading.subjects && activeBatch && (
         <div className="mb-6">
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
@@ -934,7 +941,60 @@ const handleEvaluate = (copyBarcode) => {
             />
           </div>
         </div>
-      )}
+      )} */}
+
+{!loading.subjects && activeBatch && (
+  <div className="mb-6">
+    <div className="bg-white px-5 py-4 rounded-lg shadow-sm border border-gray-200 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+      
+      {/* Left: Info Section */}
+      <div className="flex-1 min-w-[280px]">
+        <h2 className="text-xl font-semibold text-gray-900">
+          {activeBatch.subjectCode} — {activeBatch.examName}
+        </h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Assigned: <span className="font-medium text-gray-700">{new Date(activeBatch.assignedAt).toLocaleDateString()}</span>
+          &nbsp; • &nbsp;
+          Expires: <span className="font-medium text-gray-700">{new Date(activeBatch.expiresAt).toLocaleString()}</span>
+        </p>
+      </div>
+
+      {/* Right: Summary Stats */}
+      <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-gray-800">
+        <div className="flex items-center gap-2 min-w-[120px]" title="Total Copies">
+          <Assignment className="text-blue-600 w-5 h-5" />
+          <span className="font-medium">{copies.length} Copies</span>
+        </div>
+
+        <div className="flex items-center gap-2 min-w-[120px]" title="Checked Copies">
+          <CheckCircle className="text-green-600 w-5 h-5" />
+          <span className="font-medium">{completedCount} Checked</span>
+        </div>
+
+        <div className="flex items-center gap-2 min-w-[120px]" title="Pending Copies">
+          <AccessTime className="text-yellow-500 w-5 h-5" />
+          <span className="font-medium">{pendingCount} Pending</span>
+        </div>
+
+        <div className="flex items-center gap-2 min-w-[140px]" title="Expires In">
+          <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="font-medium">
+            {`${Math.max(0, Math.floor((new Date(activeBatch.expiresAt) - new Date()) / (1000 * 60 * 60)))}h ` +
+              `${Math.max(0, Math.floor(((new Date(activeBatch.expiresAt) - new Date()) % (1000 * 60 * 60)) / (1000 * 60)))}m`}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
+
+
 
       <div className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
         {loading.batch ? (
@@ -944,50 +1004,100 @@ const handleEvaluate = (copyBarcode) => {
         ) : error ? (
           <ErrorMessage error={error} />
         ) : !activeBatch && !loading.subjects ? (
-          <NoBatchMessage activeSubjects={activeSubjects.length > 0} />
+          <NoBatchMessage activeSubjects={activeSubjects.length > 0} handleTabChange={handleTabChange} />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Copy</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 pr-10 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {copies.map((copy, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{"copy " + idx}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {copy.isChecked ? (
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          Checked
-                        </span>
-                      ) : (
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                          Pending
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleEvaluate(copy.copyBarcode)}
-                        disabled={copy.isChecked}
-                        className={`inline-flex items-center px-3 py-1 border text-sm font-medium rounded-md ${
-                          copy.isChecked
-                            ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "border-blue-600 bg-white text-blue-600 hover:bg-blue-50"
-                        }`}
-                      >
-                        {copy.isChecked ? "Evaluated" : "Evaluate"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          // <div className="overflow-x-auto">
+          //   <table className="min-w-full divide-y divide-gray-200">
+          //     <thead className="bg-gray-50">
+          //       <tr>
+          //         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Copy</th>
+          //         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          //         <th className="px-6 py-3 pr-10 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+          //       </tr>
+          //     </thead>
+          //     <tbody className="bg-white divide-y divide-gray-200">
+          //                         {copies.map((copy, idx) => (
+          //         <tr key={idx} className="hover:bg-gray-50">
+          //           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{"copy " + idx}</td>
+          //           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          //             {copy.isChecked ? (
+          //               <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+          //                 Checked
+          //               </span>
+          //             ) : (
+          //               <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+          //                 Pending
+          //               </span>
+          //             )}
+          //           </td>
+          //           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          //             <button
+          //               onClick={() => handleEvaluate(copy.copyBarcode)}
+          //               disabled={copy.isChecked}
+          //               className={`inline-flex items-center px-3 py-1 border text-sm font-medium rounded-md ${
+          //                 copy.isChecked
+          //                   ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
+          //                   : "border-blue-600 bg-white text-blue-600 hover:bg-blue-50"
+          //               }`}
+          //             >
+          //               {copy.isChecked ? "Evaluated" : "Evaluate"}
+          //             </button>
+          //           </td>
+          //         </tr>
+          //       ))}
+          //     </tbody>
+          //   </table>
+          // </div>
+
+<div className="overflow-x-auto">
+  <table className="min-w-full divide-y divide-gray-200">
+    <thead className="bg-gray-50">
+      <tr>
+        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Copy</th>
+        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th className="px-6 py-3 pr-10 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+      </tr>
+    </thead>
+  </table>
+
+  {/* Scrollable table body */}
+  <div className="max-h-[40vh] overflow-y-auto">
+    <table className="min-w-full divide-y divide-gray-200">
+      <tbody className="bg-white divide-y divide-gray-200">
+        {copies.map((copy, idx) => (
+          <tr key={idx} className="hover:bg-gray-50">
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{"copy " + idx}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {copy.isChecked ? (
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  Checked
+                </span>
+              ) : (
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                  Pending
+                </span>
+              )}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button
+                onClick={() => handleEvaluate(copy.copyBarcode)}
+                disabled={copy.isChecked}
+                className={`inline-flex items-center px-3 py-1 border text-sm font-medium rounded-md ${
+                  copy.isChecked
+                    ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "border-blue-600 bg-white text-blue-600 hover:bg-blue-50"
+                }`}
+              >
+                {copy.isChecked ? "Evaluated" : "Evaluate"}
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
         )}
       </div>
     </main>
@@ -1041,7 +1151,7 @@ function ErrorMessage({ error }) {
   );
 }
 
-function NoBatchMessage({ activeSubjects }) {
+function NoBatchMessage({ activeSubjects, handleTabChange }) {
   return (
     <div className="text-center py-16">
       <div className="mx-auto h-12 w-12 text-gray-400">
@@ -1058,7 +1168,7 @@ function NoBatchMessage({ activeSubjects }) {
       {!activeSubjects && (
         <div className="mt-6">
           <a
-            onClick={() => setActiveTab(1)}
+            onClick={() => handleTabChange(1)}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
           >
             Go to Assign Copies

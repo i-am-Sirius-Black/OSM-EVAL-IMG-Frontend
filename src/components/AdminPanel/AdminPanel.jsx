@@ -154,6 +154,7 @@ import React, { useState } from "react";
 import EvaluatorStatus from "./Panels/Dashboard/EvaluatorStatus";
 import Stats from "./Panels/Advanced/Stats";
 import AssignSubjects from "./Panels/Dashboard/AssignSubjects";
+import AssignedStatus from "./Panels/Dashboard/AssignedStatus";
 import CheckedCopies from "./Panels/Advanced/CheckedCopies";
 import Moderation from "./Panels/Advanced/Moderation";
 import Reevaluation from "./Panels/Advanced/Reevaluation";
@@ -220,6 +221,8 @@ const AdminPanel = () => {
         return <EvaluatorStatus />;
       case "assign":
         return <AssignSubjects />;
+      case "assigned-status":
+        return <AssignedStatus />;
       case "copies":
         return <CheckedCopies />;
       case "rejected":
@@ -318,6 +321,16 @@ const AdminPanel = () => {
                   } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
                 >
                   Assign Subjects
+                </button>
+                <button
+                  onClick={() => setActiveTab("assigned-status")}
+                  className={`${
+                    activeTab === "assigned-status"
+                      ? "border-blue-500 text-gray-900"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
+                >
+                  Assignment Status
                 </button>
               </>
             )}

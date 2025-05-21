@@ -608,35 +608,6 @@ const ImageViewer = memo(
         </div>
 
         {pages.length === 0 ? <LoadingSpinner /> : renderedPages}
-          
-        {/* {commentPosition && (
-          <div
-            className="absolute bg-white border border-gray-200 rounded-md shadow-lg p-3 flex gap-2 z-50"
-            style={{ top: commentPosition.y, left: commentPosition.x }}
-          >
-            <input
-              type="text"
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleCommentSubmit()}
-              placeholder="Enter comment"
-              className="px-2 py-1 border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-40"
-              autoFocus
-            />
-            <button
-              onClick={handleCommentSubmit}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-            >
-              Add
-            </button>
-            <button
-              onClick={() => setCommentPosition(null)}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm"
-            >
-              Cancel
-            </button>
-          </div>
-        )} */}
 
 {/* v2.3 updated ui comment input popup */}
 {commentPosition && (

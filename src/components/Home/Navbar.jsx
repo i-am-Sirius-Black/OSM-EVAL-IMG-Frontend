@@ -320,6 +320,18 @@ export default function Navbar({ activeTab, setActiveTab, userData }) {
               <span className="ml-2 text-xl font-bold text-gray-900">OSM</span>
             </div>
             <nav className="ml-16 flex space-x-8">
+                            <button
+                onClick={() => setActiveTab(2)}
+                className={`${
+                  activeTab === 2
+                    ? "border-blue-500 text-gray-900"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+              >
+                <Assignment className="mr-1" fontSize="small" />
+                Evaluation
+              </button>
+              
               <button
                 onClick={() => setActiveTab(1)}
                 className={`${
@@ -331,18 +343,8 @@ export default function Navbar({ activeTab, setActiveTab, userData }) {
                 <LibraryAdd className="mr-1" fontSize="small" />
                 Assign Copies
               </button>
-              <button
-                onClick={() => setActiveTab(2)}
-                className={`${
-                  activeTab === 2
-                    ? "border-blue-500 text-gray-900"
-                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
-              >
-                <Assignment className="mr-1" fontSize="small" />
-                Evaluation
-              </button>
-              <button
+
+              {/* <button
                 onClick={() => setActiveTab(3)}
                 className={`${
                   activeTab === 3
@@ -352,7 +354,7 @@ export default function Navbar({ activeTab, setActiveTab, userData }) {
               >
                 <AssessmentIcon className="mr-1" fontSize="small" />
                 Status
-              </button>
+              </button> */}
             </nav>
           </div>
 

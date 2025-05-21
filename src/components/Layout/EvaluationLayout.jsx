@@ -464,7 +464,7 @@ function EvaluationLayout() {
     const location = useLocation();
   
   // Get copyId from location state instead of URL params
-  const { copyId: stateCopyId } = location.state || {};
+  const { copyId: stateCopyId, subjectCode } = location.state || {};
 
 
   const { user } = useAuth();
@@ -1068,6 +1068,9 @@ useEffect(() => {
           >
             OSM Evaluation
           </h1>
+        </div>
+        <div>
+          <p className="text-sm text-gray-800">Sub - {subjectCode}</p>
         </div>
         <div className="flex items-center gap-4">
           {showSaveIcon &&

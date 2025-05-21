@@ -1304,7 +1304,7 @@ const EvaluationPanel = memo(
 
                 <div className="relative">
                   <button
-                    className="ml-1 w-5 h-5 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none"
+                    className={`ml-1 w-5 h-5 rounded-full flex items-center justify-center ${showMarksReset ? "text-red-400 hover:text-red-600 hover:bg-red-100 animate-pulse":"text-gray-400 hover:text-gray-600 hover:bg-gray-100"}  transition-colors focus:outline-none`}
                     title="Options"
                     onClick={() => setShowMarksReset(!showMarksReset)}
                   >
@@ -1312,15 +1312,15 @@ const EvaluationPanel = memo(
                   </button>
 
                   {showMarksReset && (
-                    <div className="absolute top-full left-0 mt-1 bg-white shadow-sm rounded-md border border-gray-200 py-1 z-20 min-w-[140px] text-xs">
+                    <div className="absolute -top-4 left-7 mt-1 bg-white shadow-sm rounded-md border border-gray-200 z-20 min-w-[110px] text-xs">
                       <button
                         onClick={() => {
                           handleReset();
                           setShowMarksReset(false); // Auto-close after clicking
                         }}
-                        className="flex items-center gap-1.5 w-full text-left px-2 py-1.5 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="flex items-center gap-1.5 w-full text-left px-2 py-1.5 text-gray-700 hover:bg-red-50 hover:text-red-500 transition-colors"
                       >
-                        <CachedIcon sx={{ fontSize: 14 }} />
+                        {/* <CachedIcon sx={{ fontSize: 14 }} /> */}
                         <span>Reset All Marks</span>
                       </button>
                     </div>
