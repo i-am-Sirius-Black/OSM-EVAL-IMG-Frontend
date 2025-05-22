@@ -279,6 +279,7 @@ export default function Navbar({ activeTab, setActiveTab, userData }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [reevalAssigned, setReevalAssigned] = useState(true);      
 
   const dropdownRef = useRef(null);
   const ipAddress = useUserIP();
@@ -343,6 +344,20 @@ export default function Navbar({ activeTab, setActiveTab, userData }) {
                 <LibraryAdd className="mr-1" fontSize="small" />
                 Assign Copies
               </button>
+
+              {reevalAssigned && (
+                              <button
+                onClick={() => setActiveTab(3)}
+                className={`${
+                  activeTab === 3
+                    ? "border-blue-500 text-blue-900"
+                    : "animate-pulse border-transparent text-red-600 hover:border-gray-300 hover:text-gray-700"
+                } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+              >
+                {/* <LibraryAdd className="mr-1" fontSize="small" /> */}
+                Re-Evaluation Copy
+              </button>
+              )}
 
               {/* <button
                 onClick={() => setActiveTab(3)}

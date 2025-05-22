@@ -161,7 +161,7 @@ import Reevaluation from "./Panels/Advanced/Reevaluation";
 import AuditTrail from "./Panels/Advanced/AuditTrail";
 import FinalMarkReview from "./Panels/Advanced/FinalMarkReview";
 import RejectedCopies from "./Panels/Advanced/RejectedCopies";
-import StudentResults from "./Panels/Student/StudentResults";
+import StudentResults from "./Panels/Registration/Registration";
 
 
 // Import material-ui icons
@@ -173,6 +173,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import API_ROUTES from "../../api/routes";
 import { useAuth } from "../context/AuthContext";
+import Registration from "./Panels/Registration/Registration";
 
 const AdminPanel = () => {
   // State for panel and tab management
@@ -210,7 +211,7 @@ const AdminPanel = () => {
     } else if(panel === "secondary") {
       setActiveTab("copies");
     } else if(panel === "tertiary") {
-      setActiveTab("studentResults");
+      setActiveTab("registration");
     }
   };
 
@@ -231,6 +232,8 @@ const AdminPanel = () => {
         return <Reevaluation />;
       case "stats":
         return <Stats />;
+      case "registration":
+        return  <Registration />
       // Add more cases for other tabs as needed
       default:
         return <div>Select a tab</div>;
@@ -272,17 +275,17 @@ const AdminPanel = () => {
                   <SwapHoriz fontSize="small" className="h-4.5 w-4.5 mr-1" />
                   Advanced
                 </button>
-                {/* <button
+                <span className="mx-2 text-gray-300">|</span>
+                <button
                   onClick={() => handlePanelSwitch("tertiary")}
                   className={`px-3 py-1.5 rounded text-sm font-medium transition-colors flex items-center hover:cursor-pointer ${
                     activePanel === "tertiary"
-                      ? "bg-blue-50 text-blue-500 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                      ? "bg-cyan-50 text-cyan-500 shadow-sm"
+                      : "text-cyan-500 hover:text-cyan-700 hover:bg-cyan-50"
                   }`}
                 >
-                  <SwapHoriz fontSize="small" className="h-4.5 w-4.5 mr-1" />
-                  Student
-                </button> */}
+                  Registration
+                </button>
               </div>
             </div>
 
@@ -369,7 +372,7 @@ const AdminPanel = () => {
                   Re-Evaluation
                 </button>
 
-                <button
+                {/* <button
                   onClick={() => setActiveTab("stats")}
                   className={`${
                     activeTab === "stats"
@@ -378,25 +381,25 @@ const AdminPanel = () => {
                   } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
                 >
                   Analytics
-                </button>
+                </button> */}
               </>
             )}
 
-            {/* Tertiary Panel Tabs
+            {/* Tertiary Panel Tabs */}
             {activePanel === "tertiary" && (
               <>
                 <button
-                  onClick={() => setActiveTab("studentResults")}
+                  onClick={() => setActiveTab("registration")}
                   className={`${
-                    activeTab === "studentResults"
-                      ? "border-blue-500 text-gray-900"
+                    activeTab === "registration"
+                      ? "border-cyan-500 text-cyan-900"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
                 >
-                  Results Analysis
+                  Evaluators Registration
                 </button>
               </>
-            )} */}
+            )}
           </nav>
         </div>
 

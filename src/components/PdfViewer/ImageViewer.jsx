@@ -398,7 +398,7 @@ const ImageViewer = memo(
     handleUpdateAnnotation,
     handleDrawAnnotation,
   }) => {
-    const [zoom, setZoom] = useState(1); //made default zoom 100%
+    const [zoom, setZoom] = useState(0.8); //made default zoom 100%
     const [containerWidth, setContainerWidth] = useState(1);
     const [commentPosition, setCommentPosition] = useState(null);
     const [commentText, setCommentText] = useState("");

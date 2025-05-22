@@ -149,6 +149,7 @@ import Evaluation from "./Evaluation";
 import AssignCopies from "./AssignCopies";
 import { useAuth } from "../context/AuthContext";
 import Loader from "../Common/Loader";
+import ReevaluateCopy from "./ReevaluateCopy";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState(2);
@@ -168,7 +169,7 @@ export default function Dashboard() {
           
           {activeTab === 1 && <AssignCopies setActiveTab={setActiveTab} />}
           {activeTab === 2 && <Evaluation setActiveTab={setActiveTab} />}
-          {/* {activeTab === 3 && <EvaluationStatus setActiveTab={setActiveTab} />} */}
+          {activeTab === 3 && <ReevaluateCopy setActiveTab={setActiveTab} />}
         </>
       )}
     </div>

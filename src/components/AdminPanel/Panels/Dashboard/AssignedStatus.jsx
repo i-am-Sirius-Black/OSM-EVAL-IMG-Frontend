@@ -67,20 +67,80 @@ const AssignedStatus = () => {
     }
   };
 
-  const handleUnAssign = async(evalId, subCode) => {
+  //*V2  Handle Un-Assigning Subject with states update
+  const handleUnAssign = async (evalId, subCode) => {
     try {
-        const response = await api.post("/api/admin/unassign-subject", {
-          evaluatorId: evalId,
-          subjectCode: subCode
-        });
-        if (response.status === 200) {
-          toast.success("Subject Un-Assigned Successfully");
+      const response = await api.post("/api/admin/unassign-subject", {
+        evaluatorId: evalId,
+        subjectCode: subCode,
+      });
+
+      if (response.status === 200) {
+        // Update local state to remove the unassigned subject
+        const updatedAssignments = subjectsAssigned.filter(
+          (assignment) =>
+            !(
+              assignment.evaluatorId === evalId &&
+              assignment.subjectCode === subCode
+            )
+        );
+
+        // Update both master list and filtered list
+        setSubjectsAssigned(updatedAssignments);
+
+        // Update filtered list based on current filter
+        if (selectedSubject === "") {
+          setFilteredAssignments(updatedAssignments);
+        } else {
+          setFilteredAssignments(
+            updatedAssignments.filter(
+              (assign) => assign.subjectCode === selectedSubject
+            )
+          );
         }
+
+        // If this was the last assignment for a subject, update uniqueSubjects
+        const remainingSubjectCodes = [
+          ...new Set(updatedAssignments.map((a) => a.subjectCode)),
+        ];
+        if (!remainingSubjectCodes.includes(subCode)) {
+          setUniqueSubjects(
+            uniqueSubjects.filter((s) => s.subjectCode !== subCode)
+          );
+
+          // If the unassigned subject was the currently selected filter, reset to show all
+          if (selectedSubject === subCode) {
+            setSelectedSubject("");
+            setFilteredAssignments(updatedAssignments);
+          }
+        }
+
+        toast.success("Subject Un-Assigned Successfully");
+      }
     } catch (error) {
       console.log("Error Un-Assigning Subject", error);
-      toast.error("Error Un-Assigning Subject");   
+
+      // Show more specific error message if available
+      const errorMessage =
+        error.response?.data?.error || "Error Un-Assigning Subject";
+      toast.error(errorMessage);
     }
   };
+
+  // const handleUnAssign = async(evalId, subCode) => {
+  //   try {
+  //       const response = await api.post("/api/admin/unassign-subject", {
+  //         evaluatorId: evalId,
+  //         subjectCode: subCode
+  //       });
+  //       if (response.status === 200) {
+  //         toast.success("Subject Un-Assigned Successfully");
+  //       }
+  //   } catch (error) {
+  //     console.log("Error Un-Assigning Subject", error);
+  //     toast.error("Error Un-Assigning Subject");
+  //   }
+  // };
 
   if (loading) {
     return (
@@ -101,6 +161,7 @@ const AssignedStatus = () => {
             <p className="mt-1 max-w-2xl text-sm text-gray-500">
               Overview of assigned subjects to evaluators
             </p>
+            <p className="mt-1 max-w-2xl text-sm text-gray-900 italic">Note: Subjects with Active Copy Batch can't be unassigned</p>
           </div>
           <div className="flex items-center gap-4 px-4 pb-4">
             <div className="text-sm font-black text-gray-800">Subject:</div>
@@ -157,90 +218,81 @@ const AssignedStatus = () => {
         </div>
 
         <div className="px-4 py-5 sm:p-6">
-         <div className="max-h-[50vh] overflow-y-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-100">
-              <tr className="">
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Course
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Subject Code
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Evaluator
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Assigned Date
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Active Batch
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Action
-                </th>
-              </tr>
-            </thead>
-
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredAssignments.map((assign) => (
-                  <tr key={assign.assignmentId}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {assign.examName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {assign.subjectCode}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {assign.evaluatorName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {formattedDateTime(assign.assignedAt, "date")}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">True?False</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        className="text-xs px-4 py-1 rounded border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
-                        onClick={() =>
-                          handleUnAssign(assign.evaluatorId, assign.subjectCode)
-                        }
-                      >
-                        Un-Assign
-                      </button>
-                    </td>
+          <div className="max-h-[50vh] overflow-y-auto">
+            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3">
+                      Course
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Subject Code
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Evaluator
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Assigned Date
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-center">
+                      Active Copy Batch?
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-center">
+                      Action
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filteredAssignments.map((assign) => (
+                    <tr
+                      key={assign.assignmentId}
+                      className="odd:bg-white even:bg-gray-50 border-b border-gray-200"
+                    >
+                      <th
+                        scope="row"
+                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                      >
+                        {assign.examName}
+                      </th>
+                      <td className="px-6 py-4">{assign.subjectCode}</td>
+                      <td className="px-6 py-4 font-medium text-gray-900">
+                        {assign.evaluatorName}
+                      </td>
+                      <td className="px-6 py-4">
+                        {formattedDateTime(assign.assignedAt, "date")}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className={
+                            assign.hasActiveBatch
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }
+                        >
+                          {assign.hasActiveBatch ? "Yes" : "No"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          title="Un-Assign Subject"
+                          onClick={() =>
+                            handleUnAssign(
+                              assign.evaluatorId,
+                              assign.subjectCode
+                            )
+                          }
+                          className="font-medium text-blue-600 hover:underline hover:text-red-700 transition-colors duration-200"
+                        >
+                          Un-Assign
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          </div>
         </div>
       </div>
     </div>

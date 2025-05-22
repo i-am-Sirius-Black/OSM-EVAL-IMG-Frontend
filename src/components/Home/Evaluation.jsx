@@ -847,7 +847,7 @@ const handleEvaluate = (copyBarcode) => {
           {/* Subject Dropdown Selector */}
           {activeSubjects.length > 0 && (
             <div className="flex items-center gap-4">
-              <div className="text-sm font-black text-gray-800">Subject:</div>
+              <div className="text-sm font-black text-gray-800">{activeSubjects.length} Active {activeSubjects.length > 1 ? "Subjects" : "Subject"}:</div>
               <div className="relative subject-dropdown">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -893,55 +893,6 @@ const handleEvaluate = (copyBarcode) => {
       )}
 
       {/* Active batch info */}
-      {/* {!loading.subjects && activeBatch && (
-        <div className="mb-6">
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-              <div>
-                <h2 className="text-lg font-medium text-gray-900">
-                  {activeBatch.subjectCode} - {activeBatch.examName}
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Assigned on {new Date(activeBatch.assignedAt).toLocaleDateString()} • 
-                  Expires {new Date(activeBatch.expiresAt).toLocaleString()}
-                </p>
-              </div>
-
-              <div className="mt-4 sm:mt-0">
-                <div className="flex items-center">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2 sm:w-48">
-                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progressPercent}%` }}></div>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">{progressPercent}%</span>
-                </div>
-                <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-                  <span>{completedCount} completed</span>
-                  <span>{pendingCount} remaining</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard icon={<Assignment />} label="Total Copies" value={copies.length} color="blue" />
-            <StatCard icon={<CheckCircle />} label="Completed" value={completedCount} color="green" />
-            <StatCard icon={<AccessTime />} label="Pending" value={pendingCount} color="yellow" />
-            <StatCard
-              icon={
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              }
-              label="Expires In"
-              value={
-                `${Math.max(0, Math.floor((new Date(activeBatch.expiresAt) - new Date()) / (1000 * 60 * 60)))}h ` +
-                `${Math.max(0, Math.floor(((new Date(activeBatch.expiresAt) - new Date()) % (1000 * 60 * 60)) / (1000 * 60)))}m`
-              }
-              color="red"
-            />
-          </div>
-        </div>
-      )} */}
 
 {!loading.subjects && activeBatch && (
   <div className="mb-6">
@@ -1006,48 +957,6 @@ const handleEvaluate = (copyBarcode) => {
         ) : !activeBatch && !loading.subjects ? (
           <NoBatchMessage activeSubjects={activeSubjects.length > 0} handleTabChange={handleTabChange} />
         ) : (
-          // <div className="overflow-x-auto">
-          //   <table className="min-w-full divide-y divide-gray-200">
-          //     <thead className="bg-gray-50">
-          //       <tr>
-          //         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Copy</th>
-          //         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-          //         <th className="px-6 py-3 pr-10 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-          //       </tr>
-          //     </thead>
-          //     <tbody className="bg-white divide-y divide-gray-200">
-          //                         {copies.map((copy, idx) => (
-          //         <tr key={idx} className="hover:bg-gray-50">
-          //           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{"copy " + idx}</td>
-          //           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-          //             {copy.isChecked ? (
-          //               <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-          //                 Checked
-          //               </span>
-          //             ) : (
-          //               <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-          //                 Pending
-          //               </span>
-          //             )}
-          //           </td>
-          //           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-          //             <button
-          //               onClick={() => handleEvaluate(copy.copyBarcode)}
-          //               disabled={copy.isChecked}
-          //               className={`inline-flex items-center px-3 py-1 border text-sm font-medium rounded-md ${
-          //                 copy.isChecked
-          //                   ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
-          //                   : "border-blue-600 bg-white text-blue-600 hover:bg-blue-50"
-          //               }`}
-          //             >
-          //               {copy.isChecked ? "Evaluated" : "Evaluate"}
-          //             </button>
-          //           </td>
-          //         </tr>
-          //       ))}
-          //     </tbody>
-          //   </table>
-          // </div>
 
 <div className="overflow-x-auto">
   <table className="min-w-full divide-y divide-gray-200">

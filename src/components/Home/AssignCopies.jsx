@@ -566,7 +566,7 @@ export default function AssignCopies({setActiveTab}) {
         <div className="flex flex-col gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Assign Answer Scripts</h1>
-            <p className="mt-1 text-sm text-gray-500">Select a subject to assign copies for evaluation</p>
+            <p className="mt-1 text-sm text-gray-500">Select a subject to assign its copies for evaluation</p>
           </div>
         </div>
       </div>
