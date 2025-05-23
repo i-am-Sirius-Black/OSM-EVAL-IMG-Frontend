@@ -263,7 +263,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Person, Logout, Dashboard } from "@mui/icons-material";
-import AssessmentIcon from "@mui/icons-material/Assessment";
 import Assignment from "@mui/icons-material/Assignment";
 import LibraryAdd from "@mui/icons-material/LibraryAdd";
 import { useUserIP } from "../../hooks/ShowUserIP";
@@ -275,11 +274,11 @@ import ProfileModal from "./ProfileModal";
 import ConfirmModal from "../Common/ConfirmModal.jsx";
 import Notifications from "./components/Notifications.jsx";
 
-export default function Navbar({ activeTab, setActiveTab, userData }) {
+export default function Navbar({ activeTab, setActiveTab, userData, isReevalAssigned }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
-  const [reevalAssigned, setReevalAssigned] = useState(true);      
+
 
   const dropdownRef = useRef(null);
   const ipAddress = useUserIP();
@@ -288,6 +287,7 @@ export default function Navbar({ activeTab, setActiveTab, userData }) {
   const username = userData?.name || "User";
   const navigate = useNavigate();
 
+ 
   // Handle clicks outside dropdowns
   useEffect(() => {
     function handleClickOutside(event) {
@@ -345,8 +345,8 @@ export default function Navbar({ activeTab, setActiveTab, userData }) {
                 Assign Copies
               </button>
 
-              {reevalAssigned && (
-                              <button
+              {isReevalAssigned && (
+               <button
                 onClick={() => setActiveTab(3)}
                 className={`${
                   activeTab === 3
@@ -355,7 +355,7 @@ export default function Navbar({ activeTab, setActiveTab, userData }) {
                 } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
               >
                 {/* <LibraryAdd className="mr-1" fontSize="small" /> */}
-                Re-Evaluation Copy
+                Re-Evaluation
               </button>
               )}
 

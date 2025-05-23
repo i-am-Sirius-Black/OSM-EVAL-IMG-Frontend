@@ -501,6 +501,7 @@
 import { useState, useEffect } from "react";
 import { Assignment, MenuBook } from "@mui/icons-material";
 import api from "../../api/axios.js";
+import toast from "react-hot-toast";
 
 export default function AssignCopies({setActiveTab}) {
   const [assignedSubjects, setAssignedSubjects] = useState([]);
@@ -550,7 +551,7 @@ export default function AssignCopies({setActiveTab}) {
       );
       
       // Show success message
-      alert(`Successfully assigned ${response.data.copies?.length || 0} copies for ${subject.subjectCode}`);
+      toast.success(`Successfully assigned copies for ${subject.subjectCode} (${subject.examName})`);
       
     } catch (error) {
       console.error("Failed to assign copies:", error);

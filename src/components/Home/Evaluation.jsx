@@ -815,10 +815,10 @@ const handleEvaluate = (copyBarcode) => {
   });
 };
 
-  // Calculate stats for current batch
-  const completedCount = copies.filter(copy => copy.isChecked).length;
-  const pendingCount = copies.length - completedCount;
-  const progressPercent = copies.length > 0 ? Math.round((completedCount / copies.length) * 100) : 0;
+  // // Calculate stats for current batch
+  // const completedCount = copies.filter(copy => copy.isChecked).length;
+  // const pendingCount = copies.length - completedCount;
+  // const progressPercent = copies.length > 0 ? Math.round((completedCount / copies.length) * 100) : 0;
 
   // Get active subjects (with copies assigned)
   const activeSubjects = assignedSubjects.filter(subject => subject.isCopyAssigned);
@@ -914,17 +914,17 @@ const handleEvaluate = (copyBarcode) => {
       <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-gray-800">
         <div className="flex items-center gap-2 min-w-[120px]" title="Total Copies">
           <Assignment className="text-blue-600 w-5 h-5" />
-          <span className="font-medium">{copies.length} Copies</span>
+          <span className="font-medium">{activeBatch.totalCount} Copies</span>
         </div>
 
         <div className="flex items-center gap-2 min-w-[120px]" title="Checked Copies">
           <CheckCircle className="text-green-600 w-5 h-5" />
-          <span className="font-medium">{completedCount} Checked</span>
+          <span className="font-medium">{activeBatch.checkedCount} Checked</span>
         </div>
 
         <div className="flex items-center gap-2 min-w-[120px]" title="Pending Copies">
           <AccessTime className="text-yellow-500 w-5 h-5" />
-          <span className="font-medium">{pendingCount} Pending</span>
+          <span className="font-medium">{activeBatch.pendingCount} Pending</span>
         </div>
 
         <div className="flex items-center gap-2 min-w-[140px]" title="Expires In">

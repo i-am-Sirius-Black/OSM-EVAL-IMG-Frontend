@@ -907,26 +907,26 @@ useEffect(() => {
   };
 
 
-  const validateTimePassed = (seconds) => {
-    if (seconds < constants.MIN_EVAL_TIME) {
-      toast(
-        `Can't Submit Before ${constants.MIN_EVAL_TIME / 60} Minutes.`,
-        {
-          icon: "⏳",
-          duration: 4000,
-        }
-      );
-      return false;
-    }
-    return true;
-  }
+  // const validateTimePassed = (seconds) => {
+  //   if (seconds < constants.MIN_EVAL_TIME) {
+  //     toast(
+  //       `Can't Submit Before ${constants.MIN_EVAL_TIME / 60} Minutes.`,
+  //       {
+  //         icon: "⏳",
+  //         duration: 4000,
+  //       }
+  //     );
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
   //?v1.2 simple toast message
   const handleSubmitCopy = async (submissionData) => {
     const seconds = getElapsedTime();
-    if (!validateTimePassed(seconds)) {
-      return false; // Indicate failure to caller
-    }
+    // if (!validateTimePassed(seconds)) {
+    //   return false; // Indicate failure to caller
+    // }
 
     try {
       // Step 1: Save Annotations
@@ -945,8 +945,8 @@ useEffect(() => {
       // Step 2: Save Evaluation
       const evaluationData = {
         copyid: copyId,
-        obt_mark: submissionData.totalMarks,
-        max_mark: 100, // Hardcoded max marks for now
+        obt_mark: submissionData.obtMarks,
+        max_mark: submissionData.maxMarks,
         status: "Evaluated",
         eval_time: seconds,
         eval_id: submissionData.userId, // Replace with actual user ID
@@ -954,7 +954,6 @@ useEffect(() => {
       };
 
       await evaluationService.saveEvaluation(evaluationData);
-      console.log("Evaluation saved successfully:", evaluationResponse.data);
 
       // After successful submission:
       // 1. Clear localStorage

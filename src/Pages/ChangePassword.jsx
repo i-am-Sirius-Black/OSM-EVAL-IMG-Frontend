@@ -59,6 +59,9 @@ const ChangePassword = () => {
       setSuccess(
         "Password changed successfully! You can now use your new password to login."
       );
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
     } catch (err) {
       setError(
         err.response?.data?.error ||

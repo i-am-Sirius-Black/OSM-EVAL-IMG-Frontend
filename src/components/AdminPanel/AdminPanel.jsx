@@ -157,7 +157,7 @@ import AssignSubjects from "./Panels/Dashboard/AssignSubjects";
 import AssignedStatus from "./Panels/Dashboard/AssignedStatus";
 import CheckedCopies from "./Panels/Advanced/CheckedCopies";
 import Moderation from "./Panels/Advanced/Moderation";
-import Reevaluation from "./Panels/Advanced/Reevaluation";
+import ReevaluationStats from "./Panels/Advanced/ReevaluationStats";
 import AuditTrail from "./Panels/Advanced/AuditTrail";
 import FinalMarkReview from "./Panels/Advanced/FinalMarkReview";
 import RejectedCopies from "./Panels/Advanced/RejectedCopies";
@@ -174,6 +174,7 @@ import { useNavigate } from "react-router-dom";
 import API_ROUTES from "../../api/routes";
 import { useAuth } from "../context/AuthContext";
 import Registration from "./Panels/Registration/Registration";
+import ReevaluationAssignment from "./Panels/Advanced/ReevaluationAssignment";
 
 const AdminPanel = () => {
   // State for panel and tab management
@@ -228,8 +229,10 @@ const AdminPanel = () => {
         return <CheckedCopies />;
       case "rejected":
         return <RejectedCopies />;
-      case "reEvaluation":
-        return <Reevaluation />;
+      case "reeval-stats":
+        return <ReevaluationStats />;
+      case "reevalAssignment":
+        return <ReevaluationAssignment />;  
       case "stats":
         return <Stats />;
       case "registration":
@@ -362,14 +365,25 @@ const AdminPanel = () => {
                   Rejected Copies
                 </button>
                 <button
-                  onClick={() => setActiveTab("reEvaluation")}
+                  onClick={() => setActiveTab("reeval-stats")}
                   className={`${
-                    activeTab === "reEvaluation"
+                    activeTab === "reeval-stats"
                       ? "border-blue-500 text-gray-900"
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
                 >
                   Re-Evaluation
+                </button>
+
+                <button
+                  onClick={() => setActiveTab("reevalAssignment")}
+                  className={`${
+                    activeTab === "reevalAssignment"
+                      ? "border-blue-500 text-gray-900"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
+                >
+                  Re-Evaluation Assignment
                 </button>
 
                 {/* <button

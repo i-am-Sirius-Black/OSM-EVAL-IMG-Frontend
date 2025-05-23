@@ -936,12 +936,18 @@ const EvaluationPanel = memo(
     const [paperId, setPaperId] = useState(1); //using hardcoded value for now
     const [showMarksReset, setShowMarksReset] = useState(false);
 
+    
+
     const navigate = useNavigate();
     const { user } = useAuth();
 
     const pdfUrl = "http://www.pdf995.com/samples/pdf.pdf"; // Example PDF URL, replace with actual data
 
-    console.log("Eval Panel rerendering");
+    const totalQuestionsCount = questions.length;
+    const evaluatedQuestionsCount = Object.keys(marks).length;
+
+    
+    
 
     //Todo: move this and paperId to its parent as pass question..
     // Fetch questions when paperId changes
@@ -979,8 +985,8 @@ const EvaluationPanel = memo(
       return acc;
     }, {});
 
-    // Update the totalMarks calculation
-    const totalMarks = Object.values(marks).reduce(
+    // Update the totalMarks (obtained marks) calculation
+    const obtMarks = Object.values(marks).reduce(
       (sum, mark) => sum + (Number(mark) || 0),
       0
     );
@@ -1115,7 +1121,8 @@ const EvaluationPanel = memo(
 
         const submissionData = {
           copyId,
-          totalMarks,
+          obtMarks,
+          maxMarks: maxTotalMarks,
           userId: user.uid,
           annotations: regularAnnotations,
           drawAnnotations: drawAnnotations,
@@ -1329,7 +1336,7 @@ const EvaluationPanel = memo(
               </div>
 
               <div className="text-xl font-semibold tabular-nums">
-                {totalMarks}
+                {obtMarks}
                 <span className="text-red-400 text-lg ml-1">
                   /{maxTotalMarks}
                 </span>
