@@ -180,28 +180,33 @@ const AdminPanel = () => {
   // State for panel and tab management
   const [activePanel, setActivePanel] = useState("main"); // "main" or "secondary"
   const [activeTab, setActiveTab] = useState("evaluators"); // Default tab
+  const [loggingOut, setLoggingOut] = useState(false);
 
   // Get adminLogout function from AuthContext
   const { adminLogout } = useAuth();
   const navigate = useNavigate();
 
-  // Handle logout logic
-  const handleLogout = async () => {
-    try {
-      // 1. Call server to clear the HTTP-only cookie
-      const response = await api.post(API_ROUTES.ADMIN.ADMIN_LOGOUT);
-      localStorage.removeItem("adminUser");
-      toast.success(response.data.message || "Logged out successfully");
-    } catch (error) {
-      console.error("Logout error:", error);
-      toast.error("Server logout failed, but you've been logged out locally");
-    } finally {
-      // 2. Call AuthContext function to clear local storage and state
-      adminLogout();
-      // 3. Navigate to login page
+const handleLogout = async () => {
+  setLoggingOut(true);
+
+  try {
+    const response = await api.post(API_ROUTES.ADMIN.ADMIN_LOGOUT);
+    toast.success(response.data.message || "Logged out successfully");
+  } catch (error) {
+    toast.error("Logout error, logging out locally");
+  } finally {
+    localStorage.removeItem("adminUser");
+
+    // Delay the state change and navigation
+    setTimeout(() => {
+      adminLogout(); // this sets admin to null
+      setLoggingOut(false);
       navigate("/admin-login", { replace: true });
-    }
-  };
+    }, 500); 
+  }
+};
+
+
 
   // Handle switching between panels
   const handlePanelSwitch = (panel) => {
@@ -295,7 +300,8 @@ const AdminPanel = () => {
             <div className="flex items-center">
               <button
                 onClick={handleLogout}
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-red-400 flex items-center"
+                disabled={loggingOut}
+                className={`px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-red-400 flex items-center ${loggingOut && "animate-bounce"}`}
               >
                 <Logout className="mr-1" fontSize="small" />
                 Logout

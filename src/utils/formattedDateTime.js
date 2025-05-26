@@ -18,6 +18,8 @@ export default function formatDateTime(isoString, format = 'datetime') {
       return date.toLocaleDateString('en-US', dateOptions); // "May 20, 2025"
     case 'time':
       return date.toLocaleTimeString('en-US', timeOptions); // "5:50 AM"
+    case 'year':
+      return date.getFullYear().toString(); // "2025"
     case 'datetime':
     default:
       return `${date.toLocaleDateString('en-US', dateOptions)}, ${date.toLocaleTimeString('en-US', timeOptions)}`; // "May 20, 2025, 5:50 AM"

@@ -612,35 +612,32 @@ const AssignSubjects = () => {
     setViewMode('review');
   };
   
-  // Submit assignment
-  const handleSubmitAssignment = async () => {
-    try {
-      setLoading(prev => ({ ...prev, submit: true }));
-      
-      // Prepare data for API
-      const assignmentData = {
-        evaluatorId: selectedEvaluator.id,
+// Submit assignment
+const handleSubmitAssignment = async () => {
+  try {
+    setLoading(prev => ({ ...prev, submit: true }));
+    
+    // Prepare data for API
+    const assignmentData = {
+      evaluatorId: selectedEvaluator.id,
+      subjectCode: selectedSubject,
+      examName: selectedCourse,
+    };
+    
+    // Call API to assign subject
+    await api.post('/api/admin/assign-subject', assignmentData);
+    
+    // Update assigned subjects list
+    const subjectDetails = subjects.find(s => s.subjectId === selectedSubject);
+    if (subjectDetails) {
+      setAssignedSubjects(prev => [...prev, {
         subjectCode: selectedSubject,
-        examName: selectedCourse,
-      };
-      
-      // Call API to assign subject
-      await api.post('/api/admin/assign-subject', assignmentData);
-      
-      // Update UI with success message
-      setSuccess(`Successfully assigned subject to ${selectedEvaluator.name}`);
-      
-      // Update assigned subjects list
-      const subjectDetails = subjects.find(s => s.subjectId === selectedSubject);
-      if (subjectDetails) {
-        setAssignedSubjects(prev => [...prev, {
-          subjectCode: selectedSubject,
-          subjectName: subjectDetails.subject
-        }]);
-      }
-      
-          // Update UI with success message
-    setSuccess(`Successfully assigned ${subjectDetails?.subject || selectedSubject} to ${evaluatorName}`);
+        subjectName: subjectDetails.subject
+      }]);
+    }
+    
+    // Update UI with success message (FIXED)
+    setSuccess(`Successfully assigned ${subjectDetails?.subject || selectedSubject} to ${selectedEvaluator.name}`);
     
     // Reset all selection states
     setSelectedSubject('');
@@ -651,16 +648,16 @@ const AssignSubjects = () => {
     // Optionally, keep the same evaluator selected to allow multiple assignments to the same person
     // If you prefer to reset everything, uncomment the next line:
     // setSelectedEvaluator(null);
-      
-      // Auto clear success after delay
-      setTimeout(() => setSuccess(null), 5000);
-    } catch (err) {
-      console.error('Error assigning subject:', err);
-      setError('Failed to assign subject. Please try again.');
-    } finally {
-      setLoading(prev => ({ ...prev, submit: false }));
-    }
-  };
+    
+    // Auto clear success after delay
+    setTimeout(() => setSuccess(null), 5000);
+  } catch (err) {
+    console.error('Error assigning subject:', err);
+    setError('Failed to assign subject. Please try again.');
+  } finally {
+    setLoading(prev => ({ ...prev, submit: false }));
+  }
+};
 
   // Render loading indicator
   if (loading.initial) {
@@ -749,7 +746,7 @@ const AssignSubjects = () => {
                       <option value="">Select Evaluator</option>
                       {evaluators.map(evaluator => (
                         <option key={evaluator.id} value={evaluator.id}>
-                          {evaluator.name} ({evaluator.email}) - {evaluator.subjectCount} subjects
+                          {evaluator.name} ({evaluator.email})
                         </option>
                       ))}
                     </select>

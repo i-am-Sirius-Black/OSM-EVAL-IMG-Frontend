@@ -1,19 +1,20 @@
-
-
 //?V2 Using Real data from API
 import React, { useState } from "react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
 import formatDateTime from "../../utils/formattedDateTime";
+import { useNavigate } from "react-router-dom";
 
 const ReevaluateCopy = ({ reevalCopies = [] }) => {
+  const navigate = useNavigate();
   const [loadingCopyId, setLoadingCopyId] = useState(null);
 
-  const handleStartReevaluation = async (copyId) => {
+  const handleStartReevaluation = async (copyId, subjectCode) => {
     setLoadingCopyId(copyId);
     try {
-      // Redirect to the evaluation page with the copy ID
-      // window.location.href = `/evaluate/${copyId}?reevaluation=true`;
+      navigate("/evaluate", {
+        state: { copyId, subjectCode, isReevaluation: true },
+      });
       toast("Starting reevaluation...", { icon: "🔄" });
       setLoadingCopyId(null);
     } catch (error) {
@@ -35,12 +36,28 @@ const ReevaluateCopy = ({ reevalCopies = [] }) => {
     }
   };
 
+  function getDaysAgo(dateString) {
+    const assignedDate = new Date(dateString);
+    const today = new Date();
+
+    assignedDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const diffDays = Math.floor((today - assignedDate) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "1 day ago";
+    return `${diffDays} days ago`;
+  }
+
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         {/* Header */}
         <div className="px-6 py-5 border-b border-gray-200">
-          <h1 className="text-xl font-semibold text-gray-900 mb-1">Re-evaluate Copies</h1>
+          <h1 className="text-xl font-semibold text-gray-900 mb-1">
+            Re-evaluate Copies
+          </h1>
           <p className="text-gray-600 text-sm">
             Manage and start re-evaluation for assigned copies
           </p>
@@ -63,7 +80,9 @@ const ReevaluateCopy = ({ reevalCopies = [] }) => {
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No copies assigned</h3>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">
+                No copies assigned
+              </h3>
               <p className="mt-1 text-sm text-gray-500">
                 There are no copies assigned for re-evaluation at the moment.
               </p>
@@ -95,7 +114,7 @@ const ReevaluateCopy = ({ reevalCopies = [] }) => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {reevalCopies.map((copy) => (
                   <tr key={copy.copyId} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div>
                         <div className="text-sm font-medium text-gray-900">
                           Copy *****
@@ -105,7 +124,7 @@ const ReevaluateCopy = ({ reevalCopies = [] }) => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div>
                         <div className="text-sm font-medium text-gray-900">
                           {copy.subjectName}
@@ -115,7 +134,7 @@ const ReevaluateCopy = ({ reevalCopies = [] }) => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
                           copy.status
@@ -124,17 +143,24 @@ const ReevaluateCopy = ({ reevalCopies = [] }) => {
                         {copy.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDateTime(copy.assignedAt, "date")}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                      <div className="text-sm text-gray-900">
+                        {formatDateTime(copy.assignedAt, "date")}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {getDaysAgo(copy.assignedAt)}
+                      </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 text-center">
                       <div className="text-sm text-gray-900 max-w-xs truncate">
                         {copy.reason}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                       <button
-                        onClick={() => handleStartReevaluation(copy.copyId)}
+                        onClick={() =>
+                          handleStartReevaluation(copy.copyId, copy.subjectCode)
+                        }
                         disabled={loadingCopyId === copy.copyId}
                         className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 hover:cursor-pointer rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       >

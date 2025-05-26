@@ -44,7 +44,7 @@ const API_ROUTES = {
     // Evaluation routes
     EVALUATION: {
     //   GET_COPY: (copyId) => `/api/evaluate/${copyId}`, //: not made yet
-      SAVE: '/api/evaluations',
+      SAVE: '/api/evaluations/save',
       GET_COPIES: '/api/evaluations/fetchAssignedCopies', //get assigned copies to evaluate
       GET_EVALUATION_STATS: '/api/evaluations/stats', //get evaluation stats for a specific evaluator
     },

@@ -941,12 +941,6 @@ const handleEvaluate = (copyBarcode) => {
   </div>
 )}
 
-
-
-
-
-
-
       <div className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
         {loading.batch ? (
           <div className="flex justify-center items-center h-64">
@@ -974,9 +968,9 @@ const handleEvaluate = (copyBarcode) => {
     <table className="min-w-full divide-y divide-gray-200">
       <tbody className="bg-white divide-y divide-gray-200">
         {copies.map((copy, idx) => (
-          <tr key={idx} className="hover:bg-gray-50">
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{"copy " + idx}</td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          <tr key={idx} className={`${copy.isChecked ? "bg-green-100" : ""} hover:bg-blue-50`}>
+            <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{"copy " + idx}</td>
+            <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500">
               {copy.isChecked ? (
                 <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                   Checked
@@ -987,7 +981,7 @@ const handleEvaluate = (copyBarcode) => {
                 </span>
               )}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <td className="px-6 py-2 whitespace-nowrap text-right text-sm font-medium">
               <button
                 onClick={() => handleEvaluate(copy.copyBarcode)}
                 disabled={copy.isChecked}

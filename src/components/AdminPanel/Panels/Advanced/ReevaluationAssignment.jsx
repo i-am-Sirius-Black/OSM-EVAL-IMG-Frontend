@@ -193,9 +193,9 @@ return (
               value={selectedSubject}
               onChange={handleSubjectChange}
               disabled={!selectedCourse || loading || submitting}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed"
             >
-              <option value="">Select a subject</option>
+              <option value="">{selectedCourse ? "Select a subject":""}</option>
               {subjects.map(subject => (
                 <option key={subject.subjectId} value={subject.packingId}>{subject.subject}</option>
               ))}
@@ -213,9 +213,9 @@ return (
               value={formData.copyId}
               onChange={handleInputChange}
               disabled={!selectedSubject || loading || submitting}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed"
             >
-              <option value="">Select a copy</option>
+              <option value="">{selectedSubject ? "Select a copy" : ""}</option>
               {evaluatedCopies.map(copy => (
                 <option key={copy.copyId} value={copy.copyId}>
                   {copy.copyId} - Evaluated by {copy.evaluatorName} ({copy.evaluatorId})
@@ -232,9 +232,9 @@ return (
               value={formData.assignedEvaluatorId}
               onChange={handleInputChange}
               disabled={!formData.copyId || loading || submitting}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed"
             >
-              <option value="">Select an evaluator</option>
+              <option value="">{formData.copyId ? "Select an evaluator" : ""}</option>
               {evaluators.map(evaluator => (
                 <option key={evaluator.uid} value={evaluator.uid}>
                   {evaluator.name} ({evaluator.uid})

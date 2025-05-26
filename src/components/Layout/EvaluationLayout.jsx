@@ -443,7 +443,6 @@ import EvaluationPanel from "../EvaluationPanel/EvaluationPanel";
 import useAnnotations from "../../hooks/useAnnotations";
 import { useEffect, useRef, useState } from "react";
 import ImageViewer from "../PdfViewer/ImageViewer";
-import { saveAnnotations } from "../../services/annotationService";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import evaluationService from "../../services/evaluationService";
 import toast from "react-hot-toast";
@@ -464,7 +463,8 @@ function EvaluationLayout() {
     const location = useLocation();
   
   // Get copyId from location state instead of URL params
-  const { copyId: stateCopyId, subjectCode } = location.state || {};
+// Destructure all needed values from location.state in one line
+const { copyId: stateCopyId, subjectCode, isReevaluation } = location.state || {};
 
 
   const { user } = useAuth();
@@ -507,32 +507,30 @@ function EvaluationLayout() {
   const hideIconTimerRef = useRef(null);
 
 
-  console.log("Eval Layout rerendering");
 
+//TODO: Testing this feature for future implementation
+// useEffect(() => {
+//   if (!restored || !copyId) return;
 
+//   const handleBeforeUnload = (event) => {
+//     // Save synchronously
+//     const state = {
+//       annotations,
+//       marks,
+//       seconds: getElapsedTime()
+//     };
+//     console.log("State saved to localStorage:", copyId, "state->", state);
 
-useEffect(() => {
-  if (!restored || !copyId) return;
+//     event.preventDefault();
+//     event.returnValue = ''; // Required for Chrome
+//   };
 
-  const handleBeforeUnload = (event) => {
-    // Save synchronously
-    const state = {
-      annotations,
-      marks,
-      seconds: getElapsedTime()
-    };
-    console.log("State saved to localStorage:", copyId, "state->", state);
-
-    event.preventDefault();
-    event.returnValue = ''; // Required for Chrome
-  };
-
-  window.addEventListener('beforeunload', handleBeforeUnload);
+//   window.addEventListener('beforeunload', handleBeforeUnload);
   
-  return () => {
-    window.removeEventListener('beforeunload', handleBeforeUnload);
-  };
-}, [restored, copyId]);
+//   return () => {
+//     window.removeEventListener('beforeunload', handleBeforeUnload);
+//   };
+// }, [restored, copyId]);
 
 
 
@@ -553,8 +551,7 @@ useEffect(() => {
     localStorage.removeItem("evaluationState-null");
   }, []);
 
-  //*Hybrid Restore System
-  // Restore state from localStorage or server when component mounts
+  //* Restore state from localStorage component mounts
   useEffect(() => {
     if (copyId && copyId !== "undefined") {
       console.log("Copy ID from URL:", copyId);
@@ -586,169 +583,63 @@ useEffect(() => {
             setIsSaving(false);
           } else {
             console.log("Empty state in localStorage, checking server...");
-            fetchFromServer();
           }
         } catch (error) {
           console.error("Error parsing localStorage data:", error);
-          fetchFromServer();
         }
       } else {
         console.log(
           "No saved state found in localStorage. Fetching from server..."
         );
-        fetchFromServer();
       }
     }
 
-    async function fetchFromServer() {
-      try {
-        if (!evaluatorId) {
-          toast.error(
-            "There was an error fetching your data. Please try again."
-          );
-          console.log("Evaluator ID not found. Cannot fetch from server.");
-          setRestored(true);
-          setIsSaving(false);
-          setAnnotations([]);
-          setMarks({});
-          setTimeInSeconds(0);
-          return;
-        }
-
-        const response = await api.get(AUTOSAVE.GET(evaluatorId, copyId));
-        const data = response.data;
-        console.log("Response.data from server hybrid restore:", data);
-
-        if (data.success && data.data) {
-          // Check if we got meaningful data from server
-          const hasAnnotations =
-            data.data.annotations &&
-            Array.isArray(data.data.annotations) &&
-            data.data.annotations.length > 0;
-          const hasMarks =
-            data.data.marks && Object.keys(data.data.marks).length > 0;
-          const hasSeconds = data.data.seconds > 0;
-
-          if (hasAnnotations || hasMarks || hasSeconds) {
-            console.log("Found meaningful state on server");
-            setAnnotations(data.data.annotations || []);
-            setMarks(data.data.marks || {});
-            setTimeInSeconds(data.data.seconds || 0);
-
-            // Also update localStorage with this server data
-            localStorage.setItem(
-              `evaluationState-${copyId}`,
-              JSON.stringify({
-                annotations: data.data.annotations || [],
-                marks: data.data.marks || {},
-                seconds: data.data.seconds || 0,
-              })
-            );
-
-            console.log("State restored from server");
-          } else {
-            console.log("Empty state on server. Initializing default state.");
-            setAnnotations([]);
-            setMarks({});
-            setTimeInSeconds(0);
-          }
-        } else {
-          console.log(
-            "No saved state found on server. Initializing default state."
-          );
-          setAnnotations([]);
-          setMarks({});
-        }
-      } catch (error) {
-        console.error("Error fetching state from server:", error);
-        setAnnotations([]);
-        setMarks({});
-      } finally {
-        setRestored(true);
-        setIsSaving(false);
-      }
-    }
   }, [copyId, setAnnotations, evaluatorId, copyId]);
 
-  //* Hybrid Autosave System
-  // Save annotations with debounce - hybrid approach (localStorage + server)
-  useEffect(() => {
-    if (restored && copyId && copyId !== "undefined") {
-      const localDebounceTimeout = constants.LOCAL_TIMEOUT;
-      const serverDebounceTimeout = constants.SERVER_TIMEOUT;
+//* Hybrid Autosave System (now only localStorage, no server)
+useEffect(() => {
+  if (restored && copyId && copyId !== "undefined") {
+    const localDebounceTimeout = constants.LOCAL_TIMEOUT;
 
-      // Show the saving icon immediately
-      setIsSaving(true);
-      setShowSaveIcon(true);
+    // Show the saving icon immediately
+    setIsSaving(true);
+    setShowSaveIcon(true);
 
-      // Local save timeout (quick save to localStorage)
-      const localSaveTimeout = setTimeout(() => {
-        const state = {
-          annotations,
-          marks,
-          seconds: getElapsedTime(),
-        };
-        localStorage.setItem(
-          `evaluationState-${copyId}`,
-          JSON.stringify(state)
-        );
-        console.log("State saved to localStorage:", copyId);
+    // Local save timeout (quick save to localStorage)
+    const localSaveTimeout = setTimeout(() => {
+      const state = {
+        annotations,
+        marks,
+        seconds: getElapsedTime(),
+      };
+      localStorage.setItem(
+        `evaluationState-${copyId}`,
+        JSON.stringify(state)
+      );
+      console.log("State saved to localStorage:", copyId);
 
-        // Show success icon
-        setIsSaving(false);
-      }, localDebounceTimeout);
+      // Show success icon
+      setIsSaving(false);
+    }, localDebounceTimeout);
 
-      // Server save timeout (less frequent, but more persistent)
-      const serverSaveTimeout = setTimeout(async () => {
-        try {
-          if (!evaluatorId) {
-            toast.error(
-              "There was an error fetching your data. Please try again."
-            );
-            console.log("Evaluator ID not found. Cannot fetch from server.");
-            return;
-          }
-          // Send to server
-          const response = await api.post(AUTOSAVE.SAVE, {
-            evaluatorId,
-            copyId,
-            annotations,
-            marks,
-            seconds: getElapsedTime(),
-          });
+    // Set a timer to hide the success icon
+    if (hideIconTimerRef.current) {
+      clearTimeout(hideIconTimerRef.current);
+    }
 
-          const data = response.data;
+    hideIconTimerRef.current = setTimeout(() => {
+      setShowSaveIcon(false);
+    }, 3000);
 
-          if (data.success) {
-            console.log("State saved to server:", copyId);
-          } else {
-            console.error("Failed to save state to server:", data.message);
-          }
-        } catch (error) {
-          console.error("Error saving to server:", error);
-          // If server save fails, at least we have localStorage backup
-        }
-      }, serverDebounceTimeout);
-
-      // Set a timer to hide the success icon
+    return () => {
+      clearTimeout(localSaveTimeout);
       if (hideIconTimerRef.current) {
         clearTimeout(hideIconTimerRef.current);
       }
-
-      hideIconTimerRef.current = setTimeout(() => {
-        setShowSaveIcon(false);
-      }, 3000);
-
-      return () => {
-        clearTimeout(localSaveTimeout);
-        clearTimeout(serverSaveTimeout);
-        if (hideIconTimerRef.current) {
-          clearTimeout(hideIconTimerRef.current);
-        }
-        setIsSaving(false);
-      };
-    }
-  }, [annotations, marks, copyId, restored]);
+      setIsSaving(false);
+    };
+  }
+}, [annotations, marks, copyId, restored]);
 
   // Update copyId if URL parameter changes
   useEffect(() => {
@@ -782,34 +673,6 @@ useEffect(() => {
         `evaluationState-${copyId}`,
         JSON.stringify(newState)
       );
-
-      // Also update server state
-      try {
-        if (!evaluatorId) {
-          toast.error(
-            "There was an error fetching your data. Please try again."
-          );
-          console.log("Evaluator ID not found. Cannot fetch from server.");
-          return;
-        }
-
-        // Send to server immediately - no debounce needed for explicit user actions
-        await api.post(AUTOSAVE.SAVE, {
-          evaluatorId,
-          copyId,
-          annotations: [],
-          marks: newState.marks,
-          seconds: getElapsedTime(),
-        });
-
-        console.log("Reset annotations synced to server");
-      } catch (serverError) {
-        console.error(
-          "Failed to sync annotation reset to server:",
-          serverError
-        );
-        // Continue anyway since localStorage is updated
-      }
 
       // Show success message
       toast("Annotations Cleared! Marks preserved.", {
@@ -858,31 +721,6 @@ useEffect(() => {
         JSON.stringify(newState)
       );
 
-      // Also update server state
-      try {
-        if (!evaluatorId) {
-          toast.error(
-            "There was an error fetching your data. Please try again."
-          );
-          console.log("Evaluator ID not found. Cannot fetch from server.");
-          return;
-        }
-
-        // Send to server immediately - no debounce needed for explicit user actions
-        await api.post(AUTOSAVE.SAVE, {
-          evaluatorId,
-          copyId,
-          annotations: newState.annotations, // Keep existing annotations
-          marks: {}, // Empty marks
-          seconds: getElapsedTime(),
-        });
-
-        console.log("Reset marks synced to server");
-      } catch (serverError) {
-        console.error("Failed to sync marks reset to server:", serverError);
-        // Continue anyway since localStorage is updated
-      }
-
       // Show success message
       toast("All Marks Reset!", {
         icon: "🧹",
@@ -922,70 +760,127 @@ useEffect(() => {
   // }
 
   //?v1.2 simple toast message
-  const handleSubmitCopy = async (submissionData) => {
-    const seconds = getElapsedTime();
-    // if (!validateTimePassed(seconds)) {
-    //   return false; // Indicate failure to caller
-    // }
+ 
+  // const handleSubmitCopy = async (submissionData) => {
+  //   const seconds = getElapsedTime();
+  //   // if (!validateTimePassed(seconds)) {
+  //   //   return false; // Indicate failure to caller
+  //   // }
 
-    try {
-      // Step 1: Save Annotations
-      const annotationResponse = await saveAnnotations(copyId, {
-        annotations: submissionData.annotations,
-        drawAnnotations: submissionData.drawAnnotations,
-      });
+  //   try {
+  //     // Step 1: Save Annotations
+  //     const annotationResponse = await saveAnnotations(copyId, {
+  //       annotations: submissionData.annotations,
+  //       drawAnnotations: submissionData.drawAnnotations,
+  //     });
 
-      if (!annotationResponse.data.success) {
-        toast.error(
-          annotationResponse.data.message || "Failed to save annotations."
-        );
-        return false; // Indicate failure to caller
+  //     if (!annotationResponse.data.success) {
+  //       toast.error(
+  //         annotationResponse.data.message || "Failed to save annotations."
+  //       );
+  //       return false; // Indicate failure to caller
+  //     }
+
+  //     // Step 2: Save Evaluation
+  //     const evaluationData = {
+  //       copyid: copyId,
+  //       obt_mark: submissionData.obtMarks,
+  //       max_mark: submissionData.maxMarks,
+  //       status: "Evaluated",
+  //       eval_time: seconds,
+  //       eval_id: submissionData.userId, // Replace with actual user ID
+  //       bag_id: "BAG001", // Replace with actual bag ID if available
+  //     };
+
+  //     await evaluationService.saveEvaluation(evaluationData);
+
+  //     // After successful submission:
+  //     // 1. Clear localStorage
+  //     localStorage.removeItem(`evaluationState-${copyId}`);
+
+  //     // 2. Clear server autosave
+  //     try {
+  //       if (!evaluatorId) {
+  //         toast.error(
+  //           "There was an error fetching your data. Please try again."
+  //         );
+  //         console.log("Evaluator ID not found. Cannot fetch from server.");
+  //         return;
+  //       }
+  //       // Send delete request to server
+  //       await api.delete(AUTOSAVE.DELETE(evaluatorId, copyId));
+  //       console.log("Server autosave cleared successfully");
+  //     } catch (deleteError) {
+  //       console.error("Error deleting server autosave:", deleteError);
+  //       // Continue anyway since this is just cleanup
+  //     }
+
+  //     toast.success("Evaluation submitted successfully!");
+  //     return true; // Indicate success to caller
+  //   } catch (error) {
+  //     console.error("Error during submission:", error);
+  //     toast.error(
+  //       `Submission failed: ${error.message || "Unknown error occurred"}`
+  //     );
+  //     return false; // Indicate failure to caller
+  //   }
+  // };
+
+
+  //? V2 with both eval+ annotations submission in single call also reevaluation save
+ const handleSubmitCopy = async (submissionData) => {
+  const seconds = getElapsedTime();
+  try {
+    if (isReevaluation) {
+      // Re-evaluation payload
+      const payload = {
+        copyid: copyId,
+        obt_mark2: submissionData.obtMarks,
+        eval_id2: user.uid,
+        eval_time2: seconds,
+        annotations2: submissionData.annotations,
+        draw_annotations2: submissionData.drawAnnotations,
+      };
+      const result = await evaluationService.submitReevaluation(payload);
+
+      if (!result.success) {
+        toast.error(result.message || "Failed to submit re-evaluation.");
+        return false;
       }
-
-      // Step 2: Save Evaluation
-      const evaluationData = {
+      toast.success("Re-evaluation submitted successfully!");
+    } else {
+      // Normal evaluation payload
+      const payload = {
         copyid: copyId,
         obt_mark: submissionData.obtMarks,
         max_mark: submissionData.maxMarks,
         status: "Evaluated",
         eval_time: seconds,
-        eval_id: submissionData.userId, // Replace with actual user ID
-        bag_id: "BAG001", // Replace with actual bag ID if available
+        eval_id: user.uid,
+        bag_id: "BAG001",
+        annotations: submissionData.annotations,
+        drawAnnotations: submissionData.drawAnnotations,
       };
+      const result = await evaluationService.saveEvaluationAndAnnotations(payload);
 
-      await evaluationService.saveEvaluation(evaluationData);
-
-      // After successful submission:
-      // 1. Clear localStorage
-      localStorage.removeItem(`evaluationState-${copyId}`);
-
-      // 2. Clear server autosave
-      try {
-        if (!evaluatorId) {
-          toast.error(
-            "There was an error fetching your data. Please try again."
-          );
-          console.log("Evaluator ID not found. Cannot fetch from server.");
-          return;
-        }
-        // Send delete request to server
-        await api.delete(AUTOSAVE.DELETE(evaluatorId, copyId));
-        console.log("Server autosave cleared successfully");
-      } catch (deleteError) {
-        console.error("Error deleting server autosave:", deleteError);
-        // Continue anyway since this is just cleanup
+      if (!result.success) {
+        toast.error(result.message || "Failed to save evaluation.");
+        return false;
       }
-
       toast.success("Evaluation submitted successfully!");
-      return true; // Indicate success to caller
-    } catch (error) {
-      console.error("Error during submission:", error);
-      toast.error(
-        `Submission failed: ${error.message || "Unknown error occurred"}`
-      );
-      return false; // Indicate failure to caller
     }
-  };
+
+    // After successful submission:
+    localStorage.removeItem(`evaluationState-${copyId}`);
+
+    return true;
+  } catch (error) {
+    toast.error(error.message || "Submission failed.");
+    return false;
+  }
+};
+ 
+
 
   const getElapsedTime = () => {
     return timerRef.current?.getCurrentTime() || 0;
@@ -1020,23 +915,6 @@ useEffect(() => {
             JSON.stringify(state)
           );
           
-          // 2. Try to save to server if possible
-          if (evaluatorId) {
-            try {
-              await api.post(AUTOSAVE.SAVE, {
-                evaluatorId,
-                copyId,
-                annotations,
-                marks,
-                seconds: getElapsedTime(),
-              });
-              console.log("Final state saved to server before navigation");
-            } catch (error) {
-              console.error("Could not save to server before navigation:", error);
-              // Continue with navigation anyway
-            }
-          }
-          
           // 3. Navigate after saving
           navigate(-1);
         } catch (error) {
@@ -1049,7 +927,7 @@ useEffect(() => {
       saveState();
     }
   }, [navigationPending]);
-
+  
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       {/* Header */}

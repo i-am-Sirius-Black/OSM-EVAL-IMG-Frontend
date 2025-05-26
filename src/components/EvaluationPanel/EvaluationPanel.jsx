@@ -657,8 +657,8 @@
 //                 {notAnnotatedPages.map((page) => (
 //                   <span
 //                     key={page}
-//                     className="flex-shrink-0 w-8 h-8 flex items-center justify-center 
-//                     rounded-full bg-red-50 text-red-600 text-sm font-medium 
+//                     className="flex-shrink-0 w-8 h-8 flex items-center justify-center
+//                     rounded-full bg-red-50 text-red-600 text-sm font-medium
 //                     border border-red-100"
 //                   >
 //                     {page}
@@ -767,19 +767,19 @@
 //             {/* <div className="flex justify-between items-center mb-3">
 //   <div className="flex items-center gap-1">
 //     <div className="text-md text-gray-500">Total Score</div>
-    
+
 //     <div className="relative group">
-//       <button 
+//       <button
 //         className="ml-1 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-gray-100 transition-colors"
 //         title="Reset marks options"
 //         onClick={() => setShowMarksReset(!showMarksReset)}
 //       >
 //         <SettingsIcon fontSize="4"/>
 //       </button>
-      
+
 //       {showMarksReset && (
 //         <div className="absolute top-full left-0 mt-1 bg-white shadow-md rounded-md border border-gray-200 p-2 z-20 min-w-[160px] text-sm">
-//           <button 
+//           <button
 //             onClick={handleReset}
 //             className="flex items-center gap-2 w-full text-left px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded transition-colors"
 //           >
@@ -867,14 +867,14 @@
 //           <div className="flex gap-3 justify-end">
 //             <button
 //               onClick={() => setShowRejectModal(true)}
-//               className="px-4 h-9 text-sm font-medium text-red-600 hover:bg-red-50 
+//               className="px-4 h-9 text-sm font-medium text-red-600 hover:bg-red-50
 //               rounded-lg transition-colors"
 //             >
 //               Reject
 //             </button>
 //             <button
 //               onClick={handleSubmitClick}
-//               className="px-6 h-9 text-sm font-medium bg-blue-600 text-white 
+//               className="px-6 h-9 text-sm font-medium bg-blue-600 text-white
 //               hover:bg-blue-700 rounded-lg transition-colors"
 //             >
 //               Submit
@@ -905,7 +905,6 @@
 
 // export default EvaluationPanel;
 
-
 //? (testing) skip page1 page2 unchecked cacualtion and validation
 
 import { memo, use, useEffect, useState } from "react";
@@ -923,7 +922,7 @@ import CachedIcon from "@mui/icons-material/Cached";
 import { constants } from "../../utils/constants";
 
 // Define pages to skip from annotation checking
-const PAGES_TO_SKIP = [1, 2]; // Skip pages 1 and 2 
+const PAGES_TO_SKIP = [1, 2]; // Skip pages 1 and 2
 
 const EvaluationPanel = memo(
   ({ marks, setMarks, annotations, submitCopy, copyId, handleReset }) => {
@@ -936,8 +935,6 @@ const EvaluationPanel = memo(
     const [paperId, setPaperId] = useState(1); //using hardcoded value for now
     const [showMarksReset, setShowMarksReset] = useState(false);
 
-    
-
     const navigate = useNavigate();
     const { user } = useAuth();
 
@@ -946,10 +943,7 @@ const EvaluationPanel = memo(
     const totalQuestionsCount = questions.length;
     const evaluatedQuestionsCount = Object.keys(marks).length;
 
-    
-    
-
-    //Todo: move this and paperId to its parent as pass question..
+    //Todo: move this and paperId to its parent and pass question..
     // Fetch questions when paperId changes
     useEffect(() => {
       const fetchQuestions = async () => {
@@ -993,7 +987,6 @@ const EvaluationPanel = memo(
 
     // Calculate max marks from all questions
     const maxTotalMarks = questions.reduce((sum, q) => sum + q.maxMark, 0);
-    
 
     const validateEvaluation = () => {
       // Check if all required marks are entered and valid
@@ -1050,16 +1043,18 @@ const EvaluationPanel = memo(
       const annotatedPages = Array.from(
         new Set(annotations.map((a) => a.page))
       );
-      
+
       // Create array of pages that need to be checked (excluding skipped pages)
       const pagesToCheck = Array.from(
-        { length: totalPages }, 
+        { length: totalPages },
         (_, i) => i + 1
-      ).filter(page => !PAGES_TO_SKIP.includes(page));
-      
+      ).filter((page) => !PAGES_TO_SKIP.includes(page));
+
       // Check if all required pages are annotated
-      const missingPages = pagesToCheck.filter(p => !annotatedPages.includes(p));
-      
+      const missingPages = pagesToCheck.filter(
+        (p) => !annotatedPages.includes(p)
+      );
+
       // Return validation result with specific issue if annotations are invalid
       if (missingPages.length > 0) {
         return {
@@ -1069,10 +1064,9 @@ const EvaluationPanel = memo(
           missingPages,
         };
       }
-    
+
       return { valid: true };
     };
-
 
     const validateComplete = () => {
       // First check marks
@@ -1196,12 +1190,13 @@ const EvaluationPanel = memo(
     // );
 
     //* Calculate unchecked pages (excluding pages we want to skip)
-    const allPages = Array.from({ length: 36 }, (_, i) => i + 1)
-    .filter(page => !PAGES_TO_SKIP.includes(page)); // Filter out skipped pages
+    const allPages = Array.from({ length: 36 }, (_, i) => i + 1).filter(
+      (page) => !PAGES_TO_SKIP.includes(page)
+    ); // Filter out skipped pages
 
     const annotatedPages = Array.from(new Set(annotations.map((a) => a.page)));
     const notAnnotatedPages = allPages.filter(
-    (p) => !annotatedPages.includes(p)
+      (p) => !annotatedPages.includes(p)
     );
 
     const renderTabContent = () => {
@@ -1303,11 +1298,11 @@ const EvaluationPanel = memo(
     return (
       <div className="flex flex-col h-full bg-white">
         {/* Header with total marks and tabs */}
-        <div className="sticky top-0 z-10 bg-white border-b">
+        {/* <div className="sticky top-0 z-10 bg-white border-b">
           <div className="px-4 pt-3 pb-2">
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-1">
-                <div className="text-md text-gray-500">Total Score</div>
+                <div className="text-md text-gray-500">Marks</div>
 
                 <div className="relative">
                   <button
@@ -1315,7 +1310,7 @@ const EvaluationPanel = memo(
                     title="Options"
                     onClick={() => setShowMarksReset(!showMarksReset)}
                   >
-                    <SettingsIcon sx={{ fontSize: 14 }} /> {/* Smaller icon */}
+                    <SettingsIcon sx={{ fontSize: 14 }} />
                   </button>
 
                   {showMarksReset && (
@@ -1323,11 +1318,11 @@ const EvaluationPanel = memo(
                       <button
                         onClick={() => {
                           handleReset();
-                          setShowMarksReset(false); // Auto-close after clicking
+                          setShowMarksReset(false); 
                         }}
                         className="flex items-center gap-1.5 w-full text-left px-2 py-1.5 text-gray-700 hover:bg-red-50 hover:text-red-500 transition-colors"
                       >
-                        {/* <CachedIcon sx={{ fontSize: 14 }} /> */}
+                    
                         <span>Reset All Marks</span>
                       </button>
                     </div>
@@ -1359,6 +1354,105 @@ const EvaluationPanel = memo(
                   }`}
                 >
                   {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div> */}
+
+        <div className="sticky top-0 z-10 bg-white border-b">
+          <div className="px-4 py-3">
+            {/* Single row header with both question counter and marks */}
+            <div className="flex items-center justify-between mb-3">
+              {/* Left side: Question counter */}
+              <div className="flex items-baseline">
+                <span className="text-sm font-bold text-gray-600 mr-1">
+                  Questions:
+                </span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {evaluatedQuestionsCount}
+                </span>
+                <span className="text-sm text-gray-500">/</span>
+                <span className="text-sm text-gray-500">
+                  {totalQuestionsCount}
+                </span>
+                
+              </div>
+
+
+
+              {/* Right side: Score display with reset button */}
+              <div className="flex items-center gap-2">
+
+                {/* Reset button */}
+                <div className="relative">
+                  <button
+                    className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                      showMarksReset
+                        ? "text-red-500 bg-red-50"
+                        : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                    } transition-colors focus:outline-none`}
+                    title="Reset options"
+                    onClick={() => setShowMarksReset(!showMarksReset)}
+                  >
+                    <SettingsIcon sx={{ fontSize: 16 }} />
+                  </button>
+
+                  {showMarksReset && (
+                    <div className="absolute top-full  right-0 mt-1 bg-white shadow-md rounded-md border border-gray-200 z-20 w-28">
+                      <button
+                        onClick={() => {
+                          handleReset();
+                          setShowMarksReset(false);
+                        }}
+                        className="flex items-center w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-red-50 hover:text-red-500 transition-colors"
+                      >
+                        <span>Reset All Marks</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-sm font-bold text-gray-600">Marks</div>
+                <div className="text-xl font-semibold tabular-nums text-gray-900">
+                  {obtMarks}
+                  <span className="text-red-500 text-lg ml-0.5">
+                    /{maxTotalMarks}
+                  </span>
+                </div>
+
+
+              </div>
+            </div>
+
+            {/* Tab navigation */}
+            <div className="flex gap-4 text-sm">
+              {[
+                { id: "marking", label: "Marking" },
+                {
+                  id: "copy",
+                  label: `Pages ${
+                    notAnnotatedPages.length > 0
+                      ? `(${notAnnotatedPages.length})`
+                      : ""
+                  }`,
+                },
+                { id: "paper", label: "Q.Paper" },
+                { id: "answer", label: "Ans.Key" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`pb-2 px-1 border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? "border-blue-500 text-blue-600 font-medium"
+                      : "border-transparent text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  {tab.label}
+                  {tab.id === "copy" && notAnnotatedPages.length > 0 && (
+                    <span className="ml-1 inline-flex h-1.5 w-1.5 bg-red-500 rounded-full"></span>
+                  )}
                 </button>
               ))}
             </div>
@@ -1412,4 +1506,3 @@ const EvaluationPanel = memo(
 );
 
 export default EvaluationPanel;
-
