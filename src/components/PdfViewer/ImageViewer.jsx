@@ -587,7 +587,7 @@ const ImageViewer = memo(
               </svg>
             </button>
             <button
-              onClick={() => setZoom(1)}
+              onClick={() => setZoom(0.8)}
               className="px-2 text-xs font-medium text-gray-600 hover:bg-gray-100"
             >
               {Math.round(zoom * 100)}%

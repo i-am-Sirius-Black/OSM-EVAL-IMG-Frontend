@@ -175,11 +175,12 @@ import API_ROUTES from "../../api/routes";
 import { useAuth } from "../context/AuthContext";
 import Registration from "./Panels/Registration/Registration";
 import ReevaluationAssignment from "./Panels/Advanced/ReevaluationAssignment";
+import Evaluators from "./Panels/Dashboard/Evaluators";
 
 const AdminPanel = () => {
   // State for panel and tab management
   const [activePanel, setActivePanel] = useState("main"); // "main" or "secondary"
-  const [activeTab, setActiveTab] = useState("evaluators"); // Default tab
+  const [activeTab, setActiveTab] = useState("evaluatorStatus"); // Default tab
   const [loggingOut, setLoggingOut] = useState(false);
 
   // Get adminLogout function from AuthContext
@@ -213,7 +214,7 @@ const handleLogout = async () => {
     setActivePanel(panel);
     // Set default tab for each panel
     if (panel === "main") {
-      setActiveTab("evaluators");
+      setActiveTab("evaluatorStatus");
     } else if(panel === "secondary") {
       setActiveTab("copies");
     } else if(panel === "tertiary") {
@@ -225,6 +226,8 @@ const handleLogout = async () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "evaluators":
+        return <Evaluators />;
+      case "evaluatorStatus":
         return <EvaluatorStatus />;
       case "assign":
         return <AssignSubjects />;
@@ -315,6 +318,16 @@ const handleLogout = async () => {
             {activePanel === "main" && (
               <>
                 <button
+                  onClick={() => setActiveTab("evaluatorStatus")}
+                  className={`${
+                    activeTab === "evaluatorStatus"
+                      ? "border-blue-500 text-gray-900"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
+                >
+                  Evaluator Status
+                </button>
+                            <button
                   onClick={() => setActiveTab("evaluators")}
                   className={`${
                     activeTab === "evaluators"
@@ -322,7 +335,7 @@ const handleLogout = async () => {
                       : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
                 >
-                  Evaluator Status
+                  Evaluators
                 </button>
                 <button
                   onClick={() => setActiveTab("assign")}
