@@ -127,20 +127,7 @@ const AssignedStatus = () => {
     }
   };
 
-  // const handleUnAssign = async(evalId, subCode) => {
-  //   try {
-  //       const response = await api.post("/api/admin/unassign-subject", {
-  //         evaluatorId: evalId,
-  //         subjectCode: subCode
-  //       });
-  //       if (response.status === 200) {
-  //         toast.success("Subject Un-Assigned Successfully");
-  //       }
-  //   } catch (error) {
-  //     console.log("Error Un-Assigning Subject", error);
-  //     toast.error("Error Un-Assigning Subject");
-  //   }
-  // };
+
 
   if (loading) {
     return (

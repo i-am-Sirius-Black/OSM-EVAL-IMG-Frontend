@@ -156,12 +156,10 @@ import Stats from "./Panels/Advanced/Stats";
 import AssignSubjects from "./Panels/Dashboard/AssignSubjects";
 import AssignedStatus from "./Panels/Dashboard/AssignedStatus";
 import CheckedCopies from "./Panels/Advanced/CheckedCopies";
-import Moderation from "./Panels/Advanced/Moderation";
 import ReevaluationStats from "./Panels/Advanced/ReevaluationStats";
-import AuditTrail from "./Panels/Advanced/AuditTrail";
-import FinalMarkReview from "./Panels/Advanced/FinalMarkReview";
+
 import RejectedCopies from "./Panels/Advanced/RejectedCopies";
-import StudentResults from "./Panels/Registration/Registration";
+
 
 
 // Import material-ui icons
@@ -405,7 +403,7 @@ const handleLogout = async () => {
                   Re-Evaluation Assignment
                 </button>
 
-                {/* <button
+                <button
                   onClick={() => setActiveTab("stats")}
                   className={`${
                     activeTab === "stats"
@@ -414,7 +412,7 @@ const handleLogout = async () => {
                   } inline-flex items-center px-1 py-4 border-b-2 text-sm font-medium`}
                 >
                   Analytics
-                </button> */}
+                </button>
               </>
             )}
 

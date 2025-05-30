@@ -23,8 +23,6 @@ const Stats = () => {
           { id: "bsc", name: "Bachelor of Science" },
           { id: "btech", name: "Bachelor of Technology" },
           { id: "beng", name: "Bachelor of Engineering" },
-          { id: "bcom", name: "Bachelor of Commerce" },
-          { id: "ba", name: "Bachelor of Arts" },
         ],
         courseData: [
           {
@@ -44,13 +42,6 @@ const Stats = () => {
             name: "Bachelor of Commerce",
             count: 2180,
             completion: 95,
-          },
-          { id: "ba", name: "Bachelor of Arts", count: 1840, completion: 98 },
-          {
-            id: "btech",
-            name: "Bachelor of Technology",
-            count: 765,
-            completion: 78,
           },
         ],
       };
@@ -79,53 +70,51 @@ const Stats = () => {
       <div className="flex justify-between px-6 py-4 border-b border-gray-200">
         <div>
           <h2 className="text-xl font-semibold text-gray-800">
-          Evaluation Analytics
-        </h2>
-        <p className="text-sm text-gray-500 mt-1">
-          Key metrics for evaluation, re-evaluation, and moderation
-        </p>
+            Evaluation Analytics
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Key metrics for evaluation, re-evaluation, and moderation
+          </p>
         </div>
 
-              {/* Filters */}
-             <div className="px-6 py-2 border-b border-gray-200 flex flex-wrap gap-4 items-center">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Session
-          </label>
-          <select
-            value={sessionFilter}
-            onChange={(e) => setSessionFilter(e.target.value)}
-            className="px-3 py-1 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          >
-            {statsData?.sessions.map((session) => (
-              <option key={session} value={session}>
-                {session}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Filters */}
+        <div className="px-6 py-2 border-b border-gray-200 flex flex-wrap gap-4 items-center">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Session
+            </label>
+            <select
+              value={sessionFilter}
+              onChange={(e) => setSessionFilter(e.target.value)}
+              className="px-3 py-1 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            >
+              {statsData?.sessions.map((session) => (
+                <option key={session} value={session}>
+                  {session}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Course
-          </label>
-          <select
-            value={courseFilter}
-            onChange={(e) => setCourseFilter(e.target.value)}
-            className="px-3 py-1 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="all">All Courses</option>
-            {statsData?.courses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Course
+            </label>
+            <select
+              value={courseFilter}
+              onChange={(e) => setCourseFilter(e.target.value)}
+              className="px-3 py-1 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">All Courses</option>
+              {statsData?.courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
-      </div>
-
-
 
       {/* Dashboard Content */}
       {loading ? (
@@ -133,7 +122,6 @@ const Stats = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       ) : (
-
         <div className="p-6">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Left Side - Stacked Stats Cards */}
@@ -161,7 +149,7 @@ const Stats = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div
                 className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() =>
@@ -235,7 +223,6 @@ const Stats = () => {
             </div>
           </div>
         </div>
-
       )}
     </div>
   );

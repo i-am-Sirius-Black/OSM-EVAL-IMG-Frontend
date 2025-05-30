@@ -249,7 +249,7 @@ const handleEvaluate = (copyBarcode) => {
     <table className="min-w-full divide-y divide-gray-200">
       <tbody className="bg-white divide-y divide-gray-200">
         {copies.map((copy, idx) => (
-          <tr key={idx} className={`${copy.isChecked ? "bg-green-100" : ""} hover:bg-blue-50`}>
+          <tr key={idx} className={`${copy.isChecked ? "bg-green-50" : ""} hover:bg-gray-50`}>
             <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">{"copy " + idx}</td>
             <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500">
               {copy.isChecked ? (
@@ -264,7 +264,7 @@ const handleEvaluate = (copyBarcode) => {
             </td>
             <td className="px-6 py-2 whitespace-nowrap text-right text-sm font-medium">
               <button
-                onClick={() => handleEvaluate(copy.copyBarcode)}
+                onClick={() => handleEvaluate(copy.copyId)}
                 disabled={copy.isChecked}
                 className={`inline-flex items-center px-3 py-1 border text-sm font-medium rounded-md ${
                   copy.isChecked

@@ -159,26 +159,26 @@ export default function Dashboard() {
   const { user, loading } = useAuth();
 
 
-   useEffect(() => {
-    // Check if the user has any re-evaluation assignments
-    const checkReevalAssigned = async () => {
-      try {
-        const response = await api.get("/api/evaluator/check-reeval-assigned");
-        setReevalCopies(response.data.assignments);
-        if(response.data.hasAssignments){
-          setIsReevalAssigned(true);
-        }
-        else{
-          setIsReevalAssigned(false);
-        }
-      } catch (error) {
-        console.error("Error checking re-evaluation assignments:", error);
-        setIsReevalAssigned(false);
-      }
-    };
+  //  useEffect(() => {
+  //   // Check if the user has any re-evaluation assignments
+  //   const checkReevalAssigned = async () => {
+  //     try {
+  //       const response = await api.get("/api/evaluator/check-reeval-assigned");
+  //       setReevalCopies(response.data.assignments);
+  //       if(response.data.hasAssignments){
+  //         setIsReevalAssigned(true);
+  //       }
+  //       else{
+  //         setIsReevalAssigned(false);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error checking re-evaluation assignments:", error);
+  //       setIsReevalAssigned(false);
+  //     }
+  //   };
 
-    checkReevalAssigned();
-  },[]);
+  //   checkReevalAssigned();
+  // },[]);
 
 
   return (

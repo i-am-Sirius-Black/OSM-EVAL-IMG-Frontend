@@ -16,7 +16,7 @@ const API_ROUTES = {
       REGISTER: '/auth/register',
       LOGIN: '/auth/login',
       CHECK: '/auth/check',
-      GET_NEW_UID: '/auth/uid/new',
+      GET_NEW_UID: '/auth/uid/new', //deprecated
       CHANGE_PASSWORD: '/auth/change-password',
     },
   
@@ -69,16 +69,16 @@ const API_ROUTES = {
 
     // Admin routes
     ADMIN: {
-      AUTH_CHECK: '/api/admin/check', //check if admin is logged in
+      AUTH_CHECK: '/api/admin/check',
       ADMIN_LOGIN: '/api/admin/login',
       ADMIN_LOGOUT: '/api/admin/logout',
-      GET_EVALUATORS: '/api/admin/evaluators',
-      ASSIGN_SUBJECT: '/api/admin/assign-subject', //: not made yet
-      GET_ASSIGNMENTS: '/api/admin/assignments', //: not made yet
-      GET_REJECTED_COPIES: '/api/evaluations/rejected', //get rejected copies
-      UNREJECT_COPIES: '/api/evaluations/unreject',//unreject copies
-      GET_EVALUATORS_STATUS: '/api/admin/get-evaluators-status', //get all evaluators status
-      GET_EVALUATED_COPIES: '/api/admin/get-evaluated-copies', //get evaluated copies
+      GET_EVALUATORS: '/api/admin/evaluators',  
+      ASSIGN_SUBJECT: '/api/admin/assign-subject',
+      GET_ASSIGNMENTS: '/api/admin/assignments', 
+      GET_REJECTED_COPIES: '/api/evaluations/rejected', 
+      UNREJECT_COPIES: '/api/evaluations/unreject',
+      GET_EVALUATORS_STATUS: '/api/admin/get-evaluators-status', 
+      GET_EVALUATED_COPIES: '/api/admin/get-evaluated-copies',
     },
   };
   
