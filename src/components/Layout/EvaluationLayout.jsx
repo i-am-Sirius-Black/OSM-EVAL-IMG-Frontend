@@ -1005,6 +1005,7 @@ useEffect(() => {
               submitCopy={handleSubmitCopy}
               handleRemoveAnnotation={handleRemoveAnnotation}
               handleReset={handleResetEval}
+              isReevaluation={isReevaluation}
             />
           </div>
         </div>

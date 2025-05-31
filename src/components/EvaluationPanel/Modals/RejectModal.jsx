@@ -18,7 +18,7 @@ const RejectModal = ({ copyId, isOpen, onClose, onConfirm }) => {
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
         <div className="mb-4">
           <div className="text-sm text-gray-500 mb-1">Copy ID</div>
-          <div className="text-lg font-semibold">{copyId}</div>
+          <div className="text-lg font-semibold">******</div>
         </div>
         
         <div className="space-y-4">

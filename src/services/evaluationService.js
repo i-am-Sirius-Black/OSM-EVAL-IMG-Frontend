@@ -56,8 +56,8 @@ const evaluationService = {
    * @returns {Promise<Object>} - Response from the API
    */
   submitReevaluation: async (payload) => {
-    // POST to /api/reeval/reevaluate
-    const response = await api.post('/api/reeval/reevaluate', payload);
+    // POST to /api/reeval/submit
+    const response = await api.post('/api/reeval/submit', payload);
     return response.data;
   }
 

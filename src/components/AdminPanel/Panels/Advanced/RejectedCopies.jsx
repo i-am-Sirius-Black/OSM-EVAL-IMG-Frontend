@@ -23,21 +23,20 @@ const RejectedCopies = () => {
       const response = await api.get(ADMIN.GET_REJECTED_COPIES);
       console.log("Rejected copies response:", response.data);
       
-      setRejectedCopies(response.data || []);
-      setError(null);
-
-    } catch (error) {
-     console.error('Error fetching rejected copies:', error);
-    
-      // Check if this is the "no copies found" case (404)
-      if (error.response && error.response.status === 404) {
-        // This is an expected response, not an error
-        setRejectedCopies([]);
+      // Update to handle the new response format with data property
+      if (response.data && response.data.success) {
+        setRejectedCopies(response.data.data || []);
         setError(null);
       } else {
-        // This is an actual error
-        setError('Error loading rejected copies. Please try again.');
+        setRejectedCopies([]);
+        setError('Unexpected response format');
       }
+    } catch (error) {
+      console.error('Error fetching rejected copies:', error);
+      
+      // No need to check for 404 anymore since the API always returns 200
+      setRejectedCopies([]);
+      setError('Error loading rejected copies. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -78,7 +77,7 @@ const RejectedCopies = () => {
     const matchesCopy = !filterCopyId || copy.copyid.toLowerCase().includes(filterCopyId.toLowerCase());
     return matchesEval && matchesCopy;
   });
-
+  
   return (
     <div>
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">

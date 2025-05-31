@@ -1501,7 +1501,7 @@ import { useMemo } from "react";
 const PAGES_TO_SKIP = [1, 2]; // Skip pages 1 and 2
 
 const EvaluationPanel = memo(
-  ({ marks, setMarks, annotations, submitCopy, copyId, handleReset }) => {
+  ({ marks, setMarks, annotations, submitCopy, copyId, handleReset, isReevaluation }) => {
     const [activeTab, setActiveTab] = useState("marking");
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -2051,6 +2051,7 @@ const validateEvaluation = () => {
           onConfirm={handleFinalSubmit}
           marks={marks}
           questions={questions}
+          isReevaluation={isReevaluation}
         />
       </div>
     );

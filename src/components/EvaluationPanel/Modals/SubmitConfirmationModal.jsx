@@ -140,7 +140,7 @@
 
 import React from 'react';
 
-const SubmitConfirmationModal = ({ isOpen, onClose, onConfirm, marks, questions }) => {
+const SubmitConfirmationModal = ({ isOpen, onClose, onConfirm, marks, questions, isReevaluation }) => {
   if (!isOpen) return null;
 
   // Group questions by the numeric part of qNo (1a, 1b -> group 1)
@@ -183,7 +183,7 @@ const SubmitConfirmationModal = ({ isOpen, onClose, onConfirm, marks, questions 
               </div>
               <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Review Evaluation
+                  Review Evaluation Marks
                 </h3>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500 capitalize">
@@ -264,7 +264,7 @@ const SubmitConfirmationModal = ({ isOpen, onClose, onConfirm, marks, questions 
               onClick={onConfirm}
               className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
             >
-              Submit Evaluation
+              {isReevaluation ? 'Submit Reevaluation' : 'Submit Evaluation'}
             </button>
             <button
               type="button"
