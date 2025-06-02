@@ -464,7 +464,7 @@ function EvaluationLayout() {
   
   // Get copyId from location state instead of URL params
 // Destructure all needed values from location.state in one line
-const { copyId: stateCopyId, subjectCode, isReevaluation } = location.state || {};
+const { copyId: stateCopyId, subjectCode, isReevaluation} = location.state || {};
 
 
   const { user } = useAuth();
@@ -745,88 +745,6 @@ useEffect(() => {
   };
 
 
-  // const validateTimePassed = (seconds) => {
-  //   if (seconds < constants.MIN_EVAL_TIME) {
-  //     toast(
-  //       `Can't Submit Before ${constants.MIN_EVAL_TIME / 60} Minutes.`,
-  //       {
-  //         icon: "⏳",
-  //         duration: 4000,
-  //       }
-  //     );
-  //     return false;
-  //   }
-  //   return true;
-  // }
-
-  //?v1.2 simple toast message
- 
-  // const handleSubmitCopy = async (submissionData) => {
-  //   const seconds = getElapsedTime();
-  //   // if (!validateTimePassed(seconds)) {
-  //   //   return false; // Indicate failure to caller
-  //   // }
-
-  //   try {
-  //     // Step 1: Save Annotations
-  //     const annotationResponse = await saveAnnotations(copyId, {
-  //       annotations: submissionData.annotations,
-  //       drawAnnotations: submissionData.drawAnnotations,
-  //     });
-
-  //     if (!annotationResponse.data.success) {
-  //       toast.error(
-  //         annotationResponse.data.message || "Failed to save annotations."
-  //       );
-  //       return false; // Indicate failure to caller
-  //     }
-
-  //     // Step 2: Save Evaluation
-  //     const evaluationData = {
-  //       copyid: copyId,
-  //       obt_mark: submissionData.obtMarks,
-  //       max_mark: submissionData.maxMarks,
-  //       status: "Evaluated",
-  //       eval_time: seconds,
-  //       eval_id: submissionData.userId, // Replace with actual user ID
-  //       bag_id: "BAG001", // Replace with actual bag ID if available
-  //     };
-
-  //     await evaluationService.saveEvaluation(evaluationData);
-
-  //     // After successful submission:
-  //     // 1. Clear localStorage
-  //     localStorage.removeItem(`evaluationState-${copyId}`);
-
-  //     // 2. Clear server autosave
-  //     try {
-  //       if (!evaluatorId) {
-  //         toast.error(
-  //           "There was an error fetching your data. Please try again."
-  //         );
-  //         console.log("Evaluator ID not found. Cannot fetch from server.");
-  //         return;
-  //       }
-  //       // Send delete request to server
-  //       await api.delete(AUTOSAVE.DELETE(evaluatorId, copyId));
-  //       console.log("Server autosave cleared successfully");
-  //     } catch (deleteError) {
-  //       console.error("Error deleting server autosave:", deleteError);
-  //       // Continue anyway since this is just cleanup
-  //     }
-
-  //     toast.success("Evaluation submitted successfully!");
-  //     return true; // Indicate success to caller
-  //   } catch (error) {
-  //     console.error("Error during submission:", error);
-  //     toast.error(
-  //       `Submission failed: ${error.message || "Unknown error occurred"}`
-  //     );
-  //     return false; // Indicate failure to caller
-  //   }
-  // };
-
-
   //? V2 with both eval+ annotations submission in single call also reevaluation save
  const handleSubmitCopy = async (submissionData) => {
   const seconds = getElapsedTime();
@@ -899,34 +817,34 @@ useEffect(() => {
   };
 
   // Add a new effect that responds to navigation trigger
-  useEffect(() => {
-    if (navigationPending) {
-      // Force immediate save (both local and server)
-      const saveState = async () => {
-        try {
-          // 1. Save to localStorage immediately
-          const state = {
-            annotations,
-            marks,
-            seconds: getElapsedTime(),
-          };
-          localStorage.setItem(
-            `evaluationState-${copyId}`, 
-            JSON.stringify(state)
-          );
-          
-          // 3. Navigate after saving
-          navigate(-1);
-        } catch (error) {
-          console.error("Error during navigation save:", error);
-          // Navigate anyway to avoid trapping the user
-          navigate(-1);
-        }
-      };
-      
-      saveState();
-    }
-  }, [navigationPending]);
+useEffect(() => {
+  if (navigationPending) {
+    // Force immediate save (both local and server)
+    const saveState = () => {
+      try {
+        // 1. Save to localStorage immediately
+        const state = {
+          annotations,
+          marks,
+          seconds: getElapsedTime(),
+        };
+        localStorage.setItem(
+          `evaluationState-${copyId}`, 
+          JSON.stringify(state)
+        );
+        
+        // 2. Navigate after saving - don't use await here as navigate() doesn't return a promise
+        navigate(-1);
+      } catch (error) {
+        console.error("Error during navigation save:", error);
+        // Navigate anyway to avoid trapping the user
+        navigate(-1);
+      }
+    };
+    
+    saveState();
+  }
+}, [navigationPending]);
   
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -945,9 +863,6 @@ useEffect(() => {
           >
             OSM Evaluation
           </h1>
-        </div>
-        <div>
-          <p className="text-sm text-gray-800">Sub - {subjectCode}</p>
         </div>
         <div className="flex items-center gap-4">
           {showSaveIcon &&
@@ -984,6 +899,7 @@ useEffect(() => {
           <div className="absolute inset-0 overflow-auto px-4 lg:px-6 py-4">
             <ImageViewer
               copyId={copyId}
+              subjectCode={subjectCode}
               annotations={annotations}
               selectedTool={selectedTool}
               handleAnnotate={handleAnnotate}
@@ -999,6 +915,7 @@ useEffect(() => {
           <div className="h-full overflow-auto p-4">
             <EvaluationPanel
               copyId={copyId}
+              subjectCode={subjectCode}
               marks={marks}
               setMarks={setMarks}
               annotations={annotations}
@@ -1006,6 +923,7 @@ useEffect(() => {
               handleRemoveAnnotation={handleRemoveAnnotation}
               handleReset={handleResetEval}
               isReevaluation={isReevaluation}
+              navigate={navigate}
             />
           </div>
         </div>

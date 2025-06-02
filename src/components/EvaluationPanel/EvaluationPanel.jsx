@@ -905,7 +905,7 @@
 
 // export default EvaluationPanel;
 
-//? v2 (testing) skip page1 page2 unchecked cacualtion and validation
+//? v2 skip page1 page2 unchecked cacualtion and validation
 
 // import { memo, use, useEffect, useState } from "react";
 // import QuestionInput from "./QuestionInput";
@@ -1007,7 +1007,6 @@
 
 //       return { valid: true };
 //     };
-
 
 //     const validateAnnotations = () => {
 //       // Check if all required pages are annotated (excluding skipped pages)
@@ -1200,8 +1199,8 @@
 //                 {notAnnotatedPages.map((page) => (
 //                   <span
 //                     key={page}
-//                     className="flex-shrink-0 w-8 h-8 flex items-center justify-center 
-//                     rounded-full bg-red-50 text-red-600 text-sm font-medium 
+//                     className="flex-shrink-0 w-8 h-8 flex items-center justify-center
+//                     rounded-full bg-red-50 text-red-600 text-sm font-medium
 //                     border border-red-100"
 //                   >
 //                     {page}
@@ -1290,11 +1289,11 @@
 //                       <button
 //                         onClick={() => {
 //                           handleReset();
-//                           setShowMarksReset(false); 
+//                           setShowMarksReset(false);
 //                         }}
 //                         className="flex items-center gap-1.5 w-full text-left px-2 py-1.5 text-gray-700 hover:bg-red-50 hover:text-red-500 transition-colors"
 //                       >
-                    
+
 //                         <span>Reset All Marks</span>
 //                       </button>
 //                     </div>
@@ -1348,10 +1347,8 @@
 //                 <span className="text-sm text-gray-500">
 //                   {totalQuestionsCount}
 //                 </span>
-                
+
 //               </div>
-
-
 
 //               {/* Right side: Score display with reset button */}
 //               <div className="flex items-center gap-2">
@@ -1392,7 +1389,6 @@
 //                     /{maxTotalMarks}
 //                   </span>
 //                 </div>
-
 
 //               </div>
 //             </div>
@@ -1441,14 +1437,14 @@
 //           <div className="flex gap-3 justify-end">
 //             <button
 //               onClick={() => setShowRejectModal(true)}
-//               className="px-4 h-9 text-sm font-medium text-red-600 hover:bg-red-50 
+//               className="px-4 h-9 text-sm font-medium text-red-600 hover:bg-red-50
 //               rounded-lg transition-colors"
 //             >
 //               Reject
 //             </button>
 //             <button
 //               onClick={handleSubmitClick}
-//               className="px-6 h-9 text-sm font-medium bg-blue-600 text-white 
+//               className="px-6 h-9 text-sm font-medium bg-blue-600 text-white
 //               hover:bg-blue-700 rounded-lg transition-colors"
 //             >
 //               Submit
@@ -1479,21 +1475,18 @@
 
 // export default EvaluationPanel;
 
-
-//? v3 (Gracefully Error Handling) (with commented code removed, clone from above v2)
+//? v3 (working) (Gracefully Error Handling) (with commented code removed, clone from above v2)
 
 import { memo, use, useEffect, useState } from "react";
 import QuestionInput from "./QuestionInput";
 import RejectModal from "./Modals/RejectModal";
 import SubmitConfirmationModal from "./Modals/SubmitConfirmationModal";
 import prepareAnnotationsForSave from "../../utils/FilterAnnotation";
-import { useNavigate } from "react-router-dom";
 import copyService from "../../services/copyService";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import api from "../../api/axios";
 import SettingsIcon from "@mui/icons-material/Settings";
-import CachedIcon from "@mui/icons-material/Cached";
 import { constants } from "../../utils/constants";
 import { useMemo } from "react";
 
@@ -1501,7 +1494,16 @@ import { useMemo } from "react";
 const PAGES_TO_SKIP = [1, 2]; // Skip pages 1 and 2
 
 const EvaluationPanel = memo(
-  ({ marks, setMarks, annotations, submitCopy, copyId, handleReset, isReevaluation }) => {
+  ({
+    marks,
+    setMarks,
+    annotations,
+    submitCopy,
+    copyId,
+    handleReset,
+    isReevaluation,
+    navigate,
+  }) => {
     const [activeTab, setActiveTab] = useState("marking");
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -1510,14 +1512,19 @@ const EvaluationPanel = memo(
     const [error, setError] = useState(null);
     const [paperId, setPaperId] = useState(1); //using hardcoded value for now
     const [showMarksReset, setShowMarksReset] = useState(false);
-
-    const navigate = useNavigate();
     const { user } = useAuth();
 
     const pdfUrl = "http://www.pdf995.com/samples/pdf.pdf"; // Example PDF URL, replace with actual data
 
     const totalQuestionsCount = questions.length;
-    const evaluatedQuestionsCount = Object.keys(marks).length;
+    // const evaluatedQuestionsCount = Object.keys(marks).length;
+
+    const evaluatedQuestionsCount = useMemo(() => {
+      return Object.entries(marks).reduce((count, [qNo, mark]) => {
+        // Only count if mark is not empty and is a valid number
+        return mark !== "" && !isNaN(Number(mark)) ? count + 1 : count;
+      }, 0);
+    }, [marks]);
 
     //Todo: move this and paperId to its parent and pass question..
     // Fetch questions when paperId changes
@@ -1547,17 +1554,16 @@ const EvaluationPanel = memo(
       fetchQuestions();
     }, [paperId]);
 
-
     // Safely group questions with error handling using useMemo
     const groups = useMemo(() => {
       if (!questions || !questions.length) return {};
-      
+
       try {
         return questions.reduce((acc, q) => {
           // Safely extract the group number with a fallback
           const match = q.qNo?.match(/^\d+/);
-          const groupNum = match ? match[0] : 'other';
-          
+          const groupNum = match ? match[0] : "other";
+
           if (!acc[groupNum]) acc[groupNum] = [];
           acc[groupNum].push(q);
           return acc;
@@ -1571,50 +1577,49 @@ const EvaluationPanel = memo(
     // Safely calculate marks
     const obtMarks = useMemo(() => {
       if (!marks || Object.keys(marks).length === 0) return 0;
-      
+
       return Object.values(marks).reduce(
         (sum, mark) => sum + (Number(mark) || 0),
         0
       );
     }, [marks]);
 
- // Safely calculate max marks
+    // Safely calculate max marks
     const maxTotalMarks = useMemo(() => {
       if (!questions || !questions.length) return 0;
-      
+
       return questions.reduce((sum, q) => sum + (q.maxMark || 0), 0);
     }, [questions]);
 
+    // Update validation to properly handle empty questions
+    const validateEvaluation = () => {
+      // If no questions, validation fails - cannot submit without question data
+      if (!questions || questions.length === 0) {
+        return {
+          valid: false,
+          issue: "marks",
+          message:
+            "Cannot submit evaluation: No question data available. Please try reloading the questions.",
+        };
+      }
 
-// Update validation to properly handle empty questions
-const validateEvaluation = () => {
-  // If no questions, validation fails - cannot submit without question data
-  if (!questions || questions.length === 0) {
-    return {
-      valid: false,
-      issue: "marks",
-      message: "Cannot submit evaluation: No question data available. Please try reloading the questions."
+      // Check if all required marks are entered and valid
+      const marksValidation = questions.every((q) => {
+        const mark = Number(marks[q.qNo]);
+        return !isNaN(mark) && mark >= 0 && mark <= q.maxMark;
+      });
+
+      // Return validation result with specific issue if marks are invalid
+      if (!marksValidation) {
+        return {
+          valid: false,
+          issue: "marks",
+          message: "Ensure all marks are correct and within the allowed range.",
+        };
+      }
+
+      return { valid: true };
     };
-  }
-  
-  // Check if all required marks are entered and valid
-  const marksValidation = questions.every((q) => {
-    const mark = Number(marks[q.qNo]);
-    return !isNaN(mark) && mark >= 0 && mark <= q.maxMark;
-  });
-
-  // Return validation result with specific issue if marks are invalid
-  if (!marksValidation) {
-    return {
-      valid: false,
-      issue: "marks",
-      message: "Ensure all marks are correct and within the allowed range.",
-    };
-  }
-
-  return { valid: true };
-};
-
 
     const validateAnnotations = () => {
       // Check if all required pages are annotated (excluding skipped pages)
@@ -1670,7 +1675,7 @@ const validateEvaluation = () => {
 
       if (!validationResult.valid) {
         // Show specific error based on what failed
-        toast(validationResult.message,{icon: "🚨"});
+        toast(validationResult.message, { icon: "🚨" });
         console.log("validationResult", validationResult.issue);
 
         // Optionally switch to relevant tab if specific part failed
@@ -1701,7 +1706,8 @@ const validateEvaluation = () => {
           drawAnnotations: drawAnnotations,
         };
 
-        const success = await submitCopy(submissionData);
+        // const success = await submitCopy(submissionData);
+        toast.loading("Submitting evaluation...", { id: "submit-eval" });
         console.log("submit copy response success", success);
 
         setShowSubmitModal(false);
@@ -1795,12 +1801,14 @@ const validateEvaluation = () => {
         return (
           <div className="p-4 flex flex-col items-center justify-center h-full">
             <div className="text-gray-500 mb-2">No question data available</div>
-            <button 
+            <button
               onClick={() => {
                 setLoading(true);
                 const fetchQuestions = async () => {
                   try {
-                    const response = await api.get(`/api/evaluations/questions/${paperId}`);
+                    const response = await api.get(
+                      `/api/evaluations/questions/${paperId}`
+                    );
                     if (response.data.success) {
                       setQuestions(response.data.data);
                       setError(null);
@@ -1824,7 +1832,6 @@ const validateEvaluation = () => {
         );
       }
 
-
       switch (activeTab) {
         case "copy":
           return (
@@ -1836,8 +1843,8 @@ const validateEvaluation = () => {
                 {notAnnotatedPages.map((page) => (
                   <span
                     key={page}
-                    className="flex-shrink-0 w-8 h-8 flex items-center justify-center 
-                    rounded-full bg-red-50 text-red-600 text-sm font-medium 
+                    className="flex-shrink-0 w-8 h-8 flex items-center justify-center
+                    rounded-full bg-red-50 text-red-600 text-sm font-medium
                     border border-red-100"
                   >
                     {page}
@@ -1848,25 +1855,17 @@ const validateEvaluation = () => {
           );
         case "paper":
           return (
-            <div className="p-4">
-              <p className="text-gray-600 mb-2">
-                This is the question paper content.
-              </p>
+            <div className="p-4 text-sm text-gray-600">
+              <p className="mb-2 text-gray-500">Question paper available:</p>
               <button
                 onClick={handleOpenPDFWindow}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="btn px-3 py-1 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
               >
                 View Question Paper
               </button>
             </div>
           );
-        case "answer":
-          return (
-            <div className="p-4">
-              <p className="text-gray-600">This is the answer paper content.</p>
-              {/* You can add a similar drawer for answer key if needed */}
-            </div>
-          );
+
         default:
           return (
             <div className="px-4 py-2 space-y-4">
@@ -1881,7 +1880,10 @@ const validateEvaluation = () => {
                         Section-{groupNum}
                       </span>
                       <span className="ml-auto text-xs text-gray-500">
-                        {groupQuestions.reduce((sum, q) => sum + (q.maxMark || 0), 0)}{" "}
+                        {groupQuestions.reduce(
+                          (sum, q) => sum + (q.maxMark || 0),
+                          0
+                        )}{" "}
                         marks
                       </span>
                     </div>
@@ -1928,14 +1930,10 @@ const validateEvaluation = () => {
                 <span className="text-sm text-gray-500">
                   {totalQuestionsCount}
                 </span>
-                
               </div>
-
-
 
               {/* Right side: Score display with reset button */}
               <div className="flex items-center gap-2">
-
                 {/* Reset button */}
                 <div className="relative">
                   <button
@@ -1967,18 +1965,16 @@ const validateEvaluation = () => {
 
                 <div className="text-sm font-bold text-gray-600">Marks</div>
                 <div className="text-xl font-semibold tabular-nums text-gray-900">
-                  {obtMarks}
+                  {obtMarks < maxTotalMarks ? obtMarks : maxTotalMarks}
                   <span className="text-red-500 text-lg ml-0.5">
                     /{maxTotalMarks}
                   </span>
                 </div>
-
-
               </div>
             </div>
 
             {/* Tab navigation */}
-            <div className="flex gap-4 text-sm">
+            <div className="flex justify-between text-sm">
               {[
                 { id: "marking", label: "Marking" },
                 {
@@ -1990,7 +1986,7 @@ const validateEvaluation = () => {
                   }`,
                 },
                 { id: "paper", label: "Q.Paper" },
-                { id: "answer", label: "Ans.Key" },
+                // { id: "answer", label: "Ans.Key" },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -2021,14 +2017,14 @@ const validateEvaluation = () => {
           <div className="flex gap-3 justify-end">
             <button
               onClick={() => setShowRejectModal(true)}
-              className="px-4 h-9 text-sm font-medium text-red-600 hover:bg-red-50 
+              className="px-4 h-9 text-sm font-medium text-red-600 hover:bg-red-50
               rounded-lg transition-colors"
             >
               Reject
             </button>
             <button
               onClick={handleSubmitClick}
-              className="px-6 h-9 text-sm font-medium bg-blue-600 text-white 
+              className="px-6 h-9 text-sm font-medium bg-blue-600 text-white
               hover:bg-blue-700 rounded-lg transition-colors"
             >
               Submit
@@ -2059,3 +2055,6 @@ const validateEvaluation = () => {
 );
 
 export default EvaluationPanel;
+
+//? v3.1 Testing->(Copy of v3 implemnting getnextcopy in batch)
+

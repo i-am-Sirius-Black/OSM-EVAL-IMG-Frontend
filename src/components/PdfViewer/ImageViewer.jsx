@@ -391,6 +391,7 @@ const { COPY_PAGE_COUNT } = constants;
 const ImageViewer = memo(
   ({
     copyId,
+    subjectCode,
     annotations,
     selectedTool,
     handleAnnotate,
@@ -575,7 +576,11 @@ const ImageViewer = memo(
         </div> */}
 
         {/* Zoom Controls */}
-        <div className="sticky top-0 z-20 bg-white px-2 py-1 border-b border-gray-200 flex justify-end items-center">
+        <div className="sticky top-0 z-20 bg-white px-2 py-1 border-b border-gray-200 flex justify-between items-center">
+          <div className="text-xs text-gray-500">
+            Subject:{" "}
+            <span className="font-medium text-gray-600">{subjectCode}</span>
+          </div>
           <div className="flex items-center bg-gray-50 rounded-md border border-gray-200 shadow-sm">
             <button
               onClick={() => setZoom((prev) => Math.max(0.5, prev - 0.1))}
@@ -587,8 +592,9 @@ const ImageViewer = memo(
               </svg>
             </button>
             <button
+              title="Reset zoom"
               onClick={() => setZoom(0.8)}
-              className="px-2 text-xs font-medium text-gray-600 hover:bg-gray-100"
+              className="px-2 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:cursor-pointer"
             >
               {Math.round(zoom * 100)}%
             </button>
@@ -609,65 +615,59 @@ const ImageViewer = memo(
 
         {pages.length === 0 ? <LoadingSpinner /> : renderedPages}
 
-{/* v2.3 updated ui comment input popup */}
-{commentPosition && (
-  <div
-    className="absolute bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-md z-50"
-    style={{ 
-      top: commentPosition.y, 
-      left: commentPosition.x,
-      transform: 'translate(-50%, -100%)',
-      maxWidth: '280px'
-    }}
-  >
-    <div className="flex flex-col w-full p-2 gap-2">
-      <input
-        type="text"
-        value={commentText}
-        onChange={(e) => setCommentText(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleCommentSubmit()}
-        placeholder="Add a comment..."
-        className="px-3 py-1.5 border border-gray-300 rounded-md text-sm bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
-        autoFocus
-      />
-      <div className="flex justify-end gap-2">
-        <button
-          onClick={() => setCommentPosition(null)}
-          className="px-2.5 py-1 bg-white/90 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-xs font-medium transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleCommentSubmit}
-          className="px-2.5 py-1 bg-blue-500/90 text-white rounded-md hover:bg-blue-600 text-xs font-medium transition-colors"
-        >
-          Add
-        </button>
-      </div>
-    </div>
-    {/* Triangle pointer that accurately shows click position */}
-    <div 
-      className="absolute w-3 h-3 bg-white/95 transform rotate-45 border-r border-b border-gray-200"
-      style={{ 
-        bottom: '-6px', 
-        left: '50%', 
-        marginLeft: '-6px' 
-      }}
-    ></div>
-  </div>
-)}
-
+        {/* v2.3 updated ui comment input popup */}
+        {commentPosition && (
+          <div
+            className="absolute bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-md z-50"
+            style={{
+              top: commentPosition.y,
+              left: commentPosition.x,
+              transform: "translate(-50%, -100%)",
+              maxWidth: "280px",
+            }}
+          >
+            <div className="flex flex-col w-full p-2 gap-2">
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleCommentSubmit()}
+                placeholder="Add a comment..."
+                className="px-3 py-1.5 border border-gray-300 rounded-md text-sm bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                autoFocus
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setCommentPosition(null)}
+                  className="px-2.5 py-1 bg-white/90 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-xs font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCommentSubmit}
+                  className="px-2.5 py-1 bg-blue-500/90 text-white rounded-md hover:bg-blue-600 text-xs font-medium transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+            {/* Triangle pointer that accurately shows click position */}
+            <div
+              className="absolute w-3 h-3 bg-white/95 transform rotate-45 border-r border-b border-gray-200"
+              style={{
+                bottom: "-6px",
+                left: "50%",
+                marginLeft: "-6px",
+              }}
+            ></div>
+          </div>
+        )}
       </div>
     );
   }
 );
 
 export default ImageViewer;
-
-
-
-
-
 
 //?v2.4(beta) update the ImageViewer component to preload images in the background after the initial render. (currently testing)
 // import { memo, useState, useRef, useEffect, useCallback, useMemo } from 'react';

@@ -136,8 +136,7 @@
 // export default SubmitConfirmationModal;
 
 
-//?v2 update to match new question data
-
+//* (Working version with grouped questions and total marks calculation)
 import React from 'react';
 
 const SubmitConfirmationModal = ({ isOpen, onClose, onConfirm, marks, questions, isReevaluation }) => {
@@ -281,6 +280,18 @@ const SubmitConfirmationModal = ({ isOpen, onClose, onConfirm, marks, questions,
 };
 
 export default SubmitConfirmationModal;
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //? making collapsible question groups
