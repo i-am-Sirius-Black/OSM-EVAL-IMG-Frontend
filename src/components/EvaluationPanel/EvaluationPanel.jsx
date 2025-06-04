@@ -1510,11 +1510,15 @@ const EvaluationPanel = memo(
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [paperId, setPaperId] = useState(1); //using hardcoded value for now
+    const [paperId, setPaperId] = useState(4); //using hardcoded value for now
     const [showMarksReset, setShowMarksReset] = useState(false);
     const { user } = useAuth();
 
-    const pdfUrl = "http://www.pdf995.com/samples/pdf.pdf"; // Example PDF URL, replace with actual data
+    // const pdfUrl = "http://www.pdf995.com/samples/pdf.pdf"; // Example PDF URL, replace with actual data
+
+
+
+
 
     const totalQuestionsCount = questions.length;
     // const evaluatedQuestionsCount = Object.keys(marks).length;
@@ -1528,16 +1532,47 @@ const EvaluationPanel = memo(
 
     //Todo: move this and paperId to its parent and pass question..
     // Fetch questions when paperId changes
-    useEffect(() => {
+    // useEffect(() => {
+    //   const fetchQuestions = async () => {
+    //     try {
+    //       setLoading(true);
+    //       const response = await api.get(
+    //         `/api/evaluations/questions/${paperId}`
+    //       );
+
+    //       if (response.data.success) {
+    //         setQuestions(response.data.data);
+    //         console.log("Fetched questions:", response.data.data);
+            
+    //       } else {
+    //         setError("Failed to load questions");
+    //         toast.error("Failed to load questions");
+    //       }
+    //     } catch (err) {
+    //       console.error("Error fetching questions:", err);
+    //       setError("Failed to load questions");
+    //       toast.error("Failed to load questions");
+    //     } finally {
+    //       setLoading(false);
+    //     }
+    //   };
+
+    //   fetchQuestions();
+    // }, [paperId]);
+
+    //?v2 with new api trying
+
+        useEffect(() => {
       const fetchQuestions = async () => {
         try {
           setLoading(true);
           const response = await api.get(
-            `/api/evaluations/questions/${paperId}`
+            `/api/admin/papers/${paperId}`
           );
 
-          if (response.data.success) {
-            setQuestions(response.data.data);
+          if (response.status === 200) {
+            setQuestions(response.data.questions);
+            
           } else {
             setError("Failed to load questions");
             toast.error("Failed to load questions");
@@ -1755,15 +1790,24 @@ const EvaluationPanel = memo(
       }
     };
 
-    const handleOpenPDFWindow = () => {
+
+    const getQuestionPdfUrl = async(paperId) => {
+      return `http://localhost:3000/api/admin/papers/${paperId}/file`;
+    }
+
+    const handleOpenPDFWindow = async () => {
+      const pdfUrl = await getQuestionPdfUrl(3); // Replace with real paperId
+      console.log("PDF URL:", pdfUrl);
+      
+
       const width = 800;
       const height = 600;
       const left = window.screenX + 100;
       const top = window.screenY + 100;
       window.open(
         pdfUrl,
-        "QuestionPaperWindow", // <-- window name
-        `width=${width},height=${height},left=${left},top=${top},resizable=no,toolbar=no,menubar=no,location=no,status=no,scrollbars=yes`
+        "QuestionPaperWindow",
+        `width=${width},height=${height},left=${left},top=${top},resizable=no,toolbar=no,menubar=no,location=no,status=no,scrollbars=yes,frame=false`
       );
     };
 

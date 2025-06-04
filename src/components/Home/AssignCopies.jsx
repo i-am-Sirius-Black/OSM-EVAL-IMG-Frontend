@@ -64,8 +64,8 @@ export default function AssignCopies({setActiveTab}) {
       <div className="mb-8">
         <div className="flex flex-col gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Assign Answer Scripts</h1>
-            <p className="mt-1 text-sm text-gray-500">Select a subject to assign its copies for evaluation</p>
+            <h1 className="text-2xl font-semibold text-gray-900">Allocate Answer Scripts</h1>
+            <p className="mt-1 text-sm text-gray-500">Select a subject to allocate its answer script for evaluation</p>
           </div>
         </div>
       </div>
@@ -196,7 +196,7 @@ export default function AssignCopies({setActiveTab}) {
                           </span>
                         ) : (
                           <span className="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800">
-                            No Copies Assigned
+                            No Active Copies
                           </span>
                         )}
                       </td>
@@ -221,12 +221,12 @@ export default function AssignCopies({setActiveTab}) {
                             {assigningSubject === subject.subjectCode ? (
                               <>
                                 <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                                Assigning...
+                                Allocating...
                               </>
                             ) : (
                               <>
                                 <Assignment fontSize="small" className="mr-1 h-4 w-4" />
-                                Assign Copies
+                                Allocate Copies
                               </>
                             )}
                           </button>
