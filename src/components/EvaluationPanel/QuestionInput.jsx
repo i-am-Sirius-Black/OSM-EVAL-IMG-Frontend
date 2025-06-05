@@ -64,7 +64,7 @@ const QuestionInput = ({ question, value, onChange }) => {
 
   const handleQuestionClick = (qNo) => {
     setCurrentQuestion({
-      number: qNo,
+      number: qNo, 
       imageUrl:
         "https://media.cheggcdn.com/media/a7e/a7e0b2cb-aa80-4954-b88e-ef05e1dd9629/php7dZMd8",
     });

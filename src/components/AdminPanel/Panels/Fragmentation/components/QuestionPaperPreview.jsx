@@ -470,7 +470,8 @@ export const QuestionPaperPreview = ({
   questionGroups, 
   file,
   selectedPaper,
-  loading 
+  loading,
+  confirmTxt="Submit" 
 }) => {
   if (!isOpen) return null;
 
@@ -636,7 +637,7 @@ export const QuestionPaperPreview = ({
                   Uploading...
                 </div>
               ) : (
-                "Submit"
+                confirmTxt
               )}
             </button>
           </div>
