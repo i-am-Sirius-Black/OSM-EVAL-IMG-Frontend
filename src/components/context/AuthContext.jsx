@@ -13,6 +13,18 @@ export const AuthProvider = ({ children }) => {
   const [adminLoading, setAdminLoading] = useState(true);
   const [isAdmin, setIsAdminState] = useState(false);
 
+    const [macAddress, setMacAddress] = useState("");
+    
+      useEffect(() => {
+      const params = new URLSearchParams(window.location.search);
+      const mac = params.get("mac");
+      if (mac) {
+        console.log("MAC Address from URL:", mac);
+        
+        setMacAddress(mac);
+      }
+    }, []);
+
 // Update isAdmin when admin state changes
   useEffect(() => {
     setIsAdminState(admin && admin.role === 'admin');

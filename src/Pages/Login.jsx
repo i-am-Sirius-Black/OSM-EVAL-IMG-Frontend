@@ -11,6 +11,9 @@ function Login() {
   const [pass, setPass] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+    const [macAddress, setMacAddress] = useState("");
+
+
   const navigate = useNavigate();
 
   const inputRef = useRef(null);
@@ -19,6 +22,16 @@ function Login() {
 
   useEffect(() => {
     inputRef.current.focus();
+  }, []);
+
+    useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const mac = params.get("mac");
+    if (mac) {
+      console.log("MAC Address from URL:", mac);
+      
+      setMacAddress(mac);
+    }
   }, []);
 
   const handleLogin = async (e) => {
