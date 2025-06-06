@@ -63,6 +63,7 @@ export default function Evaluation({ setActiveTab }) {
     }
 
     const fetchActiveBatch = async () => {
+      
       try {
         setLoading((prev) => ({ ...prev, batch: true }));
         const response = await api.get(
@@ -91,6 +92,7 @@ export default function Evaluation({ setActiveTab }) {
     fetchActiveBatch();
   }, [selectedSubject]);
 
+
   const handleSubjectChange = (subjectCode) => {
     setSelectedSubject(subjectCode);
     setDropdownOpen(false);
@@ -103,8 +105,9 @@ export default function Evaluation({ setActiveTab }) {
   //* Frontend: Navigate with state (secure)
   
   const handleEvaluate = (copyBarcode) => {
+    
     navigate("/evaluate", {
-      state: { copyId: copyBarcode, subjectCode: selectedSubject }, // 🔒 Hidden from URL
+      state: { copyId: copyBarcode, subjectCode: selectedSubject, paperId: activeBatch.paperId }, // 🔒 Hidden from URL
     });
   };
 

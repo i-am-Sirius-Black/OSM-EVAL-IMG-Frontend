@@ -7,14 +7,13 @@ const EvaluatorStatus = () => {
   const [loading, setLoading] = useState(true);
 
 
+
 useEffect(() => {
     const fetchEvaluatorsStatus = async () => {
       setLoading(true);
       try {
         const response = await api.get(API_ROUTES.ADMIN.GET_EVALUATORS_STATUS);
         const data = response.data.evaluators;
-
-        console.log("Fetched evaluators data:", data);
         
         // Transform the API data to match your component's expected structure
         const formattedEvaluators = data.map(evaluator => ({

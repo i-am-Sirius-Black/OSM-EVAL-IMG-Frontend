@@ -147,7 +147,7 @@
 
 //     setIsSaving(true); // Indicate that the state is being restored
 
-//     const savedState = localStorage.getItem(`evaluationState-${copyId}`);
+//     const savedState = localStorage.getItem(`evalState-${copyId}`);
 
 //     if (savedState) {
 //       const { annotations: savedAnnotations, marks: savedMarks, seconds: savedSeconds } = JSON.parse(savedState);
@@ -181,7 +181,7 @@
 //         annotations,
 //         marks,
 //       };
-//       localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify(state));
+//       localStorage.setItem(`evalState-${copyId}`, JSON.stringify(state));
 //       console.log("State saved to localStorage:", copyId, "state->", state);
 
 //       // Show the success icon
@@ -223,8 +223,8 @@
 //       setSelectedTool(null);
 //       const seconds = getElapsedTime();
 //       // Update localStorage with empty annotations but keep existing marks
-//       const currentState = JSON.parse(localStorage.getItem(`evaluationState-${copyId}`) || '{}');
-//       localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify({
+//       const currentState = JSON.parse(localStorage.getItem(`evalState-${copyId}`) || '{}');
+//       localStorage.setItem(`evalState-${copyId}`, JSON.stringify({
 //         annotations: [],
 //         marks: currentState.marks || marks,
 //         seconds
@@ -260,8 +260,8 @@
 //       setMarks({});
 //       const seconds = getElapsedTime();
 //       // Update localStorage with empty marks but keep existing annotations
-//       const currentState = JSON.parse(localStorage.getItem(`evaluationState-${copyId}`) || '{}');
-//       localStorage.setItem(`evaluationState-${copyId}`, JSON.stringify({
+//       const currentState = JSON.parse(localStorage.getItem(`evalState-${copyId}`) || '{}');
+//       localStorage.setItem(`evalState-${copyId}`, JSON.stringify({
 //         annotations: currentState.annotations || annotations,
 //         marks: {},
 //         seconds
@@ -328,7 +328,7 @@
 //       console.log('evaluationResponse for evaluation layout:', evaluationResponse);
 
 //       // Clear localStorage after successful submission
-//       localStorage.removeItem(`evaluationState-${copyId}`);
+//       localStorage.removeItem(`evalState-${copyId}`);
 
 //       toast.success('Evaluation submitted successfully!');
 //       return true; // Indicate success to caller
@@ -464,13 +464,11 @@ function EvaluationLayout() {
   
   // Get copyId from location state instead of URL params
 // Destructure all needed values from location.state in one line
-const { copyId: stateCopyId, subjectCode, isReevaluation} = location.state || {};
+const { copyId: stateCopyId, subjectCode, isReevaluation, paperId } = location.state || {};
 
 
   const { user } = useAuth();
   const evaluatorId = user?.uid || null;
-
-  const { AUTOSAVE } = API_ROUTES;
 
   const {
     annotations,
@@ -505,8 +503,6 @@ const { copyId: stateCopyId, subjectCode, isReevaluation} = location.state || {}
   const timerRef = useRef(null);
 
   const hideIconTimerRef = useRef(null);
-
-
 
 //TODO: Testing this feature for future implementation
 // useEffect(() => {
@@ -544,22 +540,21 @@ const { copyId: stateCopyId, subjectCode, isReevaluation} = location.state || {}
     };
   }, []);
 
-  // Use to clean up any "undefined" entries in localStorage
-  useEffect(() => {
-    // Clean up any "undefined" entries in localStorage
-    localStorage.removeItem("evaluationState-undefined");
-    localStorage.removeItem("evaluationState-null");
-  }, []);
+  // // Use to clean up any "undefined" entries in localStorage
+  // useEffect(() => {
+  //   // Clean up any "undefined" entries in localStorage
+  //   localStorage.removeItem("evalState-undefined");
+  //   localStorage.removeItem("evalState-null");
+  // }, []);
 
   //* Restore state from localStorage component mounts
   useEffect(() => {
     if (copyId && copyId !== "undefined") {
-      console.log("Copy ID from URL:", copyId);
       setCopyId(copyId);
       setIsSaving(true); // Indicate that the state is being restored
 
       // First try to get data from localStorage (fastest)
-      const savedState = localStorage.getItem(`evaluationState-${copyId}`);
+      const savedState = localStorage.getItem(`evalState-${copyId}`);
 
       if (savedState) {
         try {
@@ -596,7 +591,7 @@ const { copyId: stateCopyId, subjectCode, isReevaluation} = location.state || {}
 
   }, [copyId, setAnnotations, evaluatorId, copyId]);
 
-//* Hybrid Autosave System (now only localStorage, no server)
+//* Autosave System (now only localStorage, no server)
 useEffect(() => {
   if (restored && copyId && copyId !== "undefined") {
     const localDebounceTimeout = constants.LOCAL_TIMEOUT;
@@ -613,10 +608,9 @@ useEffect(() => {
         seconds: getElapsedTime(),
       };
       localStorage.setItem(
-        `evaluationState-${copyId}`,
+        `evalState-${copyId}`,
         JSON.stringify(state)
       );
-      console.log("State saved to localStorage:", copyId);
 
       // Show success icon
       setIsSaving(false);
@@ -658,7 +652,7 @@ useEffect(() => {
 
       // Get current state for keeping marks
       const currentState = JSON.parse(
-        localStorage.getItem(`evaluationState-${copyId}`) || "{}"
+        localStorage.getItem(`evalState-${copyId}`) || "{}"
       );
 
       // Update local state
@@ -670,7 +664,7 @@ useEffect(() => {
 
       // Save to localStorage
       localStorage.setItem(
-        `evaluationState-${copyId}`,
+        `evalState-${copyId}`,
         JSON.stringify(newState)
       );
 
@@ -705,7 +699,7 @@ useEffect(() => {
 
       // Get current state for keeping annotations
       const currentState = JSON.parse(
-        localStorage.getItem(`evaluationState-${copyId}`) || "{}"
+        localStorage.getItem(`evalState-${copyId}`) || "{}"
       );
 
       // Update local state
@@ -717,7 +711,7 @@ useEffect(() => {
 
       // Save to localStorage
       localStorage.setItem(
-        `evaluationState-${copyId}`,
+        `evalState-${copyId}`,
         JSON.stringify(newState)
       );
 
@@ -789,7 +783,7 @@ useEffect(() => {
     }
 
     // After successful submission:
-    localStorage.removeItem(`evaluationState-${copyId}`);
+    localStorage.removeItem(`evalState-${copyId}`);
 
     return true;
   } catch (error) {
@@ -816,24 +810,34 @@ useEffect(() => {
     setNavigationPending(true);
   };
 
-  // Add a new effect that responds to navigation trigger
+// Handle navigation after saving state
 useEffect(() => {
   if (navigationPending) {
-    // Force immediate save (both local and server)
     const saveState = () => {
       try {
-        // 1. Save to localStorage immediately
-        const state = {
-          annotations,
-          marks,
-          seconds: getElapsedTime(),
-        };
-        localStorage.setItem(
-          `evaluationState-${copyId}`, 
-          JSON.stringify(state)
-        );
+        // Check if there's meaningful data to save
+        const hasAnnotations = annotations && annotations.length > 0;
+        const hasMarks = marks && Object.keys(marks).length > 0;
         
-        // 2. Navigate after saving - don't use await here as navigate() doesn't return a promise
+        // Only save if we have annotations or marks
+        if (hasAnnotations || hasMarks) {
+          const state = {
+            annotations,
+            marks,
+            seconds: getElapsedTime(),
+          };
+          
+          localStorage.setItem(
+            `evalState-${copyId}`, 
+            JSON.stringify(state)
+          );
+          
+          console.log("State saved to localStorage before navigation:", copyId);
+        } else {
+          console.log("No meaningful data to save before navigation");
+        }
+        
+        // Navigate back regardless of whether we saved or not
         navigate(-1);
       } catch (error) {
         console.error("Error during navigation save:", error);
@@ -916,6 +920,7 @@ useEffect(() => {
             <EvaluationPanel
               copyId={copyId}
               subjectCode={subjectCode}
+              paperId={paperId}
               marks={marks}
               setMarks={setMarks}
               annotations={annotations}

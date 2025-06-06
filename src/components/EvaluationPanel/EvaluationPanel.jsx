@@ -2123,6 +2123,8 @@ const EvaluationPanel = memo(
     handleReset,
     isReevaluation,
     navigate,
+    subjectCode,
+    paperId,
   }) => {
     const [activeTab, setActiveTab] = useState("marking");
     const [showRejectModal, setShowRejectModal] = useState(false);
@@ -2130,13 +2132,13 @@ const EvaluationPanel = memo(
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [paperId, setPaperId] = useState(4); //using hardcoded value for now
     const [showMarksReset, setShowMarksReset] = useState(false);
 
     const [showNAAlert, setShowNAAlert] = useState(false);
     const [naQuestions, setNAQuestions] = useState([]);
 
     const { user } = useAuth();
+
 
     // const pdfUrl = "http://www.pdf995.com/samples/pdf.pdf"; // Example PDF URL, replace with actual data
 

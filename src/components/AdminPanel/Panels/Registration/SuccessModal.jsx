@@ -67,7 +67,7 @@ const SuccessModal = ({
               <p className="text-xs text-gray-500">User ID</p>
               <p className="font-medium">{credentials.uid}</p>
             </div>
-            <div>
+            {/* <div>
               <div className="flex justify-between">
                 <p className="text-xs text-gray-500">Password</p>
                 <button 
@@ -81,7 +81,7 @@ const SuccessModal = ({
               <p className="font-medium">
                 {showPassword ? credentials.password : '••••••••••'}
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
         

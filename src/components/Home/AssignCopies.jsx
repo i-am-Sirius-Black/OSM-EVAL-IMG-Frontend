@@ -47,6 +47,9 @@ export default function AssignCopies({setActiveTab}) {
             : s
         )
       );
+
+
+      removeLocalStorageStartsWith("evalState");
       
       // Show success message
       toast.success(`Successfully assigned copies for ${subject.subjectCode} (${subject.examName})`);
@@ -58,6 +61,20 @@ export default function AssignCopies({setActiveTab}) {
       setAssigningSubject(null);
     }
   };
+
+
+
+
+// Function to remove all localStorage items that start with a specific prefix
+  function removeLocalStorageStartsWith(prefix) {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(prefix)) {
+      localStorage.removeItem(key);
+    }
+  }
+}
+
 
   return (
     <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
