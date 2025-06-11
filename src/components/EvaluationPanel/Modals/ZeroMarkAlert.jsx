@@ -1,6 +1,6 @@
 import React from 'react';
 
-const NAAlertModal = ({ isOpen, onClose, onReview, naQuestions }) => {
+const ZeroMarkAlert = ({ isOpen, onClose, onReview, zeroMarkQuestions }) => {
   if (!isOpen) return null;
   
   return (
@@ -23,14 +23,14 @@ const NAAlertModal = ({ isOpen, onClose, onReview, naQuestions }) => {
               </div>
               <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Questions Marked as "Not Attempted"
+                  Questions Marked with Zero Points
                 </h3>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    The following questions have been marked as "NA" (Not Attempted):
+                    The following questions have been marked with 0 points:
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {naQuestions.map(qNo => (
+                    {zeroMarkQuestions.map(qNo => (
                       <span 
                         key={qNo} 
                         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
@@ -40,7 +40,7 @@ const NAAlertModal = ({ isOpen, onClose, onReview, naQuestions }) => {
                     ))}
                   </div>
                   <p className="mt-3 text-sm text-gray-500">
-                    These questions will not contribute to the total marks. Please review if this is intended.
+                    Please confirm these questions were intentionally given zero marks.
                   </p>
                 </div>
               </div>
@@ -53,7 +53,7 @@ const NAAlertModal = ({ isOpen, onClose, onReview, naQuestions }) => {
               onClick={onClose}
               className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
             >
-              Continue
+              Confirm Zero Marks
             </button>
             <button
               type="button"
@@ -69,4 +69,4 @@ const NAAlertModal = ({ isOpen, onClose, onReview, naQuestions }) => {
   );
 };
 
-export default NAAlertModal;
+export default ZeroMarkAlert;

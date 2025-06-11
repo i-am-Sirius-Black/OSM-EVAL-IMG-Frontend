@@ -87,7 +87,7 @@ export default function AssignCopies({setActiveTab}) {
         </div>
       </div>
 
-      {/* Show active assigned subjects as a summary card */}
+
       {assignedSubjects.some(subject => subject.isCopyAssigned) && (
         <div className="mb-6 p-4 border-l-4 border-blue-500 bg-blue-50 rounded-md">
           <div className="flex">

@@ -1,14 +1,16 @@
-
-// export const QuestionPaperPreview = ({ 
-//   isOpen, 
-//   onClose, 
-//   onConfirm, 
-//   formData, 
-//   questionGroups, 
+// export const QuestionPaperPreview = ({
+//   isOpen,
+//   onClose,
+//   onConfirm,
+//   formData,
+//   questionGroups,
 //   file,
-//   loading 
+//   loading
 // }) => {
 //   if (!isOpen) return null;
+
+import { calculateTotalMarks } from "../helper/calculateTotalMarks";
+import getEffectiveMarks from "../helper/getEffectiveMarks";
 
 //   // Calculate total marks
 //   const calculateTotalMarks = () => {
@@ -60,7 +62,7 @@
 //                 </svg>
 //                 Paper Information
 //               </h3>
-              
+
 //               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 //                 <div className="space-y-3">
 //                   <div>
@@ -77,7 +79,7 @@
 //                     <p className="text-gray-900 font-medium">{formData.paperCode}</p>
 //                   </div>
 //                 </div>
-                
+
 //                 <div className="space-y-3">
 //                   <div>
 //                     <label className="text-sm font-medium text-gray-500">Paper Title</label>
@@ -136,7 +138,7 @@
 //                           </span>
 //                         )}
 //                         <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-//                           {group.subquestions.length === 0 
+//                           {group.subquestions.length === 0
 //                             ? `${group.maxMarks || 0} marks`
 //                             : `${group.subquestions.reduce((sum, sq) => sum + (parseFloat(sq.maxMarks) || 0), 0)} marks total`
 //                           }
@@ -213,7 +215,7 @@
 //           >
 //             Back to Edit
 //           </button>
-          
+
 //           <button
 //             type="button"
 //             onClick={onConfirm}
@@ -242,18 +244,16 @@
 //   );
 // };
 
-
-
 //?V2 simple UI
 
-// export const QuestionPaperPreview = ({ 
-//   isOpen, 
-//   onClose, 
-//   onConfirm, 
-//   formData, 
-//   questionGroups, 
+// export const QuestionPaperPreview = ({
+//   isOpen,
+//   onClose,
+//   onConfirm,
+//   formData,
+//   questionGroups,
 //   file,
-//   loading 
+//   loading
 // }) => {
 //   if (!isOpen) return null;
 
@@ -312,7 +312,7 @@
 //                 </div>
 //               </div>
 //             </div>
-            
+
 //             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
 //               <div>
 //                 <span className="text-gray-500 font-medium">{formData.course}</span>
@@ -362,7 +362,7 @@
 //                     </div>
 //                     <div className="text-right">
 //                       <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
-//                         {group.subquestions.length === 0 
+//                         {group.subquestions.length === 0
 //                           ? `${group.maxMarks || 0} marks`
 //                           : `${group.subquestions.reduce((sum, sq) => sum + (parseFloat(sq.maxMarks) || 0), 0)} marks`
 //                         }
@@ -429,7 +429,7 @@
 //             >
 //               Back to Edit
 //             </button>
-            
+
 //             <button
 //               type="button"
 //               onClick={onConfirm}
@@ -459,38 +459,23 @@
 //   );
 // };
 
-
 //?v3 more Simple UI
 
-export const QuestionPaperPreview = ({ 
-  isOpen, 
-  onClose, 
-  onConfirm, 
-  formData, 
-  questionGroups, 
+export const QuestionPaperPreview = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  formData,
+  questionGroups,
   file,
   selectedPaper,
   loading,
-  confirmTxt="Submit" 
+  confirmTxt = "Submit",
 }) => {
   if (!isOpen) return null;
 
-  // Calculate total marks
-  const calculateTotalMarks = () => {
-    return questionGroups.reduce((total, group) => {
-      if (group.subquestions.length === 0) {
-        return total + (parseFloat(group.maxMarks) || 0);
-      } else {
-        const subquestionsTotal = group.subquestions.reduce(
-          (sum, sq) => sum + (parseFloat(sq.maxMarks) || 0),
-          0
-        );
-        return total + subquestionsTotal;
-      }
-    }, 0);
-  };
-
-  const totalMarks = calculateTotalMarks();
+  // Calculate total marks across all question groups using helper function
+  const totalMarks = calculateTotalMarks(questionGroups);
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-6 z-50">
@@ -499,8 +484,12 @@ export const QuestionPaperPreview = ({
         <div className="bg-white border-b px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Paper Fragmentation Preview</h2>
-              <p className="text-sm text-gray-500">Review and confirm submission</p>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Paper Fragmentation Preview
+              </h2>
+              <p className="text-sm text-gray-500">
+                Review and confirm submission
+              </p>
             </div>
             <div className="flex items-center space-x-3">
               <div className="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-sm font-medium">
@@ -510,8 +499,18 @@ export const QuestionPaperPreview = ({
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -524,20 +523,36 @@ export const QuestionPaperPreview = ({
           <div className="bg-gray-50 rounded-xl p-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <div className="text-gray-500 text-xs uppercase tracking-wide font-medium">Code</div>
-                <div className="text-gray-900 font-medium mt-1">{selectedPaper.paperCode}</div>
+                <div className="text-gray-500 text-xs uppercase tracking-wide font-medium">
+                  Code
+                </div>
+                <div className="text-gray-900 font-medium mt-1">
+                  {selectedPaper.paperCode}
+                </div>
               </div>
               <div>
-                <div className="text-gray-500 text-xs uppercase tracking-wide font-medium">Subject</div>
-                <div className="text-gray-900 font-medium mt-1">{selectedPaper.subject}</div>
+                <div className="text-gray-500 text-xs uppercase tracking-wide font-medium">
+                  Subject
+                </div>
+                <div className="text-gray-900 font-medium mt-1">
+                  {selectedPaper.subject}
+                </div>
               </div>
               <div>
-                <div className="text-gray-500 text-xs uppercase tracking-wide font-medium">Title</div>
-                <div className="text-gray-900 font-medium mt-1">{selectedPaper?.title || "Untitled"}</div>
+                <div className="text-gray-500 text-xs uppercase tracking-wide font-medium">
+                  Title
+                </div>
+                <div className="text-gray-900 font-medium mt-1">
+                  {selectedPaper?.title || "Untitled"}
+                </div>
               </div>
               <div>
-                <div className="text-gray-500 text-xs uppercase tracking-wide font-medium">Max Marks</div>
-                <div className="text-gray-900 font-medium mt-1">{selectedPaper?.maxMarks}</div>
+                <div className="text-gray-500 text-xs uppercase tracking-wide font-medium">
+                  Max Marks
+                </div>
+                <div className="text-gray-900 font-medium mt-1">
+                  {selectedPaper?.maxMarks}
+                </div>
               </div>
             </div>
           </div>
@@ -545,20 +560,37 @@ export const QuestionPaperPreview = ({
           {/* Question Structure */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-medium text-gray-900">Questions ({questionGroups.length})</h3>
+              <h3 className="text-base font-medium text-gray-900">
+                Questions ({questionGroups.length})
+              </h3>
             </div>
 
             <div className="space-y-2">
               {questionGroups.map((group) => (
-                <div key={group.id} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                <div
+                  key={group.id}
+                  className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                >
                   <div className="flex items-center space-x-3">
                     <div className="w-7 h-7 bg-gray-100 text-gray-700 rounded-full flex items-center justify-center text-sm font-medium">
                       {group.questionNumber}
                     </div>
                     <div className="text-sm">
-                      <span className="text-gray-900 font-medium">Question {group.questionNumber}</span>
+                      <span className="text-gray-900 font-medium">
+                        Question {group.questionNumber}
+                      </span>
                       {group.subquestions.length > 0 && (
-                        <span className="text-gray-500 ml-1">• {group.subquestions.length} parts</span>
+                        <span className="text-gray-500 ml-1">
+                          • {group.subquestions.length} parts
+                        </span>
+                      )}
+
+                      {/* Add choice-based indicator */}
+                      {group.choiceBased && group.subquestions.length > 0 && (
+                        <span className="ml-1 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
+                          • Attempt {group.choiceCount} of{" "}
+                          {group.subquestions.length}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -566,17 +598,33 @@ export const QuestionPaperPreview = ({
                     {group.subquestions.length > 0 && (
                       <div className="flex space-x-1">
                         {group.subquestions.map((sq) => (
-                          <span key={sq.id} className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                            <span className="text-gray-700 font-semibold">{sq.questionNumber}</span>: {sq.maxMarks}m
+                          <span
+                            key={sq.id}
+                            className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded"
+                          >
+                            <span className="text-gray-700 font-semibold">
+                              {sq.questionNumber}
+                            </span>
+                            : {sq.maxMarks}m
                           </span>
                         ))}
                       </div>
                     )}
-                    <span className="text-sm font-medium text-gray-900 bg-gray-100 px-2 py-1 rounded">
+                    {/* <span className="text-sm font-medium text-gray-900 bg-gray-100 px-2 py-1 rounded">
                       {group.subquestions.length === 0 
                         ? `${group.maxMarks || 0} marks`
                         : `${group.subquestions.reduce((sum, sq) => sum + (parseFloat(sq.maxMarks) || 0), 0)} marks`
                       }
+                    </span> */}
+                    <span className="text-sm font-medium text-gray-900 bg-gray-100 px-2 py-1 rounded">
+                      {group.subquestions.length === 0
+                        ? `${group.maxMarks || 0} marks`
+                        : group.choiceBased && group.subquestions.length > 0
+                        ? `${getEffectiveMarks(group)} marks`
+                        : `${group.subquestions.reduce(
+                            (sum, sq) => sum + (parseFloat(sq.maxMarks) || 0),
+                            0
+                          )} marks`}
                     </span>
                   </div>
                 </div>
@@ -588,8 +636,18 @@ export const QuestionPaperPreview = ({
           {totalMarks !== parseFloat(formData.maxMarks) ? (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <div className="flex items-center text-sm">
-                <svg className="w-4 h-4 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-4 h-4 text-red-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span className="text-red-800">
                   Marks don't match: {totalMarks} ≠ {formData.maxMarks}
@@ -599,8 +657,18 @@ export const QuestionPaperPreview = ({
           ) : (
             <div className="bg-green-50 border border-green-200 rounded-lg p-3">
               <div className="flex items-center text-sm">
-                <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-4 h-4 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span className="text-green-800">Ready to submit</span>
               </div>
@@ -630,9 +698,24 @@ export const QuestionPaperPreview = ({
             >
               {loading ? (
                 <div className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Uploading...
                 </div>

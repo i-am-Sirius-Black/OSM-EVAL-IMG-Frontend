@@ -382,6 +382,7 @@ import api from "../../../../api/axios";
 import toast from "react-hot-toast";
 import QuestionStructure from "./components/QuestionStructure";
 import { QuestionPaperPreview } from "./components/QuestionPaperPreview";
+import { calculateTotalMarks } from "./helper/calculateTotalMarks";
 
 const QuestionFragmentation = () => {
   const [loading, setLoading] = useState(false);
@@ -422,49 +423,75 @@ const QuestionFragmentation = () => {
     fetchUploadedPapers();
   }, []);
 
-  // Flatten all questions for submission
-  const getAllQuestions = () => {
-    const allQuestions = [];
 
-    questionGroups.forEach((group) => {
-      if (group.subquestions.length === 0) {
-        // Main question with no subquestions
-        allQuestions.push({
-          questionNumber: group.questionNumber,
-          maxMarks: parseFloat(group.maxMarks) || 0,
-        });
+
+// Corrected function for choice-based questions
+const getAllQuestions = () => {
+  const questions = [];
+
+  questionGroups.forEach((group) => {
+    // For questions without subparts - simple case
+    if (group.subquestions.length === 0) {
+      questions.push({
+        q_no: group.questionNumber,
+        max_mark: parseFloat(group.maxMarks) || 0,
+        has_parts: false
+      });
+    } 
+    // For questions with subparts - use our new fields
+    else {
+      // Check if all subquestions have the same mark
+      const allMarksEqual = group.subquestions.every(
+        sq => sq.maxMarks === group.subquestions[0].maxMarks
+      );
+      
+      // Get part mark (if all equal) or null (if variable)
+      const partMark = allMarksEqual 
+        ? parseFloat(group.subquestions[0].maxMarks) || 0
+        : null;
+      
+      // Calculate correct max_mark based on whether it's choice-based
+      let maxMark = 0;
+      
+      if (group.choiceBased) {
+        // For choice-based questions, multiply the choice count by the part mark
+        // If parts have different marks, we can't use a simple calculation
+        if (allMarksEqual) {
+          // If all parts have the same mark, it's simple
+          maxMark = (parseInt(group.choiceCount) || 0) * partMark;
+        } else {
+          // If parts have different marks, we need to sort and take the highest marks
+          const sortedMarks = [...group.subquestions]
+            .map(sq => parseFloat(sq.maxMarks) || 0)
+            .sort((a, b) => b - a); // Sort in descending order
+          
+          // Take the sum of the highest marks up to choiceCount
+          const choiceCount = parseInt(group.choiceCount) || 0;
+          for (let i = 0; i < Math.min(choiceCount, sortedMarks.length); i++) {
+            maxMark += sortedMarks[i];
+          }
+        }
       } else {
-        // Add all subquestions
-        group.subquestions.forEach((sq) => {
-          allQuestions.push({
-            questionNumber: sq.questionNumber,
-            maxMarks: parseFloat(sq.maxMarks) || 0,
-          });
-        });
-      }
-    });
-
-    return allQuestions;
-  };
-
-  // Calculate total marks
-  const calculateTotalMarks = () => {
-    return questionGroups.reduce((total, group) => {
-      if (group.subquestions.length === 0) {
-        // If no subquestions, use the group's marks
-        return total + (parseFloat(group.maxMarks) || 0);
-      } else {
-        // Sum marks of all subquestions
-        const subquestionsTotal = group.subquestions.reduce(
-          (sum, sq) => sum + (parseFloat(sq.maxMarks) || 0),
-          0
+        // For regular questions with parts, sum all part marks
+        maxMark = group.subquestions.reduce(
+          (sum, sq) => sum + (parseFloat(sq.maxMarks) || 0), 0
         );
-        return total + subquestionsTotal;
       }
-    }, 0);
-  };
+      
+      questions.push({
+        q_no: group.questionNumber,
+        max_mark: maxMark,
+        has_parts: true,
+        parts_count: group.subquestions.length,
+        part_marks: partMark,
+        is_choice_based: group.choiceBased || false,
+        choice_attempt_count: group.choiceBased ? (parseInt(group.choiceCount) || 0) : null
+      });
+    }
+  });
 
-  const totalMarks = calculateTotalMarks();
+  return questions;
+}
 
   // Handle selecting a paper for fragmentation
   const handleSelectPaper = async (paperId) => {
@@ -561,61 +588,68 @@ const QuestionFragmentation = () => {
     setShowPreview(true);
   };
 
-  // Final submit from preview
-  const handleFinalSubmit = async () => {
-    const totalMarks = calculateTotalMarks();
-    const maxMarks = parseFloat(formData.maxMarks);
 
-    if (totalMarks !== maxMarks) {
-      toast.error(
-        `Total question marks (${totalMarks}) don't match paper max marks (${maxMarks})`
-      );
-      return;
-    }
+// Simplified final submit function
+const handleFinalSubmit = async () => {
+  const totalMarks = calculateTotalMarks(questionGroups);
+  const maxMarks = parseFloat(formData.maxMarks);
 
-    // Validate question structure again before final submission
-    if (!validateQuestionStructure()) {
-      return;
-    }
+  if (totalMarks !== maxMarks) {
+    toast.error(
+      `Total question marks (${totalMarks.toFixed(1)}) don't match paper max marks (${maxMarks})`
+    );
+    return;
+  }
 
-    try {
-      setLoading(true);
+  // Validate question structure again before final submission
+  if (!validateQuestionStructure()) {
+    return;
+  }
 
-      // Submit the fragmentation data
-      const fragmentationData = {
-        paperId: selectedPaperId,
-        questions: getAllQuestions(),
-        fragmentation: true, // Set fragmentation flag to true
-      };
+  try {
+    setLoading(true);
 
-      await api.post("/api/admin/create-fragmentation", fragmentationData);
+    // Get simplified question data that matches our table structure
+    const questions = getAllQuestions();
 
-      toast.success("Question structure saved successfully");
+    // Submit the fragmentation data
+    const fragmentationData = {
+      paperId: selectedPaperId,
+      questions: questions,
+      fragmentation: true
+    };
 
-      // Reset fragmentation form
-      setSelectedPaperId(null);
-      setQuestionGroups([
-        {
-          id: Date.now(),
-          questionNumber: "1",
-          maxMarks: 10,
-          subquestions: [],
-        },
-      ]);
+    console.log("Submitting fragmentation data:", fragmentationData);
+    
+    await api.post("/api/admin/create-fragmentation", fragmentationData);
 
-      // Refresh the paper list
-      const response = await api.get("/api/admin/papers?unfragmented=true");
-      setUploadedPapers(response.data);
+    toast.success("Question structure saved successfully");
 
-      // Close preview
-      setShowPreview(false);
-    } catch (error) {
-      console.error("Error saving fragmentation:", error);
-      toast.error("Failed to save question structure");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Reset fragmentation form
+    setSelectedPaperId(null);
+    setQuestionGroups([
+      {
+        id: Date.now(),
+        questionNumber: "1",
+        maxMarks: 10,
+        subquestions: [],
+      },
+    ]);
+
+    // Refresh the paper list
+    const response = await api.get("/api/admin/papers?unfragmented=true");
+    setUploadedPapers(response.data);
+
+    // Close preview
+    setShowPreview(false);
+  } catch (error) {
+    console.error("Error saving fragmentation:", error);
+    toast.error("Failed to save question structure");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="bg-white shadow-sm rounded-lg p-6">
