@@ -1,3 +1,7 @@
+
+
+//? Complete Updated UploadPaper Component with Paper Upload Status Check
+
 // import { useState, useEffect } from "react";
 // import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 // import api from "../../../../api/axios";
@@ -51,6 +55,7 @@
 //             SubjectID: subject.subjectId,
 //             Subject: subject.subject,
 //             Course: formData.course,
+//             isPaperUploaded: subject.isPaperUploaded || false, // Include paper upload status
 //           }))
 //         );
 //       } catch (error) {
@@ -64,14 +69,31 @@
 //     fetchSubjects();
 //   }, [formData.course]);
 
+//   console.log("Subjects with paper upload status:", subjects);
+  
+
 //   // Filter subjects when course changes
 //   const filteredSubjects = subjects.filter(
 //     (subject) => subject.Course === formData.course
 //   );
 
+//   // Count subjects with existing papers
+//   const subjectsWithPapers = filteredSubjects.filter(s => s.isPaperUploaded).length;
+//   const totalSubjects = filteredSubjects.length;
+
 //   // Handle form input changes
 //   const handleInputChange = (e) => {
 //     const { name, value } = e.target;
+    
+//     // Prevent selecting subjects that already have papers
+//     if (name === "subject") {
+//       const selectedSubject = subjects.find((s) => s.Subject === value);
+//       if (selectedSubject && selectedSubject.isPaperUploaded) {
+//         toast.error("This subject already has a paper uploaded");
+//         return;
+//       }
+//     }
+    
 //     setFormData({
 //       ...formData,
 //       [name]: value,
@@ -111,6 +133,13 @@
 //       return;
 //     }
 
+//     // Double-check that the selected subject doesn't already have a paper
+//     const selectedSubject = subjects.find((s) => s.Subject === formData.subject);
+//     if (selectedSubject && selectedSubject.isPaperUploaded) {
+//       toast.error("This subject already has a paper uploaded. Please select a different subject.");
+//       return;
+//     }
+
 //     try {
 //       setLoading(true);
 
@@ -127,6 +156,11 @@
 //           headers: { "Content-Type": "multipart/form-data" },
 //         }
 //       );
+
+//       console.log("File upload response path:", fileResponse.data.filePath);
+      
+      
+      
 
 //       // Create the paper record without questions yet
 //       const paperData = {
@@ -173,6 +207,26 @@
 //         </h2>
 //       </div>
 
+//       {/* Paper Upload Status Summary */}
+//       {/* {formData.course && subjectsWithPapers > 0 && (
+//         <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-md">
+//           <div className="flex items-center">
+//             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+//               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+//             </svg>
+//             <h3 className="text-sm font-medium text-blue-800">
+//               Paper Upload Status
+//             </h3>
+//           </div>
+//           <p className="mt-1 text-xs text-blue-600">
+//             {subjectsWithPapers} out of {totalSubjects} subjects already have papers uploaded.
+//             {subjectsWithPapers === totalSubjects && (
+//               <span className="block mt-1 font-medium">All subjects in this course have papers. To add a new paper, select a different course.</span>
+//             )}
+//           </p>
+//         </div>
+//       )} */}
+
 //       <form onSubmit={handleUploadSubmit} className="space-y-6">
 //         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 //           {/* Course Selection */}
@@ -208,24 +262,48 @@
 //             >
 //               <span className="text-red-500">*</span>Subject
 //             </label>
-//             <select
-//               id="subject"
-//               name="subject"
-//               value={formData.subject}
-//               onChange={handleInputChange}
-//               required
-//               disabled={!formData.course}
-//               className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md ${
-//                 !formData.course ? "opacity-50 cursor-not-allowed" : ""
-//               }`}
-//             >
-//               <option value="">Select Subject</option>
-//               {filteredSubjects.map((subject) => (
-//                 <option key={subject.SubjectID} value={subject.Subject}>
-//                   {subject.Subject} ({subject.SubjectID})
-//                 </option>
-//               ))}
-//             </select>
+//             <div className="relative">
+//               <select
+//                 id="subject"
+//                 name="subject"
+//                 value={formData.subject}
+//                 onChange={handleInputChange}
+//                 required
+//                 disabled={!formData.course}
+//                 className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md ${
+//                   !formData.course ? "opacity-50 cursor-not-allowed" : ""
+//                 }`}
+//               >
+//                 <option value="">Select Subject</option>
+//                 {filteredSubjects.map((subject) => (
+//                   <option 
+//                     key={subject.SubjectID} 
+//                     value={subject.Subject}
+//                     disabled={subject.isPaperUploaded}
+//                     className={subject.isPaperUploaded ? "text-gray-400 bg-gray-100" : ""}
+//                   >
+//                     {subject.Subject} ({subject.SubjectID}) 
+//                     {subject.isPaperUploaded ? " - Already Uploaded" : ""}
+//                   </option>
+//                 ))}
+//               </select>
+              
+//               {/* Count indicator for subjects with papers */}
+//               {formData.course && subjectsWithPapers > 0 && (
+//                 <div className="absolute right-10 top-2.5 pointer-events-none">
+//                   <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
+//                     {subjectsWithPapers} with paper
+//                   </span>
+//                 </div>
+//               )}
+//             </div>
+            
+//             {/* Helper text for subjects with papers */}
+//             {formData.course && subjectsWithPapers > 0 && (
+//               <p className="mt-1 text-xs text-gray-500 italic">
+//                 Subjects with existing papers are disabled to prevent duplicates
+//               </p>
+//             )}
 //           </div>
 
 //           {/* Paper Code */}
@@ -343,9 +421,11 @@
 //           </button>
 //           <button
 //             type="submit"
-//             disabled={loading}
+//             disabled={loading || (formData.course && subjectsWithPapers === totalSubjects)}
 //             className={`ml-3 inline-flex justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
-//               loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
+//               loading || (formData.course && subjectsWithPapers === totalSubjects) 
+//                 ? "bg-blue-400 cursor-not-allowed" 
+//                 : "bg-blue-600 hover:bg-blue-700"
 //             } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
 //           >
 //             {loading ? (
@@ -387,7 +467,7 @@
 // export default UploadPaper;
 
 
-//? Complete Updated UploadPaper Component with Paper Upload Status Check
+//?v2- autofill paperCode using subjectId
 
 import { useState, useEffect } from "react";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -442,7 +522,7 @@ const UploadPaper = () => {
             SubjectID: subject.subjectId,
             Subject: subject.subject,
             Course: formData.course,
-            isPaperUploaded: subject.isPaperUploaded || false, // Include paper upload status
+            isPaperUploaded: subject.isPaperUploaded || false,
           }))
         );
       } catch (error) {
@@ -455,9 +535,6 @@ const UploadPaper = () => {
 
     fetchSubjects();
   }, [formData.course]);
-
-  console.log("Subjects with paper upload status:", subjects);
-  
 
   // Filter subjects when course changes
   const filteredSubjects = subjects.filter(
@@ -486,7 +563,7 @@ const UploadPaper = () => {
       [name]: value,
     });
 
-    // Auto-set subjectId when subject is selected
+    // Auto-set subjectId and paperCode when subject is selected
     if (name === "subject") {
       const selectedSubject = subjects.find((s) => s.Subject === value);
       if (selectedSubject) {
@@ -494,6 +571,7 @@ const UploadPaper = () => {
           ...prev,
           subject: value,
           subjectId: selectedSubject.SubjectID,
+          paperCode: selectedSubject.SubjectID, // Auto-fill paperCode with subjectId
         }));
       }
     }
@@ -589,26 +667,6 @@ const UploadPaper = () => {
         </h2>
       </div>
 
-      {/* Paper Upload Status Summary */}
-      {/* {formData.course && subjectsWithPapers > 0 && (
-        <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-md">
-          <div className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-            <h3 className="text-sm font-medium text-blue-800">
-              Paper Upload Status
-            </h3>
-          </div>
-          <p className="mt-1 text-xs text-blue-600">
-            {subjectsWithPapers} out of {totalSubjects} subjects already have papers uploaded.
-            {subjectsWithPapers === totalSubjects && (
-              <span className="block mt-1 font-medium">All subjects in this course have papers. To add a new paper, select a different course.</span>
-            )}
-          </p>
-        </div>
-      )} */}
-
       <form onSubmit={handleUploadSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Course Selection */}
@@ -688,7 +746,7 @@ const UploadPaper = () => {
             )}
           </div>
 
-          {/* Paper Code */}
+          {/* Paper Code - Auto-filled and read-only */}
           <div>
             <label
               htmlFor="paperCode"
@@ -701,10 +759,13 @@ const UploadPaper = () => {
               id="paperCode"
               name="paperCode"
               value={formData.paperCode}
-              onChange={handleInputChange}
-              required
-              className="mt-1 p-1 px-3 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md"
+              readOnly
+              className="mt-1 p-1 px-3 bg-gray-50 border border-gray-300 block w-full shadow-sm sm:text-sm rounded-md cursor-not-allowed"
+              placeholder="Auto-filled when subject is selected"
             />
+            <p className="mt-1 text-xs text-gray-500">
+              Paper code is automatically set to the Subject ID
+            </p>
           </div>
 
           {/* Paper Title */}

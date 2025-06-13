@@ -4210,6 +4210,7 @@ const EvaluationPanel = memo(
                       question={question}
                       marks={marks}
                       setMarks={setMarks}
+                      paperId={paperId} // Added paperId prop
                     />
                   </div>
                 ))

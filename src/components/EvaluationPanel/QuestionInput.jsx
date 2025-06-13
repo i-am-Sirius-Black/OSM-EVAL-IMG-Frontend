@@ -906,13 +906,13 @@ const QuestionInput = ({
   isChoicePart = false,
   choiceAttemptCount = 0,
   isOverLimit = false,
+  paperId, //Added paperId prop
 }) => {
-  const [error, setError] = useState(false);
-
+   const [error, setError] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState({
     number: 1,
-    imageUrl:
-      "https://media.cheggcdn.com/media/a7e/a7e0b2cb-aa80-4954-b88e-ef05e1dd9629/php7dZMd8",
+    paperId: null,
+    partLetter: null,
   });
   const [popupOpen, setPopupOpen] = useState(false);
 
@@ -966,11 +966,16 @@ const QuestionInput = ({
     }
   };
 
-  const handleQuestionClick = (qNo) => {
+const handleQuestionClick = (qNo) => {
+    // Parse question number to determine if it's a part
+    const match = qNo.toString().match(/^(\d+)([a-z]?)$/);
+    const baseNumber = match ? match[1] : qNo;
+    const partLetter = match ? match[2] : null;
+
     setCurrentQuestion({
-      number: qNo,
-      imageUrl:
-        "https://media.cheggcdn.com/media/a7e/a7e0b2cb-aa80-4954-b88e-ef05e1dd9629/php7dZMd8",
+      number: baseNumber,
+      paperId: paperId,
+      partLetter: partLetter || null,
     });
     setPopupOpen(true);
   };
@@ -1053,14 +1058,14 @@ const QuestionInput = ({
         </div>
       </div>
 
-      {/* The popup component */}
+      {/* Updated popup component */}
       <ExamQuestionPopup
         ref={popupRef}
         isOpen={popupOpen}
         onClose={closePopup}
         questionNumber={currentQuestion.number}
-        questionText={currentQuestion.text}
-        questionImageUrl={currentQuestion.imageUrl}
+        paperId={currentQuestion.paperId}
+        partLetter={currentQuestion.partLetter}
         position="right"
       />
     </div>

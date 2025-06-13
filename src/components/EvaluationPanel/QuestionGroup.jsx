@@ -152,7 +152,7 @@
 import React from 'react';
 import QuestionInput from './QuestionInput';
 
-const QuestionGroup = ({ question, marks, setMarks }) => {
+const QuestionGroup = ({ question, marks, setMarks, paperId }) => {
   // For questions without parts, render with consistent UI but as a single question
   if (!question.hasParts) {
     return (
@@ -172,6 +172,7 @@ const QuestionGroup = ({ question, marks, setMarks }) => {
             question={question}
             value={marks[question.qNo] || ""}
             onChange={(value) => setMarks((prev) => ({ ...prev, [question.qNo]: value }))}
+            paperId={paperId}
           />
         </div>
       </div>
@@ -258,6 +259,7 @@ const QuestionGroup = ({ question, marks, setMarks }) => {
             isChoicePart={question.isChoiceBased}
             choiceAttemptCount={question.choiceAttemptCount}
             isOverLimit={tooManyMarked}
+             paperId={paperId}
           />
         ))}
       </div>
